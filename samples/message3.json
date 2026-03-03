@@ -1,0 +1,177 @@
+{
+
+                "id": "72305940-7f01-11ee-8483-0a581d404156",
+
+                "parentInstanceId": "6e9705a2-7f01-11ee-8483-0a581d404156",
+
+                "rootInstanceId": "4beb9891-7f01-11ee-8c50-0a581d403018",
+
+                "processId": "b8804abc-d9a0-45a2-9d32-073d62034490",
+
+                "processDefinitionId": "3ca4f80a-7d3f-11ee-b720-0a581d404089",
+
+                "resourceName": null,
+
+                "rootProcessId": "c83ccbd7-beb0-4446-addf-19cf20049254",
+
+                "processName": "MassTransferProcessUnif",
+
+                "startDate": "2023-11-09T16:11:08.253+03:00",
+
+                "endDate": null,
+
+                "state": 1,
+
+                "businessKey": "f2e19c52-7b2a-4e41-9119-1855a29306f5",
+
+                "version": 5,
+
+                "bamProjectId": null,
+
+                "extIds": null,
+
+                "error": null,
+
+                "moduleId": "psi-5g-fl-mpz1",
+
+                "retryCount": 4,
+
+                "ownerRole": "mass -ui_admin",
+
+                "operation": null,
+
+                "nodeInstances": [
+
+                               {
+
+                                               "id": "e79200c4-98d7-11ee-a71e-0a581d4038a2",
+
+                                               "nodeId": "e18fa089-9b77-4602-bbdd-891756703df7",
+
+                                               "nodeDefinitionId": "e18fa089-9b77-4602-bbdd-891756703df7",
+
+                                               "nodeName": "Ожидание проверки ответа",
+
+                                               "nodeType": "intermediateCatchEvent",
+
+                                               "error": null,
+
+                                               "state": 4,
+
+                                               "calledProcessInstanceIds": null,
+
+                                               "retries": [],
+
+                                               "htmTaskId": null,
+
+                                               "triggerTime": "2023-12-12T13:19:16.556+03:00",
+
+                                               "leaveTime": "2023-12-12T14:19:17.566+03:00",
+
+                                               "triggerNodeInstanceId": null,
+
+                                               "creationOrder": 2375
+
+                               },
+
+                               {
+
+                                               "id": "49f08609-98e0-11ee-a71e-0a581d4038a2",
+
+                                               "nodeId": "eff25b19-74d0-460c-8ae0-a462e42f2294",
+
+                                               "nodeDefinitionId": "eff25b19-74d0-460c-8ae0-a462e42f2294",
+
+                                               "nodeName": "Проверка ответа по Unif",
+
+                                               "nodeType": "restTask",
+
+                                               "error": null,
+
+                                               "state": 0,
+
+                                               "calledProcessInstanceIds": null,
+
+                                               "retries": [],
+
+                                               "htmTaskId": null,
+
+                                               "triggerTime": "2023-12-12T14:19:17.566+03:00",
+
+                                               "leaveTime": null,
+
+                                               "triggerNodeInstanceId": null,
+
+                                               "creationOrder": 2377
+
+                               },
+
+                               {
+
+                                               "id": "49f08608-98e0-11ee-a71e-0a581d4038a2",
+
+                                               "nodeId": "e455a12c-db28-44ca-a7b2-3e8bd8acad26",
+
+                                               "nodeDefinitionId": "e455a12c-db28-44ca-a7b2-3e8bd8acad26",
+
+                                               "nodeName": "Перед проверкой ответа",
+
+                                               "nodeType": "exclusiveGateway",
+
+                                               "error": null,
+
+                                               "state": 4,
+
+                                               "calledProcessInstanceIds": null,
+
+                                               "retries": [],
+
+                                               "htmTaskId": null,
+
+                                               "triggerTime": "2023-12-12T14:19:17.566+03:00",
+
+                                               "leaveTime": "2023-12-12T14:19:17.566+03:00",
+
+                                               "triggerNodeInstanceId": null,
+
+                                               "creationOrder": 2376
+
+                               }
+
+                ],
+
+                "variables": {
+
+                               "durationUnifResult": "PT1H",
+
+                               "unifMetadata": "38_5278_1",
+
+                               "globalInstanceId": "f2e19c52-7b2a-4e41-9119-1855a29306f5",
+
+                               "externalIds": null,
+
+                               "unifObjectId": "7a674aad-3253-441a-bbc6-562a00d01211",
+
+                               "unifPageSize": 1000,
+
+                               "tracingHeaders": {
+
+                                               "x-request-id": "218d0117-abf7-93fe-80e6-8ae167f25b69",
+
+                                               "x-b3-parentspanid": "fb1f84852b1be211",
+
+                                               "x-b3-spanid": "81a399984c824aeb",
+
+                                               "x-b3-traceid": "ba99f51e58b7410e6e43fb887988b1dc",
+
+                                               "x-b3-sampled": "1"
+
+                               },
+
+                               "rosterId": "92aaace9-26e4-4c59-ad04-a4731b053be9"
+
+                },
+
+                "contextSize": 15197
+
+}

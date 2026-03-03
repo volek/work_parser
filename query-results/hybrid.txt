@@ -1,0 +1,1820 @@
+=== Strategy: hybrid ===
+
+
+----- query/hybrid/q01_select_all.sql -----
+time="2026-03-02T19:12:31+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:12:37.235 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:12:38.324 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:12:38.424 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:12:38.426 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:12:38.427 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:12:38.439 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:12:38.456 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:12:39.343 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 01: Select all processes with basic info
+SELECT 
+    process_id,
+    process_name,
+    state,
+    __time as start_date,
+    module_id
+FROM process_hybrid
+ORDER BY __time DESC
+LIMIT 1
+16:12:42.118 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:12:43.014 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{process_id=ift-5g-fl-cc_ea5f68c5-feca-4869-8679-93e01b2acb04, process_name=uvskRemainderReturnCR-Service, state=2, start_date=2026-03-02T13:58:29.135Z, module_id=psi-fl-cc}
+{process_id=psi-fl-cc_8af16537-67d9-4236-b98d-a125163d1915, process_name=tappeal_p2p_receiver, state=2, start_date=2026-03-02T11:03:30.259Z, module_id=psi-fl-5g}
+{process_id=psi-5g-fl-mpz1_6c7579dd-039a-4fbc-b94f-5d550e227ad4, process_name=MassTransferProcessUnif, state=1, start_date=2026-03-02T08:39:29.580Z, module_id=psi-fl-5g}
+{process_id=ift-5g-rb_f9f2feda-e263-4b4e-abe0-224306aa40b4, process_name=tappeal_p2p_receiver, state=1, start_date=2026-03-02T08:12:30.363Z, module_id=psi-5g-fl-mpz1}
+{process_id=psi-fl-cc_f5127bf9-ca16-47c8-97f7-6cfb75a8e84a, process_name=tappeal_p2p_receiver, state=1, start_date=2026-03-02T07:31:30.585Z, module_id=ift-5g-fl-cc}
+{process_id=ift-5g-rb_8e3ee38a-0f41-4f1c-add4-2ddf96d26ce4, process_name=uvskStupidsEarlyRehrenment_sub, state=1, start_date=2026-03-02T06:59:29.450Z, module_id=psi-fl-5g}
+{process_id=ift-5g-rb_9a5be65b-2d04-4519-819a-a1b3ff1c4aa7, process_name=uvskStupidsEarlyRehrenment_sub, state=1, start_date=2026-03-02T06:43:29.295Z, module_id=ift-5g-rb}
+{process_id=psi-5g-fl-mpz1_52dc05a7-f66a-49a5-854c-44d9047500e2, process_name=uvskFraudFin_front, state=1, start_date=2026-03-02T04:21:30.177Z, module_id=psi-5g-fl-mpz1}
+{process_id=psi-5g-fl-mpz1_09c352dc-7735-423c-96c1-675ea5559276, process_name=MassTransferProcessUnif, state=2, start_date=2026-03-02T04:08:29.530Z, module_id=psi-5g-fl-mpz1}
+{process_id=ift-5g-rb_679419a8-7c89-4032-83bc-2dcb2f35a853, process_name=uvskRemainderReturnCR-Service, state=2, start_date=2026-03-02T02:34:29.257Z, module_id=psi-fl-cc}
+{process_id=psi-5g-fl-mpz1_4377cb54-ad44-4d48-88f7-305309070717, process_name=MassTransferProcessUnif, state=2, start_date=2026-03-02T02:00:29.491Z, module_id=psi-5g-fl-mpz1}
+{process_id=ift-5g-rb_282da1f1-ecb8-4145-8d25-dfca80eb3ed6, process_name=uvskRemainderReturnCR-Service, state=1, start_date=2026-03-02T01:49:29.179Z, module_id=ift-5g-fl-cc}
+{process_id=ift-5g-rb_ae2d0a58-9e41-4a8e-a562-4c22a72e76c4, process_name=uvskFraudFin_front, state=2, start_date=2026-03-02T01:02:30.077Z, module_id=ift-5g-fl-cc}
+{process_id=psi-5g-fl-mpz1_c3c95215-e24f-4426-8737-477731739cd6, process_name=MassTransferProcessUnif, state=1, start_date=2026-03-02T01:02:29.777Z, module_id=psi-5g-fl-mpz1}
+{process_id=ift-5g-rb_f32b491d-6da1-4370-83dd-705ae6a25f5a, process_name=uvskStupidsEarlyRehrenment_sub, state=1, start_date=2026-03-02T00:49:29.415Z, module_id=psi-fl-5g}
+{process_id=psi-fl-cc_0dc5a4ff-7647-4b86-b2cb-8cc0fc02187e, process_name=tappeal_p2p_receiver, state=2, start_date=2026-03-01T23:51:30.506Z, module_id=psi-5g-fl-mpz1}
+{process_id=psi-fl-5g_264f86d4-4256-4519-8f7e-255c7a23b93e, process_name=uvskRemainderReturnCR-Service, state=1, start_date=2026-03-01T20:27:29.216Z, module_id=psi-fl-cc}
+{process_id=ift-5g-rb_70f8959c-7899-4bbe-98c1-f420a5a379b8, process_name=uvskStupidsEarlyRehrenment_sub, state=1, start_date=2026-03-01T18:56:29.336Z, module_id=psi-5g-fl-mpz1}
+{process_id=psi-fl-cc_cd1dcaba-737e-4015-a670-f83fee48989e, process_name=uvskFraudFin_front, state=0, start_date=2026-03-01T17:41:30.026Z, module_id=psi-fl-5g}
+{process_id=psi-5g-fl-mpz1_22027b76-1504-4d7d-b2b3-47429f695d72, process_name=MassTransferProcessUnif, state=2, start_date=2026-03-01T17:31:29.958Z, module_id=ift-5g-rb}
+{process_id=psi-fl-cc_4c615ea9-8ede-4fd7-b00c-8f035f8a8f10, process_name=uvskFraudFin_front, state=2, start_date=2026-03-01T17:06:30.213Z, module_id=psi-fl-5g}
+{process_id=psi-fl-5g_69f5e187-a7f1-4747-944b-4f1d635e0660, process_name=uvskRemainderReturnCR-Service, state=2, start_date=2026-03-01T17:02:23.372Z, module_id=ift-5g-fl-cc}
+{process_id=ift-5g-rb_fa294fe0-4a46-41c9-a6ad-7598df251a81, process_name=tappeal_p2p_receiver, state=0, start_date=2026-03-01T15:55:30.419Z, module_id=psi-fl-5g}
+{process_id=psi-5g-fl-mpz1_a63d1b0b-bfe0-4fc3-b899-17193fa5eb6f, process_name=uvskFraudFin_front, state=2, start_date=2026-03-01T14:43:30.116Z, module_id=ift-5g-fl-cc}
+{process_id=ift-5g-rb_badb1804-3165-4162-8120-0e0ab8fe2035, process_name=uvskStupidsEarlyRehrenment_sub, state=1, start_date=2026-03-01T14:25:29.377Z, module_id=ift-5g-rb}
+16:12:43.361 [main] INFO  Application - Query returned 25 rows
+
+----- query/hybrid/q02_select_by_process_name.sql -----
+time="2026-03-02T19:12:45+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:12:50.465 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:12:51.890 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:12:51.957 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:12:51.959 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:12:51.967 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:12:51.970 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:12:51.971 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:12:53.235 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 02: Filter by process name
+SELECT 
+    process_id,
+    process_name,
+    var_caseId,
+    var_epkId,
+    __time as start_date
+FROM process_hybrid
+WHERE process_name = 'uvskRemainderRet
+16:12:56.290 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:12:58.347 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{process_id=ift-5g-fl-cc_ea5f68c5-feca-4869-8679-93e01b2acb04, process_name=uvskRemainderReturnCR-Service, var_caseId=1d4d6aff-76e6-4a77-aded-473b4f197866, var_epkId=1847668451336176919, start_date=2026-03-02T13:58:29.135Z}
+{process_id=ift-5g-rb_679419a8-7c89-4032-83bc-2dcb2f35a853, process_name=uvskRemainderReturnCR-Service, var_caseId=313f45a6-65df-4c41-b78b-5bc02331c9d7, var_epkId=1719863718195456987, start_date=2026-03-02T02:34:29.257Z}
+{process_id=ift-5g-rb_282da1f1-ecb8-4145-8d25-dfca80eb3ed6, process_name=uvskRemainderReturnCR-Service, var_caseId=af8776af-d6c9-46e9-b419-e40ae484a507, var_epkId=1845141606826449015, start_date=2026-03-02T01:49:29.179Z}
+{process_id=psi-fl-5g_264f86d4-4256-4519-8f7e-255c7a23b93e, process_name=uvskRemainderReturnCR-Service, var_caseId=cc4b5c29-3cc3-46ba-9764-11d31af0875b, var_epkId=1004877928979401063, start_date=2026-03-01T20:27:29.216Z}
+{process_id=psi-fl-5g_69f5e187-a7f1-4747-944b-4f1d635e0660, process_name=uvskRemainderReturnCR-Service, var_caseId=40bb21c7-eec8-4b62-9c15-6c2c67789415, var_epkId=1949416462595644518, start_date=2026-03-01T17:02:23.372Z}
+16:12:58.991 [main] INFO  Application - Query returned 5 rows
+
+----- query/hybrid/q03_filter_by_state.sql -----
+time="2026-03-02T19:13:02+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:13:13.964 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:13:15.794 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:13:15.854 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:13:15.868 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:13:15.870 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:13:15.888 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:13:15.896 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:13:17.210 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 03: Filter by process state
+SELECT 
+    process_id,
+    process_name,
+    state,
+    var_status,
+    end_date
+FROM process_hybrid
+WHERE state = 2
+ORDER BY __time DESC
+LIMIT 50
+
+16:13:20.229 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:13:22.349 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{process_id=ift-5g-fl-cc_ea5f68c5-feca-4869-8679-93e01b2acb04, process_name=uvskRemainderReturnCR-Service, state=2, var_status=CANCELLED, end_date=1772462009135}
+{process_id=psi-fl-cc_8af16537-67d9-4236-b98d-a125163d1915, process_name=tappeal_p2p_receiver, state=2, var_status=PENDING, end_date=1772450490259}
+{process_id=psi-5g-fl-mpz1_09c352dc-7735-423c-96c1-675ea5559276, process_name=MassTransferProcessUnif, state=2, var_status=COMPLETED, end_date=1772424689530}
+{process_id=ift-5g-rb_679419a8-7c89-4032-83bc-2dcb2f35a853, process_name=uvskRemainderReturnCR-Service, state=2, var_status=CANCELLED, end_date=1772422049257}
+{process_id=psi-5g-fl-mpz1_4377cb54-ad44-4d48-88f7-305309070717, process_name=MassTransferProcessUnif, state=2, var_status=REJECTED, end_date=1772418569491}
+{process_id=ift-5g-rb_ae2d0a58-9e41-4a8e-a562-4c22a72e76c4, process_name=uvskFraudFin_front, state=2, var_status=CANCELLED, end_date=1772416890077}
+{process_id=psi-fl-cc_0dc5a4ff-7647-4b86-b2cb-8cc0fc02187e, process_name=tappeal_p2p_receiver, state=2, var_status=IN_PROGRESS, end_date=1772409570506}
+{process_id=psi-5g-fl-mpz1_22027b76-1504-4d7d-b2b3-47429f695d72, process_name=MassTransferProcessUnif, state=2, var_status=PENDING, end_date=1772388149958}
+{process_id=psi-fl-cc_4c615ea9-8ede-4fd7-b00c-8f035f8a8f10, process_name=uvskFraudFin_front, state=2, var_status=CANCELLED, end_date=1772386410213}
+{process_id=psi-fl-5g_69f5e187-a7f1-4747-944b-4f1d635e0660, process_name=uvskRemainderReturnCR-Service, state=2, var_status=PENDING, end_date=1772384603372}
+{process_id=psi-5g-fl-mpz1_a63d1b0b-bfe0-4fc3-b899-17193fa5eb6f, process_name=uvskFraudFin_front, state=2, var_status=IN_PROGRESS, end_date=1772379630116}
+16:13:22.964 [main] INFO  Application - Query returned 11 rows
+
+----- query/hybrid/q04_filter_by_epkId.sql -----
+time="2026-03-02T19:13:29+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:13:38.194 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:13:40.245 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:13:40.323 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:13:40.325 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:13:40.327 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:13:40.328 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:13:40.329 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:13:41.364 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 04: Find process by epkId
+SELECT 
+    process_id,
+    process_name,
+    var_epkId,
+    var_fio,
+    var_ucpId,
+    __time as start_date
+FROM process_hybrid
+WHERE var_epkId = '1234567
+16:13:45.603 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:13:47.274 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+16:13:47.797 [main] INFO  Application - Query returned 0 rows
+
+----- query/hybrid/q05_filter_by_caseId.sql -----
+time="2026-03-02T19:13:51+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:13:58.962 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:14:00.722 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:14:00.799 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:14:00.801 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:14:00.803 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:14:00.804 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:14:00.805 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:14:01.886 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 05: Find process by caseId
+SELECT 
+    process_id,
+    process_name,
+    var_caseId,
+    var_staticData_casePublicId,
+    var_status
+FROM process_hybrid
+WHERE var_caseId IS NOT NULL
+
+16:14:05.099 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:14:06.655 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+16:14:07.195 [main] INFO  Application - Query returned 0 rows
+
+----- query/hybrid/q06_filter_last_hour.sql -----
+time="2026-03-02T19:14:12+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:14:20.521 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:14:22.238 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:14:22.320 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:14:22.334 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:14:22.335 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:14:22.336 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:14:22.338 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:14:23.619 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 06: Processes started in the last hour
+SELECT 
+    process_id,
+    process_name,
+    state,
+    __time as start_date
+FROM process_hybrid
+WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '1
+16:14:26.699 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:14:28.439 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+16:14:29.326 [main] INFO  Application - Query returned 0 rows
+
+----- query/hybrid/q07_filter_last_24h.sql -----
+time="2026-03-02T19:14:35+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:14:43.909 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:14:45.933 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:14:46.017 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:14:46.020 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:14:46.022 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:14:46.026 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:14:46.029 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:14:47.356 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 07: Processes in the last 24 hours
+SELECT 
+    process_id,
+    process_name,
+    state,
+    module_id,
+    __time as start_date
+FROM process_hybrid
+WHERE __time >= CURRENT_TIMESTAMP -
+16:14:50.466 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:14:51.873 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{process_id=ift-5g-fl-cc_ea5f68c5-feca-4869-8679-93e01b2acb04, process_name=uvskRemainderReturnCR-Service, state=2, module_id=psi-fl-cc, start_date=2026-03-02T13:58:29.135Z}
+{process_id=psi-fl-cc_8af16537-67d9-4236-b98d-a125163d1915, process_name=tappeal_p2p_receiver, state=2, module_id=psi-fl-5g, start_date=2026-03-02T11:03:30.259Z}
+{process_id=psi-5g-fl-mpz1_6c7579dd-039a-4fbc-b94f-5d550e227ad4, process_name=MassTransferProcessUnif, state=1, module_id=psi-fl-5g, start_date=2026-03-02T08:39:29.580Z}
+{process_id=ift-5g-rb_f9f2feda-e263-4b4e-abe0-224306aa40b4, process_name=tappeal_p2p_receiver, state=1, module_id=psi-5g-fl-mpz1, start_date=2026-03-02T08:12:30.363Z}
+{process_id=psi-fl-cc_f5127bf9-ca16-47c8-97f7-6cfb75a8e84a, process_name=tappeal_p2p_receiver, state=1, module_id=ift-5g-fl-cc, start_date=2026-03-02T07:31:30.585Z}
+{process_id=ift-5g-rb_8e3ee38a-0f41-4f1c-add4-2ddf96d26ce4, process_name=uvskStupidsEarlyRehrenment_sub, state=1, module_id=psi-fl-5g, start_date=2026-03-02T06:59:29.450Z}
+{process_id=ift-5g-rb_9a5be65b-2d04-4519-819a-a1b3ff1c4aa7, process_name=uvskStupidsEarlyRehrenment_sub, state=1, module_id=ift-5g-rb, start_date=2026-03-02T06:43:29.295Z}
+{process_id=psi-5g-fl-mpz1_52dc05a7-f66a-49a5-854c-44d9047500e2, process_name=uvskFraudFin_front, state=1, module_id=psi-5g-fl-mpz1, start_date=2026-03-02T04:21:30.177Z}
+{process_id=psi-5g-fl-mpz1_09c352dc-7735-423c-96c1-675ea5559276, process_name=MassTransferProcessUnif, state=2, module_id=psi-5g-fl-mpz1, start_date=2026-03-02T04:08:29.530Z}
+{process_id=ift-5g-rb_679419a8-7c89-4032-83bc-2dcb2f35a853, process_name=uvskRemainderReturnCR-Service, state=2, module_id=psi-fl-cc, start_date=2026-03-02T02:34:29.257Z}
+{process_id=psi-5g-fl-mpz1_4377cb54-ad44-4d48-88f7-305309070717, process_name=MassTransferProcessUnif, state=2, module_id=psi-5g-fl-mpz1, start_date=2026-03-02T02:00:29.491Z}
+{process_id=ift-5g-rb_282da1f1-ecb8-4145-8d25-dfca80eb3ed6, process_name=uvskRemainderReturnCR-Service, state=1, module_id=ift-5g-fl-cc, start_date=2026-03-02T01:49:29.179Z}
+{process_id=ift-5g-rb_ae2d0a58-9e41-4a8e-a562-4c22a72e76c4, process_name=uvskFraudFin_front, state=2, module_id=ift-5g-fl-cc, start_date=2026-03-02T01:02:30.077Z}
+{process_id=psi-5g-fl-mpz1_c3c95215-e24f-4426-8737-477731739cd6, process_name=MassTransferProcessUnif, state=1, module_id=psi-5g-fl-mpz1, start_date=2026-03-02T01:02:29.777Z}
+{process_id=ift-5g-rb_f32b491d-6da1-4370-83dd-705ae6a25f5a, process_name=uvskStupidsEarlyRehrenment_sub, state=1, module_id=psi-fl-5g, start_date=2026-03-02T00:49:29.415Z}
+{process_id=psi-fl-cc_0dc5a4ff-7647-4b86-b2cb-8cc0fc02187e, process_name=tappeal_p2p_receiver, state=2, module_id=psi-5g-fl-mpz1, start_date=2026-03-01T23:51:30.506Z}
+{process_id=psi-fl-5g_264f86d4-4256-4519-8f7e-255c7a23b93e, process_name=uvskRemainderReturnCR-Service, state=1, module_id=psi-fl-cc, start_date=2026-03-01T20:27:29.216Z}
+{process_id=ift-5g-rb_70f8959c-7899-4bbe-98c1-f420a5a379b8, process_name=uvskStupidsEarlyRehrenment_sub, state=1, module_id=psi-5g-fl-mpz1, start_date=2026-03-01T18:56:29.336Z}
+{process_id=psi-fl-cc_cd1dcaba-737e-4015-a670-f83fee48989e, process_name=uvskFraudFin_front, state=0, module_id=psi-fl-5g, start_date=2026-03-01T17:41:30.026Z}
+{process_id=psi-5g-fl-mpz1_22027b76-1504-4d7d-b2b3-47429f695d72, process_name=MassTransferProcessUnif, state=2, module_id=ift-5g-rb, start_date=2026-03-01T17:31:29.958Z}
+{process_id=psi-fl-cc_4c615ea9-8ede-4fd7-b00c-8f035f8a8f10, process_name=uvskFraudFin_front, state=2, module_id=psi-fl-5g, start_date=2026-03-01T17:06:30.213Z}
+{process_id=psi-fl-5g_69f5e187-a7f1-4747-944b-4f1d635e0660, process_name=uvskRemainderReturnCR-Service, state=2, module_id=ift-5g-fl-cc, start_date=2026-03-01T17:02:23.372Z}
+16:14:52.450 [main] INFO  Application - Query returned 22 rows
+
+----- query/hybrid/q08_filter_time_range.sql -----
+time="2026-03-02T19:14:55+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:15:04.987 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:15:06.812 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:15:06.915 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:15:06.927 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:15:06.928 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:15:06.930 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:15:06.931 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:15:08.097 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 08: Processes in specific time range
+SELECT 
+    process_id,
+    process_name,
+    __time as start_date,
+    end_date
+FROM process_hybrid
+WHERE __time >= TIMESTAMP '2024-07-01 00:00:00
+16:15:10.932 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:15:12.381 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+16:15:12.903 [main] INFO  Application - Query returned 0 rows
+
+----- query/hybrid/q09_count_by_process_name.sql -----
+time="2026-03-02T19:15:15+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:15:23.090 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:15:25.431 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:15:25.504 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:15:25.506 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:15:25.507 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:15:25.509 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:15:25.510 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:15:26.792 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 09: Count processes by name
+SELECT 
+    process_name,
+    COUNT(*) as process_count
+FROM process_hybrid
+GROUP BY process_name
+ORDER BY process_count DESC
+
+16:15:30.283 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:15:32.138 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{process_name=MassTransferProcessUnif, process_count=5}
+{process_name=tappeal_p2p_receiver, process_count=5}
+{process_name=uvskFraudFin_front, process_count=5}
+{process_name=uvskRemainderReturnCR-Service, process_count=5}
+{process_name=uvskStupidsEarlyRehrenment_sub, process_count=5}
+16:15:32.964 [main] INFO  Application - Query returned 5 rows
+
+----- query/hybrid/q10_count_by_state.sql -----
+time="2026-03-02T19:15:35+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:15:41.259 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:15:42.543 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:15:42.640 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:15:42.644 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:15:42.646 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:15:42.652 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:15:42.654 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:15:43.420 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 10: Count processes by state
+SELECT 
+    state,
+    COUNT(*) as cnt_total,
+    CASE state
+        WHEN 0 THEN 'WAITING'
+        WHEN 1 THEN 'RUNNING'
+        WHEN 2 THEN 'COMPLETED'
+ 
+16:15:46.454 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:15:48.260 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{state=0, cnt_total=2, state_name=WAITING}
+{state=1, cnt_total=12, state_name=RUNNING}
+{state=2, cnt_total=11, state_name=COMPLETED}
+16:15:48.879 [main] INFO  Application - Query returned 3 rows
+
+----- query/hybrid/q11_count_by_module.sql -----
+time="2026-03-02T19:15:52+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:15:59.056 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:16:00.503 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:16:00.597 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:16:00.602 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:16:00.606 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:16:00.609 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:16:00.610 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:16:01.281 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 11: Count processes by module
+SELECT 
+    module_id,
+    COUNT(*) as cnt_total
+FROM process_hybrid
+WHERE module_id IS NOT NULL
+GROUP BY module_id
+ORDER BY cnt_total DESC
+
+16:16:03.598 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:16:04.922 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{module_id=psi-5g-fl-mpz1, cnt_total=7}
+{module_id=psi-fl-5g, cnt_total=7}
+{module_id=ift-5g-fl-cc, cnt_total=5}
+{module_id=ift-5g-rb, cnt_total=3}
+{module_id=psi-fl-cc, cnt_total=3}
+16:16:05.352 [main] INFO  Application - Query returned 5 rows
+
+----- query/hybrid/q12_count_hourly.sql -----
+time="2026-03-02T19:16:09+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:16:16.926 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:16:18.933 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:16:19.037 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:16:19.043 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:16:19.057 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:16:19.062 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:16:19.065 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:16:20.175 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 12: Hourly process count
+SELECT 
+    TIME_FLOOR(__time, 'PT1H') as hour_ts,
+    COUNT(*) as cnt_total
+FROM process_hybrid
+WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '24' HOUR
+GROUP BY
+16:16:23.131 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:16:24.528 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{hour_ts=2026-03-01T17:00:00.000Z, cnt_total=4}
+{hour_ts=2026-03-01T18:00:00.000Z, cnt_total=1}
+{hour_ts=2026-03-01T20:00:00.000Z, cnt_total=1}
+{hour_ts=2026-03-01T23:00:00.000Z, cnt_total=1}
+{hour_ts=2026-03-02T00:00:00.000Z, cnt_total=1}
+{hour_ts=2026-03-02T01:00:00.000Z, cnt_total=3}
+{hour_ts=2026-03-02T02:00:00.000Z, cnt_total=2}
+{hour_ts=2026-03-02T04:00:00.000Z, cnt_total=2}
+{hour_ts=2026-03-02T06:00:00.000Z, cnt_total=2}
+{hour_ts=2026-03-02T07:00:00.000Z, cnt_total=1}
+{hour_ts=2026-03-02T08:00:00.000Z, cnt_total=2}
+{hour_ts=2026-03-02T11:00:00.000Z, cnt_total=1}
+{hour_ts=2026-03-02T13:00:00.000Z, cnt_total=1}
+16:16:25.147 [main] INFO  Application - Query returned 13 rows
+
+----- query/hybrid/q13_count_daily.sql -----
+time="2026-03-02T19:16:28+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:16:34.977 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:16:37.262 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:16:37.370 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:16:37.376 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:16:37.378 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:16:37.380 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:16:37.389 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:16:39.061 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 13: Daily process count
+SELECT 
+    TIME_FLOOR(__time, 'P1D') as day_ts,
+    process_name,
+    COUNT(*) as cnt_total
+FROM process_hybrid
+WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '7'
+16:16:42.894 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:16:45.812 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{day_ts=2026-03-01T00:00:00.000Z, process_name=uvskFraudFin_front, cnt_total=3}
+{day_ts=2026-03-01T00:00:00.000Z, process_name=tappeal_p2p_receiver, cnt_total=2}
+{day_ts=2026-03-01T00:00:00.000Z, process_name=uvskRemainderReturnCR-Service, cnt_total=2}
+{day_ts=2026-03-01T00:00:00.000Z, process_name=uvskStupidsEarlyRehrenment_sub, cnt_total=2}
+{day_ts=2026-03-01T00:00:00.000Z, process_name=MassTransferProcessUnif, cnt_total=1}
+{day_ts=2026-03-02T00:00:00.000Z, process_name=MassTransferProcessUnif, cnt_total=4}
+{day_ts=2026-03-02T00:00:00.000Z, process_name=tappeal_p2p_receiver, cnt_total=3}
+{day_ts=2026-03-02T00:00:00.000Z, process_name=uvskRemainderReturnCR-Service, cnt_total=3}
+{day_ts=2026-03-02T00:00:00.000Z, process_name=uvskStupidsEarlyRehrenment_sub, cnt_total=3}
+{day_ts=2026-03-02T00:00:00.000Z, process_name=uvskFraudFin_front, cnt_total=2}
+16:16:46.743 [main] INFO  Application - Query returned 10 rows
+
+----- query/hybrid/q14_filter_by_fio.sql -----
+time="2026-03-02T19:16:52+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:17:00.841 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:17:03.447 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:17:03.614 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:17:03.618 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:17:03.632 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:17:03.634 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:17:03.636 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:17:05.757 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 14: Find by FIO (client name)
+SELECT 
+    process_id,
+    process_name,
+    var_fio,
+    var_epkId,
+    __time as start_date
+FROM process_hybrid
+WHERE var_fio LIKE '%╨Ш╨Т╨Р╨Э╨Ю╨Т%'
+ORDER B
+16:17:10.174 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:17:12.073 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{process_id=psi-fl-cc_8af16537-67d9-4236-b98d-a125163d1915, process_name=tappeal_p2p_receiver, var_fio=╨Ъ╨Ю╨Ч╨Ы╨Ю╨Т ╨Э╨Ш╨Ъ╨Ю╨Ы╨Р╨Щ ╨Ш╨Т╨Р╨Э╨Ю╨Т╨Э╨Р, var_epkId=1312238392644949820, start_date=2026-03-02T11:03:30.259Z}
+{process_id=ift-5g-rb_f9f2feda-e263-4b4e-abe0-224306aa40b4, process_name=tappeal_p2p_receiver, var_fio=╨Ш╨Т╨Р╨Э╨Ю╨Т ╨Р╨Ы╨Х╨Ъ╨б╨Р╨Э╨Ф╨а ╨Ф╨Ь╨Ш╨в╨а╨Ш╨Х╨Т╨Э╨Р, var_epkId=1426686650730617763, start_date=2026-03-02T08:12:30.363Z}
+{process_id=ift-5g-rb_9a5be65b-2d04-4519-819a-a1b3ff1c4aa7, process_name=uvskStupidsEarlyRehrenment_sub, var_fio=╨Ш╨Т╨Р╨Э╨Ю╨Т ╨Ш╨Т╨Р╨Э ╨Ь╨Р╨Ъ╨б╨Ш╨Ь╨Ю╨Т╨Ш╨з, var_epkId=1578144867544317361, start_date=2026-03-02T06:43:29.295Z}
+{process_id=ift-5g-rb_679419a8-7c89-4032-83bc-2dcb2f35a853, process_name=uvskRemainderReturnCR-Service, var_fio=╨Ш╨Т╨Р╨Э╨Ю╨Т ╨Ь╨Р╨а╨Ш╨п ╨Р╨Э╨Ф╨а╨Х╨Х╨Т╨Ш╨з, var_epkId=1719863718195456987, start_date=2026-03-02T02:34:29.257Z}
+{process_id=ift-5g-rb_282da1f1-ecb8-4145-8d25-dfca80eb3ed6, process_name=uvskRemainderReturnCR-Service, var_fio=╨Я╨Р╨Т╨Ы╨Ю╨Т ╨Ф╨Х╨Э╨Ш╨б ╨Ш╨Т╨Р╨Э╨Ю╨Т╨Э╨Р, var_epkId=1845141606826449015, start_date=2026-03-02T01:49:29.179Z}
+{process_id=psi-5g-fl-mpz1_c3c95215-e24f-4426-8737-477731739cd6, process_name=MassTransferProcessUnif, var_fio=╨Т╨Ю╨а╨Ю╨С╨м╨Х╨Т ╨Р╨Ы╨Х╨Ъ╨б╨Р╨Э╨Ф╨а ╨Ш╨Т╨Р╨Э╨Ю╨Т╨Ш╨з, var_epkId=1153876002100362386, start_date=2026-03-02T01:02:29.777Z}
+{process_id=ift-5g-rb_f32b491d-6da1-4370-83dd-705ae6a25f5a, process_name=uvskStupidsEarlyRehrenment_sub, var_fio=╨Ш╨Т╨Р╨Э╨Ю╨Т ╨Ъ╨Ю╨Э╨б╨в╨Р╨Э╨в╨Ш╨Э ╨Ф╨Ь╨Ш╨в╨а╨Ш╨Х╨Т╨Ш╨з, var_epkId=1206583762753466164, start_date=2026-03-02T00:49:29.415Z}
+{process_id=psi-fl-5g_264f86d4-4256-4519-8f7e-255c7a23b93e, process_name=uvskRemainderReturnCR-Service, var_fio=╨Ш╨Т╨Р╨Э╨Ю╨Т ╨Х╨Т╨У╨Х╨Э╨Ш╨Щ ╨Р╨Ы╨Х╨Ъ╨б╨Р╨Э╨Ф╨а╨Ю╨Т╨Ш╨з, var_epkId=1004877928979401063, start_date=2026-03-01T20:27:29.216Z}
+{process_id=psi-fl-cc_cd1dcaba-737e-4015-a670-f83fee48989e, process_name=uvskFraudFin_front, var_fio=╨б╨Ю╨Ъ╨Ю╨Ы╨Ю╨Т ╨Ь╨Р╨а╨Ш╨п ╨Ш╨Т╨Р╨Э╨Ю╨Т╨Ш╨з, var_epkId=1243703939889051430, start_date=2026-03-01T17:41:30.026Z}
+{process_id=psi-fl-cc_4c615ea9-8ede-4fd7-b00c-8f035f8a8f10, process_name=uvskFraudFin_front, var_fio=╨в╨Р╨а╨Р╨б╨Ю╨Т ╨Ь╨Р╨а╨Ш╨п ╨Ш╨Т╨Р╨Э╨Ю╨Т╨Ш╨з, var_epkId=1442201349798891977, start_date=2026-03-01T17:06:30.213Z}
+{process_id=ift-5g-rb_fa294fe0-4a46-41c9-a6ad-7598df251a81, process_name=tappeal_p2p_receiver, var_fio=╨Э╨Ю╨Т╨Ш╨Ъ╨Ю╨Т ╨Ь╨Р╨Ъ╨б╨Ш╨Ь ╨Ш╨Т╨Р╨Э╨Ю╨Т╨Э╨Р, var_epkId=1038276726142823068, start_date=2026-03-01T15:55:30.419Z}
+16:17:12.879 [main] INFO  Application - Query returned 11 rows
+
+----- query/hybrid/q15_filter_by_status.sql -----
+time="2026-03-02T19:17:23+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:17:35.782 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:17:37.700 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:17:37.799 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:17:37.802 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:17:37.808 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:17:37.816 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:17:37.817 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:17:39.009 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 15: Filter by status variable
+SELECT 
+    process_id,
+    process_name,
+    var_status,
+    var_staticData_statusCode,
+    __time
+FROM process_hybrid
+WHERE var_status = 'IN_PROGRESS'
+16:17:42.430 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:17:43.846 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{process_id=psi-fl-cc_0dc5a4ff-7647-4b86-b2cb-8cc0fc02187e, process_name=tappeal_p2p_receiver, var_status=IN_PROGRESS, var_staticData_statusCode=REJECTED, __time=2026-03-01T23:51:30.506Z}
+{process_id=psi-fl-5g_264f86d4-4256-4519-8f7e-255c7a23b93e, process_name=uvskRemainderReturnCR-Service, var_status=IN_PROGRESS, var_staticData_statusCode=REJECTED, __time=2026-03-01T20:27:29.216Z}
+{process_id=psi-fl-cc_cd1dcaba-737e-4015-a670-f83fee48989e, process_name=uvskFraudFin_front, var_status=IN_PROGRESS, var_staticData_statusCode=REJECTED, __time=2026-03-01T17:41:30.026Z}
+{process_id=psi-5g-fl-mpz1_a63d1b0b-bfe0-4fc3-b899-17193fa5eb6f, process_name=uvskFraudFin_front, var_status=IN_PROGRESS, var_staticData_statusCode=IN_PROGRESS, __time=2026-03-01T14:43:30.116Z}
+16:17:44.446 [main] INFO  Application - Query returned 4 rows
+
+----- query/hybrid/q16_filter_by_interaction_id.sql -----
+time="2026-03-02T19:17:50+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:18:10.729 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:18:13.842 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:18:13.968 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:18:13.971 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:18:13.973 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:18:13.999 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:18:14.001 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:18:15.492 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 16: Find by interaction ID
+SELECT 
+    process_id,
+    process_name,
+    var_interactionId,
+    var_interactionDate,
+    var_caseId
+FROM process_hybrid
+WHERE var_interactionId LIKE '2
+16:18:21.061 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:18:22.555 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+16:18:23.081 [main] INFO  Application - Query returned 0 rows
+
+----- query/hybrid/q17_json_extract_node_name.sql -----
+time="2026-03-02T19:18:28+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:18:38.309 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:18:40.239 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:18:40.342 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:18:40.344 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:18:40.346 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:18:40.347 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:18:40.348 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:18:41.810 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 17: Extract first node name from JSON
+SELECT 
+    process_id,
+    process_name,
+    JSON_VALUE(node_instances_json, '$[0].nodeName') as first_node_name,
+    JSON_VALUE(node_instances_jso
+16:18:45.485 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:18:47.009 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+16:18:47.506 [main] INFO  Application - Query returned 0 rows
+
+----- query/hybrid/q18_json_extract_last_node.sql -----
+time="2026-03-02T19:18:54+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:19:05.796 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:19:07.841 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:19:08.003 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:19:08.006 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:19:08.019 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:19:08.022 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:19:08.023 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:19:09.589 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 18: Extract last node info from JSON
+SELECT 
+    process_id,
+    process_name,
+    state,
+    JSON_VALUE(node_instances_json, '$[-1].nodeName') as last_node_name,
+    JSON_VALUE(node_in
+16:19:13.197 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:19:15.356 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{process_id=ift-5g-rb_badb1804-3165-4162-8120-0e0ab8fe2035, process_name=uvskStupidsEarlyRehrenment_sub, state=1, last_node_name=null, last_node_state=null}
+{process_id=ift-5g-rb_70f8959c-7899-4bbe-98c1-f420a5a379b8, process_name=uvskStupidsEarlyRehrenment_sub, state=1, last_node_name=null, last_node_state=null}
+{process_id=psi-fl-5g_264f86d4-4256-4519-8f7e-255c7a23b93e, process_name=uvskRemainderReturnCR-Service, state=1, last_node_name=null, last_node_state=null}
+{process_id=ift-5g-rb_f32b491d-6da1-4370-83dd-705ae6a25f5a, process_name=uvskStupidsEarlyRehrenment_sub, state=1, last_node_name=null, last_node_state=null}
+{process_id=psi-5g-fl-mpz1_c3c95215-e24f-4426-8737-477731739cd6, process_name=MassTransferProcessUnif, state=1, last_node_name=null, last_node_state=null}
+{process_id=ift-5g-rb_282da1f1-ecb8-4145-8d25-dfca80eb3ed6, process_name=uvskRemainderReturnCR-Service, state=1, last_node_name=null, last_node_state=null}
+{process_id=psi-5g-fl-mpz1_52dc05a7-f66a-49a5-854c-44d9047500e2, process_name=uvskFraudFin_front, state=1, last_node_name=null, last_node_state=null}
+{process_id=ift-5g-rb_9a5be65b-2d04-4519-819a-a1b3ff1c4aa7, process_name=uvskStupidsEarlyRehrenment_sub, state=1, last_node_name=null, last_node_state=null}
+{process_id=ift-5g-rb_8e3ee38a-0f41-4f1c-add4-2ddf96d26ce4, process_name=uvskStupidsEarlyRehrenment_sub, state=1, last_node_name=null, last_node_state=null}
+{process_id=psi-fl-cc_f5127bf9-ca16-47c8-97f7-6cfb75a8e84a, process_name=tappeal_p2p_receiver, state=1, last_node_name=null, last_node_state=null}
+{process_id=ift-5g-rb_f9f2feda-e263-4b4e-abe0-224306aa40b4, process_name=tappeal_p2p_receiver, state=1, last_node_name=null, last_node_state=null}
+{process_id=psi-5g-fl-mpz1_6c7579dd-039a-4fbc-b94f-5d550e227ad4, process_name=MassTransferProcessUnif, state=1, last_node_name=null, last_node_state=null}
+16:19:15.990 [main] INFO  Application - Query returned 12 rows
+
+----- query/hybrid/q19_json_count_nodes.sql -----
+time="2026-03-02T19:19:20+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:19:34.545 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:19:36.534 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:19:36.623 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:19:36.627 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:19:36.645 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:19:36.662 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:19:36.665 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:19:37.922 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 19: Count node instances per process
+SELECT 
+    process_id,
+    process_name,
+    CASE WHEN node_instances_json IS NOT NULL THEN 1 ELSE 0 END as has_nodes
+FROM process_hybrid
+WHERE nod
+16:19:41.397 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:19:43.238 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{process_id=ift-5g-fl-cc_ea5f68c5-feca-4869-8679-93e01b2acb04, process_name=uvskRemainderReturnCR-Service, has_nodes=1}
+{process_id=psi-fl-cc_8af16537-67d9-4236-b98d-a125163d1915, process_name=tappeal_p2p_receiver, has_nodes=1}
+{process_id=psi-5g-fl-mpz1_6c7579dd-039a-4fbc-b94f-5d550e227ad4, process_name=MassTransferProcessUnif, has_nodes=1}
+{process_id=ift-5g-rb_f9f2feda-e263-4b4e-abe0-224306aa40b4, process_name=tappeal_p2p_receiver, has_nodes=1}
+{process_id=psi-fl-cc_f5127bf9-ca16-47c8-97f7-6cfb75a8e84a, process_name=tappeal_p2p_receiver, has_nodes=1}
+{process_id=ift-5g-rb_8e3ee38a-0f41-4f1c-add4-2ddf96d26ce4, process_name=uvskStupidsEarlyRehrenment_sub, has_nodes=1}
+{process_id=ift-5g-rb_9a5be65b-2d04-4519-819a-a1b3ff1c4aa7, process_name=uvskStupidsEarlyRehrenment_sub, has_nodes=1}
+{process_id=psi-5g-fl-mpz1_52dc05a7-f66a-49a5-854c-44d9047500e2, process_name=uvskFraudFin_front, has_nodes=1}
+{process_id=psi-5g-fl-mpz1_09c352dc-7735-423c-96c1-675ea5559276, process_name=MassTransferProcessUnif, has_nodes=1}
+{process_id=ift-5g-rb_679419a8-7c89-4032-83bc-2dcb2f35a853, process_name=uvskRemainderReturnCR-Service, has_nodes=1}
+{process_id=psi-5g-fl-mpz1_4377cb54-ad44-4d48-88f7-305309070717, process_name=MassTransferProcessUnif, has_nodes=1}
+{process_id=ift-5g-rb_282da1f1-ecb8-4145-8d25-dfca80eb3ed6, process_name=uvskRemainderReturnCR-Service, has_nodes=1}
+{process_id=ift-5g-rb_ae2d0a58-9e41-4a8e-a562-4c22a72e76c4, process_name=uvskFraudFin_front, has_nodes=1}
+{process_id=psi-5g-fl-mpz1_c3c95215-e24f-4426-8737-477731739cd6, process_name=MassTransferProcessUnif, has_nodes=1}
+{process_id=ift-5g-rb_f32b491d-6da1-4370-83dd-705ae6a25f5a, process_name=uvskStupidsEarlyRehrenment_sub, has_nodes=1}
+{process_id=psi-fl-cc_0dc5a4ff-7647-4b86-b2cb-8cc0fc02187e, process_name=tappeal_p2p_receiver, has_nodes=1}
+{process_id=psi-fl-5g_264f86d4-4256-4519-8f7e-255c7a23b93e, process_name=uvskRemainderReturnCR-Service, has_nodes=1}
+{process_id=ift-5g-rb_70f8959c-7899-4bbe-98c1-f420a5a379b8, process_name=uvskStupidsEarlyRehrenment_sub, has_nodes=1}
+{process_id=psi-fl-cc_cd1dcaba-737e-4015-a670-f83fee48989e, process_name=uvskFraudFin_front, has_nodes=1}
+{process_id=psi-5g-fl-mpz1_22027b76-1504-4d7d-b2b3-47429f695d72, process_name=MassTransferProcessUnif, has_nodes=1}
+{process_id=psi-fl-cc_4c615ea9-8ede-4fd7-b00c-8f035f8a8f10, process_name=uvskFraudFin_front, has_nodes=1}
+{process_id=psi-fl-5g_69f5e187-a7f1-4747-944b-4f1d635e0660, process_name=uvskRemainderReturnCR-Service, has_nodes=1}
+{process_id=ift-5g-rb_fa294fe0-4a46-41c9-a6ad-7598df251a81, process_name=tappeal_p2p_receiver, has_nodes=1}
+{process_id=psi-5g-fl-mpz1_a63d1b0b-bfe0-4fc3-b899-17193fa5eb6f, process_name=uvskFraudFin_front, has_nodes=1}
+{process_id=ift-5g-rb_badb1804-3165-4162-8120-0e0ab8fe2035, process_name=uvskStupidsEarlyRehrenment_sub, has_nodes=1}
+16:19:43.812 [main] INFO  Application - Query returned 25 rows
+
+----- query/hybrid/q20_filter_running_processes.sql -----
+time="2026-03-02T19:19:46+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:19:53.504 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:19:55.249 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:19:55.332 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:19:55.336 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:19:55.338 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:19:55.339 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:19:55.340 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:19:56.345 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 20: Running processes with details
+SELECT 
+    process_id,
+    process_name,
+    var_caseId,
+    var_epkId,
+    var_fio,
+    __time as start_date,
+    TIMESTAMPDIFF(MINUTE, __time, CU
+16:20:00.288 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:20:01.907 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{process_id=ift-5g-rb_badb1804-3165-4162-8120-0e0ab8fe2035, process_name=uvskStupidsEarlyRehrenment_sub, var_caseId=fdc61bc2-dce7-4b6a-88db-e984966736b0, var_epkId=1964149291905977291, var_fio=╨Т╨Ю╨Ы╨Ъ╨Ю╨Т ╨Э╨Ш╨Ъ╨Ю╨Ы╨Р╨Щ ╨Ф╨Ь╨Ш╨в╨а╨Ш╨Х╨Т╨Ш╨з, start_date=2026-03-01T14:25:29.377Z, running_minutes=1554}
+{process_id=ift-5g-rb_70f8959c-7899-4bbe-98c1-f420a5a379b8, process_name=uvskStupidsEarlyRehrenment_sub, var_caseId=6b8d5ea6-e74b-4615-891f-6b0f751cf4b8, var_epkId=1926850920434214000, var_fio=╨С╨Х╨Ы╨Ю╨Т ╨Ф╨Х╨Э╨Ш╨б ╨Р╨Э╨Ф╨а╨Х╨Х╨Т╨Э╨Р, start_date=2026-03-01T18:56:29.336Z, running_minutes=1283}
+{process_id=psi-fl-5g_264f86d4-4256-4519-8f7e-255c7a23b93e, process_name=uvskRemainderReturnCR-Service, var_caseId=cc4b5c29-3cc3-46ba-9764-11d31af0875b, var_epkId=1004877928979401063, var_fio=╨Ш╨Т╨Р╨Э╨Ю╨Т ╨Х╨Т╨У╨Х╨Э╨Ш╨Щ ╨Р╨Ы╨Х╨Ъ╨б╨Р╨Э╨Ф╨а╨Ю╨Т╨Ш╨з, start_date=2026-03-01T20:27:29.216Z, running_minutes=1192}
+{process_id=ift-5g-rb_f32b491d-6da1-4370-83dd-705ae6a25f5a, process_name=uvskStupidsEarlyRehrenment_sub, var_caseId=21751a91-4481-4222-af0a-e9250db4d9a6, var_epkId=1206583762753466164, var_fio=╨Ш╨Т╨Р╨Э╨Ю╨Т ╨Ъ╨Ю╨Э╨б╨в╨Р╨Э╨в╨Ш╨Э ╨Ф╨Ь╨Ш╨в╨а╨Ш╨Х╨Т╨Ш╨з, start_date=2026-03-02T00:49:29.415Z, running_minutes=930}
+{process_id=psi-5g-fl-mpz1_c3c95215-e24f-4426-8737-477731739cd6, process_name=MassTransferProcessUnif, var_caseId=a4adab1e-9709-43ec-b4c0-31e108b6bcff, var_epkId=1153876002100362386, var_fio=╨Т╨Ю╨а╨Ю╨С╨м╨Х╨Т ╨Р╨Ы╨Х╨Ъ╨б╨Р╨Э╨Ф╨а ╨Ш╨Т╨Р╨Э╨Ю╨Т╨Ш╨з, start_date=2026-03-02T01:02:29.777Z, running_minutes=917}
+{process_id=ift-5g-rb_282da1f1-ecb8-4145-8d25-dfca80eb3ed6, process_name=uvskRemainderReturnCR-Service, var_caseId=af8776af-d6c9-46e9-b419-e40ae484a507, var_epkId=1845141606826449015, var_fio=╨Я╨Р╨Т╨Ы╨Ю╨Т ╨Ф╨Х╨Э╨Ш╨б ╨Ш╨Т╨Р╨Э╨Ю╨Т╨Э╨Р, start_date=2026-03-02T01:49:29.179Z, running_minutes=870}
+{process_id=psi-5g-fl-mpz1_52dc05a7-f66a-49a5-854c-44d9047500e2, process_name=uvskFraudFin_front, var_caseId=71e70b41-2c91-4601-8406-a4e602c41817, var_epkId=1273249744263995388, var_fio=╨С╨Ю╨У╨Ф╨Р╨Э╨Ю╨Т ╨Ъ╨Ю╨Э╨б╨в╨Р╨Э╨в╨Ш╨Э ╨Т╨Ы╨Р╨Ф╨Ш╨Ь╨Ш╨а╨Ю╨Т╨Ш╨з, start_date=2026-03-02T04:21:30.177Z, running_minutes=718}
+{process_id=ift-5g-rb_9a5be65b-2d04-4519-819a-a1b3ff1c4aa7, process_name=uvskStupidsEarlyRehrenment_sub, var_caseId=e0f8079f-4e8a-425c-ac3e-7bef31f62d7b, var_epkId=1578144867544317361, var_fio=╨Ш╨Т╨Р╨Э╨Ю╨Т ╨Ш╨Т╨Р╨Э ╨Ь╨Р╨Ъ╨б╨Ш╨Ь╨Ю╨Т╨Ш╨з, start_date=2026-03-02T06:43:29.295Z, running_minutes=576}
+{process_id=ift-5g-rb_8e3ee38a-0f41-4f1c-add4-2ddf96d26ce4, process_name=uvskStupidsEarlyRehrenment_sub, var_caseId=9303acda-d119-41c1-81d1-6f69710ad4fb, var_epkId=1581610522297663526, var_fio=╨Ъ╨Ю╨Ь╨Р╨а╨Ю╨Т ╨Ъ╨Ю╨Э╨б╨в╨Р╨Э╨в╨Ш╨Э ╨Ф╨Ь╨Ш╨в╨а╨Ш╨Х╨Т╨Ш╨з, start_date=2026-03-02T06:59:29.450Z, running_minutes=560}
+{process_id=psi-fl-cc_f5127bf9-ca16-47c8-97f7-6cfb75a8e84a, process_name=tappeal_p2p_receiver, var_caseId=be30f433-d1cf-4a43-8612-d3f4ea3b7adc, var_epkId=1546707393092684401, var_fio=╨Э╨Ю╨Т╨Ш╨Ъ╨Ю╨Т ╨Я╨Р╨Т╨Х╨Ы ╨Р╨Ы╨Х╨Ъ╨б╨Х╨Х╨Т╨Ш╨з, start_date=2026-03-02T07:31:30.585Z, running_minutes=528}
+{process_id=ift-5g-rb_f9f2feda-e263-4b4e-abe0-224306aa40b4, process_name=tappeal_p2p_receiver, var_caseId=1cdbf113-c7d8-495d-a1f7-1640d92c438c, var_epkId=1426686650730617763, var_fio=╨Ш╨Т╨Р╨Э╨Ю╨Т ╨Р╨Ы╨Х╨Ъ╨б╨Р╨Э╨Ф╨а ╨Ф╨Ь╨Ш╨в╨а╨Ш╨Х╨Т╨Э╨Р, start_date=2026-03-02T08:12:30.363Z, running_minutes=487}
+{process_id=psi-5g-fl-mpz1_6c7579dd-039a-4fbc-b94f-5d550e227ad4, process_name=MassTransferProcessUnif, var_caseId=f35eb5fa-0498-43fe-8746-dfedc5dae88c, var_epkId=1427526433174869083, var_fio=╨б╨Ш╨Ф╨Ю╨а╨Ю╨Т ╨Ю╨Ы╨м╨У╨Р ╨Ь╨Р╨Ъ╨б╨Ш╨Ь╨Ю╨Т╨Ш╨з, start_date=2026-03-02T08:39:29.580Z, running_minutes=460}
+16:20:02.763 [main] INFO  Application - Query returned 12 rows
+
+----- query/hybrid/q21_failed_processes.sql -----
+time="2026-03-02T19:20:05+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:20:11.559 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:20:13.617 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:20:13.728 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:20:13.731 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:20:13.741 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:20:13.744 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:20:13.754 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:20:14.927 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 21: Failed processes with errors
+SELECT 
+    process_id,
+    process_name,
+    error,
+    __time as start_date,
+    end_date
+FROM process_hybrid
+WHERE state = 3 
+   OR error IS NOT N
+16:20:18.141 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:20:19.560 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+16:20:20.050 [main] INFO  Application - Query returned 0 rows
+
+----- query/hybrid/q21_failed_with_errors.sql -----
+time="2026-03-02T19:20:27+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:20:40.807 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:20:43.835 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:20:43.984 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:20:43.996 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:20:44.014 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:20:44.021 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:20:44.022 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:20:45.832 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 21: Failed processes with errors
+SELECT 
+    process_id,
+    process_name,
+    error,
+    __time as start_date,
+    end_date
+FROM process_hybrid
+WHERE state = 3 
+   OR error IS NOT N
+16:20:49.862 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:20:52.009 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+16:20:52.733 [main] INFO  Application - Query returned 0 rows
+
+----- query/hybrid/q22_filter_by_clientEpkId.sql -----
+time="2026-03-02T19:20:56+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:21:05.112 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:21:06.974 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:21:07.061 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:21:07.073 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:21:07.075 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:21:07.076 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:21:07.077 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:21:08.353 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 22: Filter by staticData.clientEpkId
+SELECT 
+    process_id,
+    process_name,
+    var_staticData_clientEpkId,
+    var_staticData_casePublicId,
+    var_fio
+FROM process_hybrid
+WHERE v
+16:21:12.034 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:21:13.331 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+16:21:13.777 [main] INFO  Application - Query returned 0 rows
+
+----- query/hybrid/q23_casePublicId_filter.sql -----
+time="2026-03-02T19:21:17+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:21:26.431 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:21:28.983 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:21:29.075 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:21:29.086 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:21:29.087 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:21:29.088 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:21:29.089 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:21:30.783 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 23: Filter by casePublicId
+SELECT 
+    process_id,
+    process_name,
+    var_staticData_casePublicId,
+    var_staticData_statusCode,
+    __time
+FROM process_hybrid
+WHERE var_staticDat
+16:21:35.298 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:21:37.354 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+16:21:38.288 [main] INFO  Application - Query returned 0 rows
+
+----- query/hybrid/q23_filter_by_casePublicId.sql -----
+time="2026-03-02T19:21:42+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:21:51.173 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:21:52.699 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:21:52.774 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:21:52.779 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:21:52.781 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:21:52.783 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:21:52.784 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:21:53.504 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 23: Filter by casePublicId
+SELECT 
+    process_id,
+    process_name,
+    var_staticData_casePublicId,
+    var_staticData_statusCode,
+    __time
+FROM process_hybrid
+WHERE var_staticDat
+16:21:56.580 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:21:58.389 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+16:21:59.199 [main] INFO  Application - Query returned 0 rows
+
+----- query/hybrid/q24_filter_by_ucpId.sql -----
+time="2026-03-02T19:22:02+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:22:08.059 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:22:09.454 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:22:09.526 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:22:09.528 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:22:09.532 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:22:09.541 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:22:09.547 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:22:10.566 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 24: Filter by ucpId
+SELECT 
+    process_id,
+    process_name,
+    var_ucpId,
+    var_epkData_ucpId,
+    var_fio
+FROM process_hybrid
+WHERE var_ucpId = '1713880429303593444'
+   OR var_
+16:22:13.011 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:22:14.269 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+16:22:14.706 [main] INFO  Application - Query returned 0 rows
+
+----- query/hybrid/q24_ucpId_filter.sql -----
+time="2026-03-02T19:22:16+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:22:22.252 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:22:23.416 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:22:23.495 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:22:23.497 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:22:23.499 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:22:23.504 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:22:23.507 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:22:24.684 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 24: Filter by ucpId
+SELECT 
+    process_id,
+    process_name,
+    var_ucpId,
+    var_epkData_ucpId,
+    var_fio
+FROM process_hybrid
+WHERE var_ucpId = '1713880429303593444'
+   OR var_
+16:22:26.948 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:22:28.144 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+16:22:28.470 [main] INFO  Application - Query returned 0 rows
+
+----- query/hybrid/q25_filter_by_traceId.sql -----
+time="2026-03-02T19:22:30+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:22:39.375 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:22:42.498 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:22:42.613 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:22:42.617 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:22:42.619 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:22:42.621 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:22:42.634 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:22:44.125 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 25: Filter by tracing headers
+SELECT 
+    process_id,
+    process_name,
+    var_tracingHeaders_traceId,
+    var_tracingHeaders_requestId,
+    __time
+FROM process_hybrid
+WHERE var_trac
+16:22:47.639 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:22:49.164 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{process_id=ift-5g-rb_badb1804-3165-4162-8120-0e0ab8fe2035, process_name=uvskStupidsEarlyRehrenment_sub, var_tracingHeaders_traceId=6219705f14a262d68d7b0199c6396f19, var_tracingHeaders_requestId=5dee9647-20bf-41ec-8803-cbf300000af5, __time=2026-03-01T14:25:29.377Z}
+{process_id=psi-5g-fl-mpz1_a63d1b0b-bfe0-4fc3-b899-17193fa5eb6f, process_name=uvskFraudFin_front, var_tracingHeaders_traceId=937ffe85bf0a8f5daf8853a0ec7cd579, var_tracingHeaders_requestId=d6f1178b-54b0-4a57-9a8f-3a690064caee, __time=2026-03-01T14:43:30.116Z}
+{process_id=ift-5g-rb_fa294fe0-4a46-41c9-a6ad-7598df251a81, process_name=tappeal_p2p_receiver, var_tracingHeaders_traceId=dacba7aedd1ae082fc218ff4ac9dbd86, var_tracingHeaders_requestId=9052a89d-e4b8-437d-a851-087f18f642d6, __time=2026-03-01T15:55:30.419Z}
+{process_id=psi-fl-5g_69f5e187-a7f1-4747-944b-4f1d635e0660, process_name=uvskRemainderReturnCR-Service, var_tracingHeaders_traceId=f30a3e059cf563d88782a265311e69d5, var_tracingHeaders_requestId=3b34296d-4b4b-4f98-8954-68d9a860d4c6, __time=2026-03-01T17:02:23.372Z}
+{process_id=psi-fl-cc_4c615ea9-8ede-4fd7-b00c-8f035f8a8f10, process_name=uvskFraudFin_front, var_tracingHeaders_traceId=8e83bd91bce16a9af12c1988ec7d5a9c, var_tracingHeaders_requestId=9c0ac2d6-3302-49e3-8c4f-f415afc92559, __time=2026-03-01T17:06:30.213Z}
+{process_id=psi-5g-fl-mpz1_22027b76-1504-4d7d-b2b3-47429f695d72, process_name=MassTransferProcessUnif, var_tracingHeaders_traceId=7a3220ec7bde1bc83911e4bfa2ecff8f, var_tracingHeaders_requestId=f647ddf4-36da-45ac-81d6-1bd6fad22e87, __time=2026-03-01T17:31:29.958Z}
+{process_id=psi-fl-cc_cd1dcaba-737e-4015-a670-f83fee48989e, process_name=uvskFraudFin_front, var_tracingHeaders_traceId=4cdd65b80e80c24f608ee3fbd3f6c872, var_tracingHeaders_requestId=3baf55b8-33fc-484a-9910-43104eb57db3, __time=2026-03-01T17:41:30.026Z}
+{process_id=ift-5g-rb_70f8959c-7899-4bbe-98c1-f420a5a379b8, process_name=uvskStupidsEarlyRehrenment_sub, var_tracingHeaders_traceId=1e768f16739b5ffb81effc242e5d361d, var_tracingHeaders_requestId=63ef7cbf-3878-4bfd-831e-fc2fcecffb77, __time=2026-03-01T18:56:29.336Z}
+{process_id=psi-fl-5g_264f86d4-4256-4519-8f7e-255c7a23b93e, process_name=uvskRemainderReturnCR-Service, var_tracingHeaders_traceId=dce3e8cf1e3b7d406a57a6d58ddad12b, var_tracingHeaders_requestId=b7b3763e-04be-4f26-9c70-e5d2a5566851, __time=2026-03-01T20:27:29.216Z}
+{process_id=psi-fl-cc_0dc5a4ff-7647-4b86-b2cb-8cc0fc02187e, process_name=tappeal_p2p_receiver, var_tracingHeaders_traceId=01e6164d89ed520f6d81930b4ad51f39, var_tracingHeaders_requestId=af320aad-4dc5-4ec3-8bb3-6d299ad6af96, __time=2026-03-01T23:51:30.506Z}
+{process_id=ift-5g-rb_f32b491d-6da1-4370-83dd-705ae6a25f5a, process_name=uvskStupidsEarlyRehrenment_sub, var_tracingHeaders_traceId=02c7ff9bb728a6c5eddec8fe025c3aac, var_tracingHeaders_requestId=1285b3c9-4002-4e1f-ac2b-37e6059ff74b, __time=2026-03-02T00:49:29.415Z}
+{process_id=psi-5g-fl-mpz1_c3c95215-e24f-4426-8737-477731739cd6, process_name=MassTransferProcessUnif, var_tracingHeaders_traceId=bd843ae729be0441d188e5db7c1c4eb5, var_tracingHeaders_requestId=226bb116-f18a-4a3e-b569-e6860e0e76b1, __time=2026-03-02T01:02:29.777Z}
+{process_id=ift-5g-rb_ae2d0a58-9e41-4a8e-a562-4c22a72e76c4, process_name=uvskFraudFin_front, var_tracingHeaders_traceId=6ec2abcfada13362b3600f5af09487aa, var_tracingHeaders_requestId=32b73d5a-b701-44c9-890a-e19801b76d17, __time=2026-03-02T01:02:30.077Z}
+{process_id=ift-5g-rb_282da1f1-ecb8-4145-8d25-dfca80eb3ed6, process_name=uvskRemainderReturnCR-Service, var_tracingHeaders_traceId=e98a87f93d6f9c139e172df458bc4782, var_tracingHeaders_requestId=e6bc9ed6-96dc-4c3a-8afe-f3efd3981a8f, __time=2026-03-02T01:49:29.179Z}
+{process_id=psi-5g-fl-mpz1_4377cb54-ad44-4d48-88f7-305309070717, process_name=MassTransferProcessUnif, var_tracingHeaders_traceId=d5be011e0eb1199d1ec88a2e5f578e04, var_tracingHeaders_requestId=30c77044-d85a-40de-afea-d94113ac50d8, __time=2026-03-02T02:00:29.491Z}
+{process_id=ift-5g-rb_679419a8-7c89-4032-83bc-2dcb2f35a853, process_name=uvskRemainderReturnCR-Service, var_tracingHeaders_traceId=5d19c34234d669cc2d1c0735e950c41b, var_tracingHeaders_requestId=e2b510ff-2067-4eeb-8bcc-f106b75fe2f7, __time=2026-03-02T02:34:29.257Z}
+{process_id=psi-5g-fl-mpz1_09c352dc-7735-423c-96c1-675ea5559276, process_name=MassTransferProcessUnif, var_tracingHeaders_traceId=fc7d2a8b33c74e26ea44ccfd75ca46bb, var_tracingHeaders_requestId=bc3bd02b-6dc5-4af4-8d9e-320cd483f2ae, __time=2026-03-02T04:08:29.530Z}
+{process_id=psi-5g-fl-mpz1_52dc05a7-f66a-49a5-854c-44d9047500e2, process_name=uvskFraudFin_front, var_tracingHeaders_traceId=7e936c6192d80ba3ab759d0172345660, var_tracingHeaders_requestId=f40722b3-3c42-46ca-8a96-1cf12fa16a5e, __time=2026-03-02T04:21:30.177Z}
+{process_id=ift-5g-rb_9a5be65b-2d04-4519-819a-a1b3ff1c4aa7, process_name=uvskStupidsEarlyRehrenment_sub, var_tracingHeaders_traceId=e4eff84ad600282782adef69ba0d2e9c, var_tracingHeaders_requestId=c2951489-a2cb-44a3-8881-5b615f82cbe6, __time=2026-03-02T06:43:29.295Z}
+{process_id=ift-5g-rb_8e3ee38a-0f41-4f1c-add4-2ddf96d26ce4, process_name=uvskStupidsEarlyRehrenment_sub, var_tracingHeaders_traceId=0551f295e93baba1aecab9d4d2be8bf8, var_tracingHeaders_requestId=389d5051-282b-40a3-b9fd-8331616e7446, __time=2026-03-02T06:59:29.450Z}
+{process_id=psi-fl-cc_f5127bf9-ca16-47c8-97f7-6cfb75a8e84a, process_name=tappeal_p2p_receiver, var_tracingHeaders_traceId=9c785d90befb5bca6a240e929b4eebbb, var_tracingHeaders_requestId=51fad72e-d559-449e-a496-2a35e7b86b9b, __time=2026-03-02T07:31:30.585Z}
+{process_id=ift-5g-rb_f9f2feda-e263-4b4e-abe0-224306aa40b4, process_name=tappeal_p2p_receiver, var_tracingHeaders_traceId=e74b61aea1606e46b1787624c01c3879, var_tracingHeaders_requestId=c5664ab5-4865-421c-925f-5775b117434b, __time=2026-03-02T08:12:30.363Z}
+{process_id=psi-5g-fl-mpz1_6c7579dd-039a-4fbc-b94f-5d550e227ad4, process_name=MassTransferProcessUnif, var_tracingHeaders_traceId=7b10de2996c882854dbaa777c5644bd1, var_tracingHeaders_requestId=b64f0413-5177-4814-9fb5-57a9f85905fd, __time=2026-03-02T08:39:29.580Z}
+{process_id=psi-fl-cc_8af16537-67d9-4236-b98d-a125163d1915, process_name=tappeal_p2p_receiver, var_tracingHeaders_traceId=3456e2d3b0e59b27c82038b56c22625f, var_tracingHeaders_requestId=25403ce5-f321-4129-8447-20caeac828df, __time=2026-03-02T11:03:30.259Z}
+{process_id=ift-5g-fl-cc_ea5f68c5-feca-4869-8679-93e01b2acb04, process_name=uvskRemainderReturnCR-Service, var_tracingHeaders_traceId=6499d494e7aeb3e2dac3519444bbcaae, var_tracingHeaders_requestId=3d880dfa-ef37-466d-81c0-4f4be47513f4, __time=2026-03-02T13:58:29.135Z}
+16:22:49.827 [main] INFO  Application - Query returned 25 rows
+
+----- query/hybrid/q26_count_by_status.sql -----
+time="2026-03-02T19:22:52+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:23:00.364 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:23:02.463 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:23:02.558 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:23:02.575 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:23:02.579 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:23:02.582 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:23:02.584 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:23:03.777 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 26: Count by status variable
+SELECT 
+    var_status,
+    COUNT(*) as cnt_total
+FROM process_hybrid
+WHERE var_status IS NOT NULL
+GROUP BY var_status
+ORDER BY cnt_total DESC
+
+16:23:08.443 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:23:10.611 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{var_status=CANCELLED, cnt_total=7}
+{var_status=PENDING, cnt_total=7}
+{var_status=REJECTED, cnt_total=6}
+{var_status=IN_PROGRESS, cnt_total=4}
+{var_status=COMPLETED, cnt_total=1}
+16:23:11.253 [main] INFO  Application - Query returned 5 rows
+
+----- query/hybrid/q27_filter_subprocesses.sql -----
+time="2026-03-02T19:23:18+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:23:30.097 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:23:31.607 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:23:31.700 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:23:31.704 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:23:31.705 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:23:31.707 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:23:31.709 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:23:32.586 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 27: Find subprocesses (has parent)
+SELECT 
+    process_id,
+    parent_instance_id,
+    root_instance_id,
+    process_name,
+    state
+FROM process_hybrid
+WHERE parent_instance_id IS NO
+16:23:34.279 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:23:35.822 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{process_id=psi-5g-fl-mpz1_6c7579dd-039a-4fbc-b94f-5d550e227ad4, parent_instance_id=psi-5g-fl-mpz1_3f2f1b1b-6932-4147-a963-61ca17885747, root_instance_id=psi-5g-fl-mpz1_3f2f1b1b-6932-4147-a963-61ca17885747, process_name=MassTransferProcessUnif, state=1}
+{process_id=ift-5g-rb_f9f2feda-e263-4b4e-abe0-224306aa40b4, parent_instance_id=ift-5g-rb_ff253672-ee4e-4ed4-b34d-7201ced7806a, root_instance_id=ift-5g-rb_ff253672-ee4e-4ed4-b34d-7201ced7806a, process_name=tappeal_p2p_receiver, state=1}
+{process_id=psi-fl-cc_f5127bf9-ca16-47c8-97f7-6cfb75a8e84a, parent_instance_id=ift-5g-rb_7fede83a-5178-4708-af93-a31736fbd1f2, root_instance_id=ift-5g-rb_7fede83a-5178-4708-af93-a31736fbd1f2, process_name=tappeal_p2p_receiver, state=1}
+{process_id=ift-5g-rb_282da1f1-ecb8-4145-8d25-dfca80eb3ed6, parent_instance_id=psi-5g-fl-mpz1_545dfb22-9317-4004-a124-4331f2d1a6f7, root_instance_id=psi-5g-fl-mpz1_545dfb22-9317-4004-a124-4331f2d1a6f7, process_name=uvskRemainderReturnCR-Service, state=1}
+{process_id=ift-5g-rb_ae2d0a58-9e41-4a8e-a562-4c22a72e76c4, parent_instance_id=ift-5g-rb_8c55166c-f539-4a38-ac80-fcd6de3df894, root_instance_id=ift-5g-rb_8c55166c-f539-4a38-ac80-fcd6de3df894, process_name=uvskFraudFin_front, state=2}
+{process_id=psi-5g-fl-mpz1_c3c95215-e24f-4426-8737-477731739cd6, parent_instance_id=psi-5g-fl-mpz1_7b3f656e-df60-498b-8b95-8a6c316dc971, root_instance_id=psi-5g-fl-mpz1_7b3f656e-df60-498b-8b95-8a6c316dc971, process_name=MassTransferProcessUnif, state=1}
+{process_id=ift-5g-rb_f32b491d-6da1-4370-83dd-705ae6a25f5a, parent_instance_id=ift-5g-rb_9e958708-7115-4c8e-9e73-f253d4867ad4, root_instance_id=ift-5g-rb_9e958708-7115-4c8e-9e73-f253d4867ad4, process_name=uvskStupidsEarlyRehrenment_sub, state=1}
+{process_id=psi-fl-cc_0dc5a4ff-7647-4b86-b2cb-8cc0fc02187e, parent_instance_id=ift-5g-rb_72213b5f-e205-447d-8555-90cef78f562b, root_instance_id=ift-5g-rb_72213b5f-e205-447d-8555-90cef78f562b, process_name=tappeal_p2p_receiver, state=2}
+{process_id=ift-5g-rb_70f8959c-7899-4bbe-98c1-f420a5a379b8, parent_instance_id=ift-5g-rb_62d9c1dd-af23-45f0-aed0-7509f1da7f82, root_instance_id=ift-5g-rb_62d9c1dd-af23-45f0-aed0-7509f1da7f82, process_name=uvskStupidsEarlyRehrenment_sub, state=1}
+{process_id=psi-fl-cc_cd1dcaba-737e-4015-a670-f83fee48989e, parent_instance_id=psi-fl-cc_bd6fefd4-8a90-4316-9d3d-baf05876736c, root_instance_id=psi-fl-cc_bd6fefd4-8a90-4316-9d3d-baf05876736c, process_name=uvskFraudFin_front, state=0}
+{process_id=ift-5g-rb_fa294fe0-4a46-41c9-a6ad-7598df251a81, parent_instance_id=psi-fl-cc_75033fca-5f86-4414-9895-8a4cc6d2fe33, root_instance_id=psi-fl-cc_75033fca-5f86-4414-9895-8a4cc6d2fe33, process_name=tappeal_p2p_receiver, state=0}
+16:23:36.391 [main] INFO  Application - Query returned 11 rows
+
+----- query/hybrid/q28_filter_root_processes.sql -----
+time="2026-03-02T19:23:39+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:23:45.739 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:23:47.578 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:23:47.688 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:23:47.691 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:23:47.692 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:23:47.705 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:23:47.707 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:23:49.227 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 28: Find root processes only
+SELECT 
+    process_id,
+    process_name,
+    state,
+    var_caseId,
+    __time
+FROM process_hybrid
+WHERE parent_instance_id IS NULL
+ORDER BY __time DESC
+16:23:52.939 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:23:54.297 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{process_id=ift-5g-fl-cc_ea5f68c5-feca-4869-8679-93e01b2acb04, process_name=uvskRemainderReturnCR-Service, state=2, var_caseId=1d4d6aff-76e6-4a77-aded-473b4f197866, __time=2026-03-02T13:58:29.135Z}
+{process_id=psi-fl-cc_8af16537-67d9-4236-b98d-a125163d1915, process_name=tappeal_p2p_receiver, state=2, var_caseId=70d75ac3-c7b6-449b-a08a-c8433bad9d0a, __time=2026-03-02T11:03:30.259Z}
+{process_id=ift-5g-rb_8e3ee38a-0f41-4f1c-add4-2ddf96d26ce4, process_name=uvskStupidsEarlyRehrenment_sub, state=1, var_caseId=9303acda-d119-41c1-81d1-6f69710ad4fb, __time=2026-03-02T06:59:29.450Z}
+{process_id=ift-5g-rb_9a5be65b-2d04-4519-819a-a1b3ff1c4aa7, process_name=uvskStupidsEarlyRehrenment_sub, state=1, var_caseId=e0f8079f-4e8a-425c-ac3e-7bef31f62d7b, __time=2026-03-02T06:43:29.295Z}
+{process_id=psi-5g-fl-mpz1_52dc05a7-f66a-49a5-854c-44d9047500e2, process_name=uvskFraudFin_front, state=1, var_caseId=71e70b41-2c91-4601-8406-a4e602c41817, __time=2026-03-02T04:21:30.177Z}
+{process_id=psi-5g-fl-mpz1_09c352dc-7735-423c-96c1-675ea5559276, process_name=MassTransferProcessUnif, state=2, var_caseId=95a1fc79-b523-4206-9db1-c8397bfc63f3, __time=2026-03-02T04:08:29.530Z}
+{process_id=ift-5g-rb_679419a8-7c89-4032-83bc-2dcb2f35a853, process_name=uvskRemainderReturnCR-Service, state=2, var_caseId=313f45a6-65df-4c41-b78b-5bc02331c9d7, __time=2026-03-02T02:34:29.257Z}
+{process_id=psi-5g-fl-mpz1_4377cb54-ad44-4d48-88f7-305309070717, process_name=MassTransferProcessUnif, state=2, var_caseId=7d6f3da8-8a5f-4c64-a6e2-ca83d4db7360, __time=2026-03-02T02:00:29.491Z}
+{process_id=psi-fl-5g_264f86d4-4256-4519-8f7e-255c7a23b93e, process_name=uvskRemainderReturnCR-Service, state=1, var_caseId=cc4b5c29-3cc3-46ba-9764-11d31af0875b, __time=2026-03-01T20:27:29.216Z}
+{process_id=psi-5g-fl-mpz1_22027b76-1504-4d7d-b2b3-47429f695d72, process_name=MassTransferProcessUnif, state=2, var_caseId=6c57e330-8fbf-4713-ab20-76037c2acc50, __time=2026-03-01T17:31:29.958Z}
+{process_id=psi-fl-cc_4c615ea9-8ede-4fd7-b00c-8f035f8a8f10, process_name=uvskFraudFin_front, state=2, var_caseId=25015313-efbe-433e-ac5b-c85a66989446, __time=2026-03-01T17:06:30.213Z}
+{process_id=psi-fl-5g_69f5e187-a7f1-4747-944b-4f1d635e0660, process_name=uvskRemainderReturnCR-Service, state=2, var_caseId=40bb21c7-eec8-4b62-9c15-6c2c67789415, __time=2026-03-01T17:02:23.372Z}
+{process_id=psi-5g-fl-mpz1_a63d1b0b-bfe0-4fc3-b899-17193fa5eb6f, process_name=uvskFraudFin_front, state=2, var_caseId=21451d2f-1da2-4956-a15e-66606376bc2a, __time=2026-03-01T14:43:30.116Z}
+{process_id=ift-5g-rb_badb1804-3165-4162-8120-0e0ab8fe2035, process_name=uvskStupidsEarlyRehrenment_sub, state=1, var_caseId=fdc61bc2-dce7-4b6a-88db-e984966736b0, __time=2026-03-01T14:25:29.377Z}
+16:23:54.791 [main] INFO  Application - Query returned 14 rows
+
+----- query/hybrid/q29_json_epkData_gender.sql -----
+time="2026-03-02T19:23:56+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:24:06.135 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:24:08.233 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:24:08.326 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:24:08.328 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:24:08.330 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:24:08.332 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:24:08.343 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:24:09.250 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 29: Extract gender from epkData JSON
+SELECT 
+    process_id,
+    var_epkData_gender,
+    CASE var_epkData_gender
+        WHEN 1 THEN 'MALE'
+        WHEN 2 THEN 'FEMALE'
+        ELSE 'U
+16:24:12.723 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:24:13.863 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{process_id=ift-5g-rb_badb1804-3165-4162-8120-0e0ab8fe2035, var_epkData_gender=2, gender_name=FEMALE, var_fio=╨Т╨Ю╨Ы╨Ъ╨Ю╨Т ╨Э╨Ш╨Ъ╨Ю╨Ы╨Р╨Щ ╨Ф╨Ь╨Ш╨в╨а╨Ш╨Х╨Т╨Ш╨з}
+{process_id=psi-5g-fl-mpz1_a63d1b0b-bfe0-4fc3-b899-17193fa5eb6f, var_epkData_gender=2, gender_name=FEMALE, var_fio=╨Я╨Р╨Т╨Ы╨Ю╨Т ╨Р╨Ы╨Х╨Ъ╨б╨Х╨Щ ╨Р╨Ы╨Х╨Ъ╨б╨Х╨Х╨Т╨Ш╨з}
+{process_id=ift-5g-rb_fa294fe0-4a46-41c9-a6ad-7598df251a81, var_epkData_gender=1, gender_name=MALE, var_fio=╨Э╨Ю╨Т╨Ш╨Ъ╨Ю╨Т ╨Ь╨Р╨Ъ╨б╨Ш╨Ь ╨Ш╨Т╨Р╨Э╨Ю╨Т╨Э╨Р}
+{process_id=psi-fl-5g_69f5e187-a7f1-4747-944b-4f1d635e0660, var_epkData_gender=1, gender_name=MALE, var_fio=╨б╨Х╨Ь╨Х╨Э╨Ю╨Т ╨Ф╨Х╨Э╨Ш╨б ╨б╨Х╨а╨У╨Х╨Х╨Т╨Э╨Р}
+{process_id=psi-fl-cc_4c615ea9-8ede-4fd7-b00c-8f035f8a8f10, var_epkData_gender=2, gender_name=FEMALE, var_fio=╨в╨Р╨а╨Р╨б╨Ю╨Т ╨Ь╨Р╨а╨Ш╨п ╨Ш╨Т╨Р╨Э╨Ю╨Т╨Ш╨з}
+{process_id=psi-5g-fl-mpz1_22027b76-1504-4d7d-b2b3-47429f695d72, var_epkData_gender=2, gender_name=FEMALE, var_fio=╨б╨Х╨Ь╨Х╨Э╨Ю╨Т ╨Э╨Р╨в╨Р╨Ы╨м╨п ╨б╨Х╨а╨У╨Х╨Х╨Т╨Э╨Р}
+{process_id=psi-fl-cc_cd1dcaba-737e-4015-a670-f83fee48989e, var_epkData_gender=2, gender_name=FEMALE, var_fio=╨б╨Ю╨Ъ╨Ю╨Ы╨Ю╨Т ╨Ь╨Р╨а╨Ш╨п ╨Ш╨Т╨Р╨Э╨Ю╨Т╨Ш╨з}
+{process_id=ift-5g-rb_70f8959c-7899-4bbe-98c1-f420a5a379b8, var_epkData_gender=1, gender_name=MALE, var_fio=╨С╨Х╨Ы╨Ю╨Т ╨Ф╨Х╨Э╨Ш╨б ╨Р╨Э╨Ф╨а╨Х╨Х╨Т╨Э╨Р}
+{process_id=psi-fl-5g_264f86d4-4256-4519-8f7e-255c7a23b93e, var_epkData_gender=1, gender_name=MALE, var_fio=╨Ш╨Т╨Р╨Э╨Ю╨Т ╨Х╨Т╨У╨Х╨Э╨Ш╨Щ ╨Р╨Ы╨Х╨Ъ╨б╨Р╨Э╨Ф╨а╨Ю╨Т╨Ш╨з}
+{process_id=psi-fl-cc_0dc5a4ff-7647-4b86-b2cb-8cc0fc02187e, var_epkData_gender=1, gender_name=MALE, var_fio=╨б╨Ю╨Ъ╨Ю╨Ы╨Ю╨Т ╨Ю╨Ы╨м╨У╨Р ╨Т╨Ы╨Р╨Ф╨Ш╨Ь╨Ш╨а╨Ю╨Т╨Ш╨з}
+{process_id=ift-5g-rb_f32b491d-6da1-4370-83dd-705ae6a25f5a, var_epkData_gender=2, gender_name=FEMALE, var_fio=╨Ш╨Т╨Р╨Э╨Ю╨Т ╨Ъ╨Ю╨Э╨б╨в╨Р╨Э╨в╨Ш╨Э ╨Ф╨Ь╨Ш╨в╨а╨Ш╨Х╨Т╨Ш╨з}
+{process_id=psi-5g-fl-mpz1_c3c95215-e24f-4426-8737-477731739cd6, var_epkData_gender=2, gender_name=FEMALE, var_fio=╨Т╨Ю╨а╨Ю╨С╨м╨Х╨Т ╨Р╨Ы╨Х╨Ъ╨б╨Р╨Э╨Ф╨а ╨Ш╨Т╨Р╨Э╨Ю╨Т╨Ш╨з}
+{process_id=ift-5g-rb_ae2d0a58-9e41-4a8e-a562-4c22a72e76c4, var_epkData_gender=2, gender_name=FEMALE, var_fio=╨б╨Х╨Ь╨Х╨Э╨Ю╨Т ╨Х╨Т╨У╨Х╨Э╨Ш╨Щ ╨Т╨Ы╨Р╨Ф╨Ш╨Ь╨Ш╨а╨Ю╨Т╨Ш╨з}
+{process_id=ift-5g-rb_282da1f1-ecb8-4145-8d25-dfca80eb3ed6, var_epkData_gender=2, gender_name=FEMALE, var_fio=╨Я╨Р╨Т╨Ы╨Ю╨Т ╨Ф╨Х╨Э╨Ш╨б ╨Ш╨Т╨Р╨Э╨Ю╨Т╨Э╨Р}
+{process_id=psi-5g-fl-mpz1_4377cb54-ad44-4d48-88f7-305309070717, var_epkData_gender=1, gender_name=MALE, var_fio=╨в╨Р╨а╨Р╨б╨Ю╨Т ╨Э╨Ш╨Ъ╨Ю╨Ы╨Р╨Щ ╨б╨Х╨а╨У╨Х╨Х╨Т╨Ш╨з}
+{process_id=ift-5g-rb_679419a8-7c89-4032-83bc-2dcb2f35a853, var_epkData_gender=2, gender_name=FEMALE, var_fio=╨Ш╨Т╨Р╨Э╨Ю╨Т ╨Ь╨Р╨а╨Ш╨п ╨Р╨Э╨Ф╨а╨Х╨Х╨Т╨Ш╨з}
+{process_id=psi-5g-fl-mpz1_09c352dc-7735-423c-96c1-675ea5559276, var_epkData_gender=2, gender_name=FEMALE, var_fio=╨Т╨Ю╨Ы╨Ъ╨Ю╨Т ╨Э╨Ш╨Ъ╨Ю╨Ы╨Р╨Щ ╨Р╨Э╨Ф╨а╨Х╨Х╨Т╨Ш╨з}
+{process_id=psi-5g-fl-mpz1_52dc05a7-f66a-49a5-854c-44d9047500e2, var_epkData_gender=2, gender_name=FEMALE, var_fio=╨С╨Ю╨У╨Ф╨Р╨Э╨Ю╨Т ╨Ъ╨Ю╨Э╨б╨в╨Р╨Э╨в╨Ш╨Э ╨Т╨Ы╨Р╨Ф╨Ш╨Ь╨Ш╨а╨Ю╨Т╨Ш╨з}
+{process_id=ift-5g-rb_9a5be65b-2d04-4519-819a-a1b3ff1c4aa7, var_epkData_gender=2, gender_name=FEMALE, var_fio=╨Ш╨Т╨Р╨Э╨Ю╨Т ╨Ш╨Т╨Р╨Э ╨Ь╨Р╨Ъ╨б╨Ш╨Ь╨Ю╨Т╨Ш╨з}
+{process_id=ift-5g-rb_8e3ee38a-0f41-4f1c-add4-2ddf96d26ce4, var_epkData_gender=1, gender_name=MALE, var_fio=╨Ъ╨Ю╨Ь╨Р╨а╨Ю╨Т ╨Ъ╨Ю╨Э╨б╨в╨Р╨Э╨в╨Ш╨Э ╨Ф╨Ь╨Ш╨в╨а╨Ш╨Х╨Т╨Ш╨з}
+{process_id=psi-fl-cc_f5127bf9-ca16-47c8-97f7-6cfb75a8e84a, var_epkData_gender=1, gender_name=MALE, var_fio=╨Э╨Ю╨Т╨Ш╨Ъ╨Ю╨Т ╨Я╨Р╨Т╨Х╨Ы ╨Р╨Ы╨Х╨Ъ╨б╨Х╨Х╨Т╨Ш╨з}
+{process_id=ift-5g-rb_f9f2feda-e263-4b4e-abe0-224306aa40b4, var_epkData_gender=2, gender_name=FEMALE, var_fio=╨Ш╨Т╨Р╨Э╨Ю╨Т ╨Р╨Ы╨Х╨Ъ╨б╨Р╨Э╨Ф╨а ╨Ф╨Ь╨Ш╨в╨а╨Ш╨Х╨Т╨Э╨Р}
+{process_id=psi-5g-fl-mpz1_6c7579dd-039a-4fbc-b94f-5d550e227ad4, var_epkData_gender=1, gender_name=MALE, var_fio=╨б╨Ш╨Ф╨Ю╨а╨Ю╨Т ╨Ю╨Ы╨м╨У╨Р ╨Ь╨Р╨Ъ╨б╨Ш╨Ь╨Ю╨Т╨Ш╨з}
+{process_id=psi-fl-cc_8af16537-67d9-4236-b98d-a125163d1915, var_epkData_gender=1, gender_name=MALE, var_fio=╨Ъ╨Ю╨Ч╨Ы╨Ю╨Т ╨Э╨Ш╨Ъ╨Ю╨Ы╨Р╨Щ ╨Ш╨Т╨Р╨Э╨Ю╨Т╨Э╨Р}
+{process_id=ift-5g-fl-cc_ea5f68c5-feca-4869-8679-93e01b2acb04, var_epkData_gender=1, gender_name=MALE, var_fio=╨Т╨Ю╨Ы╨Ъ╨Ю╨Т ╨Р╨Э╨Э╨Р ╨б╨Х╨а╨У╨Х╨Х╨Т╨Ш╨з}
+16:24:14.210 [main] INFO  Application - Query returned 25 rows
+
+----- query/hybrid/q30_json_staticData_closed.sql -----
+time="2026-03-02T19:24:16+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:24:21.129 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:24:22.025 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:24:22.085 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:24:22.087 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:24:22.088 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:24:22.090 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:24:22.091 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:24:22.877 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 30: Closed processes with timing
+SELECT 
+    process_id,
+    process_name,
+    var_staticData_registrationTime,
+    var_staticData_closedTime,
+    CASE 
+        WHEN var_staticData_reg
+16:24:25.197 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:24:26.228 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+16:24:26.482 [main] INFO  Application - Query returned 0 rows
+
+----- query/hybrid/q31_complex_filter.sql -----
+time="2026-03-02T19:24:28+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:24:32.554 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:24:33.509 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:24:33.552 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:24:33.554 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:24:33.555 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:24:33.556 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:24:33.557 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:24:34.239 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 31: Complex multi-condition filter
+SELECT 
+    process_id,
+    process_name,
+    var_epkId,
+    var_status,
+    state
+FROM process_hybrid
+WHERE process_name IN ('uvskRemainderReturnCR
+16:24:36.157 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:24:37.266 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{process_id=psi-5g-fl-mpz1_52dc05a7-f66a-49a5-854c-44d9047500e2, process_name=uvskFraudFin_front, var_epkId=1273249744263995388, var_status=PENDING, state=1}
+{process_id=ift-5g-rb_282da1f1-ecb8-4145-8d25-dfca80eb3ed6, process_name=uvskRemainderReturnCR-Service, var_epkId=1845141606826449015, var_status=REJECTED, state=1}
+{process_id=psi-fl-5g_264f86d4-4256-4519-8f7e-255c7a23b93e, process_name=uvskRemainderReturnCR-Service, var_epkId=1004877928979401063, var_status=IN_PROGRESS, state=1}
+16:24:37.735 [main] INFO  Application - Query returned 3 rows
+
+----- query/hybrid/q32_avg_duration.sql -----
+time="2026-03-02T19:24:39+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:24:44.562 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:24:45.936 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:24:45.994 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:24:45.996 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:24:45.998 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:24:45.999 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:24:46.000 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:24:47.281 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 32: Average process duration by name
+SELECT 
+    process_name,
+    COUNT(*) as total,
+    MIN(__time) as first_seen,
+    MAX(__time) as last_seen
+FROM process_hybrid
+GROUP BY process_n
+16:24:50.091 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:24:51.903 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{process_name=MassTransferProcessUnif, total=5, first_seen=2026-03-01T17:31:29.958Z, last_seen=2026-03-02T08:39:29.580Z}
+{process_name=tappeal_p2p_receiver, total=5, first_seen=2026-03-01T15:55:30.419Z, last_seen=2026-03-02T11:03:30.259Z}
+{process_name=uvskFraudFin_front, total=5, first_seen=2026-03-01T14:43:30.116Z, last_seen=2026-03-02T04:21:30.177Z}
+{process_name=uvskRemainderReturnCR-Service, total=5, first_seen=2026-03-01T17:02:23.372Z, last_seen=2026-03-02T13:58:29.135Z}
+{process_name=uvskStupidsEarlyRehrenment_sub, total=5, first_seen=2026-03-01T14:25:29.377Z, last_seen=2026-03-02T06:59:29.450Z}
+16:24:52.712 [main] INFO  Application - Query returned 5 rows
+
+----- query/hybrid/q33_success_rate.sql -----
+time="2026-03-02T19:24:58+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:25:05.448 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:25:06.956 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:25:07.009 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:25:07.012 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:25:07.016 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:25:07.018 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:25:07.019 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:25:08.192 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 33: Success rate by process name
+SELECT 
+    process_name,
+    COUNT(*) as total,
+    SUM(CASE WHEN state = 2 THEN 1 ELSE 0 END) as completed,
+    SUM(CASE WHEN state = 3 THEN 1 ELSE 0 E
+16:25:12.027 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:25:13.188 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+16:25:13.621 [main] INFO  Application - Query returned 0 rows
+
+----- query/hybrid/q34_json_node_type_count.sql -----
+time="2026-03-02T19:25:15+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:25:19.068 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:25:20.078 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:25:20.129 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:25:20.131 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:25:20.132 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:25:20.133 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:25:20.134 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:25:20.816 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 34: Count processes by first node type
+SELECT 
+    JSON_VALUE(node_instances_json, '$[0].nodeType') as first_node_type,
+    COUNT(*) as cnt_total
+FROM process_hybrid
+GROUP BY 1
+ORDER BY
+16:25:22.757 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:25:23.654 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{first_node_type=null, cnt_total=25}
+16:25:24.043 [main] INFO  Application - Query returned 1 rows
+
+----- query/hybrid/q35_theme_distribution.sql -----
+time="2026-03-02T19:25:26+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:25:30.179 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:25:31.220 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:25:31.302 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:25:31.315 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:25:31.317 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:25:31.318 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:25:31.330 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:25:32.058 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 35: Distribution by theme
+SELECT 
+    var_theme,
+    COUNT(*) as cnt_total,
+    COUNT(DISTINCT var_epkId) as unique_clients
+FROM process_hybrid
+WHERE var_theme IS NOT NULL
+GROUP BY var
+16:25:33.794 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:25:34.733 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{var_theme=complaint, cnt_total=9, unique_clients=9}
+{var_theme=refundRequest, cnt_total=9, unique_clients=9}
+{var_theme=incorrectCommunication, cnt_total=4, unique_clients=4}
+{var_theme=fraudAlert, cnt_total=3, unique_clients=3}
+16:25:35.242 [main] INFO  Application - Query returned 4 rows
+
+----- query/hybrid/q36_version_distribution.sql -----
+time="2026-03-02T19:25:37+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:25:41.017 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:25:42.192 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:25:42.261 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:25:42.265 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:25:42.266 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:25:42.268 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:25:42.269 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:25:42.940 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 36: Process version distribution
+SELECT 
+    process_name,
+    version,
+    COUNT(*) as cnt_total
+FROM process_hybrid
+GROUP BY process_name, version
+ORDER BY process_name, version DESC
+16:25:44.832 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:25:45.588 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{process_name=MassTransferProcessUnif, version=86, cnt_total=1}
+{process_name=MassTransferProcessUnif, version=83, cnt_total=1}
+{process_name=MassTransferProcessUnif, version=73, cnt_total=1}
+{process_name=MassTransferProcessUnif, version=25, cnt_total=1}
+{process_name=MassTransferProcessUnif, version=15, cnt_total=1}
+{process_name=tappeal_p2p_receiver, version=94, cnt_total=1}
+{process_name=tappeal_p2p_receiver, version=92, cnt_total=1}
+{process_name=tappeal_p2p_receiver, version=74, cnt_total=1}
+{process_name=tappeal_p2p_receiver, version=64, cnt_total=1}
+{process_name=tappeal_p2p_receiver, version=43, cnt_total=1}
+{process_name=uvskFraudFin_front, version=47, cnt_total=1}
+{process_name=uvskFraudFin_front, version=41, cnt_total=1}
+{process_name=uvskFraudFin_front, version=39, cnt_total=1}
+{process_name=uvskFraudFin_front, version=7, cnt_total=2}
+{process_name=uvskRemainderReturnCR-Service, version=98, cnt_total=1}
+{process_name=uvskRemainderReturnCR-Service, version=93, cnt_total=1}
+{process_name=uvskRemainderReturnCR-Service, version=74, cnt_total=1}
+{process_name=uvskRemainderReturnCR-Service, version=65, cnt_total=1}
+{process_name=uvskRemainderReturnCR-Service, version=5, cnt_total=1}
+{process_name=uvskStupidsEarlyRehrenment_sub, version=93, cnt_total=1}
+{process_name=uvskStupidsEarlyRehrenment_sub, version=83, cnt_total=1}
+{process_name=uvskStupidsEarlyRehrenment_sub, version=77, cnt_total=1}
+{process_name=uvskStupidsEarlyRehrenment_sub, version=58, cnt_total=1}
+{process_name=uvskStupidsEarlyRehrenment_sub, version=11, cnt_total=1}
+16:25:45.845 [main] INFO  Application - Query returned 24 rows
+
+----- query/hybrid/q37_business_key_pattern.sql -----
+time="2026-03-02T19:25:47+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:25:51.562 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:25:52.533 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:25:52.583 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:25:52.586 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:25:52.588 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:25:52.589 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:25:52.590 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:25:53.296 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 37: Business key pattern analysis
+SELECT 
+    SUBSTRING(business_key, 1, 6) as date_prefix,
+    COUNT(*) as cnt_total
+FROM process_hybrid
+WHERE business_key IS NOT NULL
+GROUP BY 1
+ORDE
+16:25:55.283 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:25:56.384 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{date_prefix=260302, cnt_total=25}
+16:25:56.690 [main] INFO  Application - Query returned 1 rows
+
+----- query/hybrid/q38_long_running.sql -----
+time="2026-03-02T19:25:58+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:26:03.025 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:26:03.886 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:26:03.930 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:26:03.932 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:26:03.934 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:26:03.937 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:26:03.938 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:26:04.497 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 38: Long-running processes (over 1 hour)
+SELECT 
+    process_id,
+    process_name,
+    __time as start_date,
+    TIMESTAMPDIFF(HOUR, __time, CURRENT_TIMESTAMP) as hours_running,
+    var
+16:26:06.310 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:26:07.206 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{process_id=ift-5g-rb_badb1804-3165-4162-8120-0e0ab8fe2035, process_name=uvskStupidsEarlyRehrenment_sub, start_date=2026-03-01T14:25:29.377Z, hours_running=26, var_caseId=fdc61bc2-dce7-4b6a-88db-e984966736b0}
+{process_id=ift-5g-rb_70f8959c-7899-4bbe-98c1-f420a5a379b8, process_name=uvskStupidsEarlyRehrenment_sub, start_date=2026-03-01T18:56:29.336Z, hours_running=21, var_caseId=6b8d5ea6-e74b-4615-891f-6b0f751cf4b8}
+{process_id=psi-fl-5g_264f86d4-4256-4519-8f7e-255c7a23b93e, process_name=uvskRemainderReturnCR-Service, start_date=2026-03-01T20:27:29.216Z, hours_running=19, var_caseId=cc4b5c29-3cc3-46ba-9764-11d31af0875b}
+{process_id=ift-5g-rb_f32b491d-6da1-4370-83dd-705ae6a25f5a, process_name=uvskStupidsEarlyRehrenment_sub, start_date=2026-03-02T00:49:29.415Z, hours_running=15, var_caseId=21751a91-4481-4222-af0a-e9250db4d9a6}
+{process_id=psi-5g-fl-mpz1_c3c95215-e24f-4426-8737-477731739cd6, process_name=MassTransferProcessUnif, start_date=2026-03-02T01:02:29.777Z, hours_running=15, var_caseId=a4adab1e-9709-43ec-b4c0-31e108b6bcff}
+{process_id=ift-5g-rb_282da1f1-ecb8-4145-8d25-dfca80eb3ed6, process_name=uvskRemainderReturnCR-Service, start_date=2026-03-02T01:49:29.179Z, hours_running=14, var_caseId=af8776af-d6c9-46e9-b419-e40ae484a507}
+{process_id=psi-5g-fl-mpz1_52dc05a7-f66a-49a5-854c-44d9047500e2, process_name=uvskFraudFin_front, start_date=2026-03-02T04:21:30.177Z, hours_running=12, var_caseId=71e70b41-2c91-4601-8406-a4e602c41817}
+{process_id=ift-5g-rb_9a5be65b-2d04-4519-819a-a1b3ff1c4aa7, process_name=uvskStupidsEarlyRehrenment_sub, start_date=2026-03-02T06:43:29.295Z, hours_running=9, var_caseId=e0f8079f-4e8a-425c-ac3e-7bef31f62d7b}
+{process_id=ift-5g-rb_8e3ee38a-0f41-4f1c-add4-2ddf96d26ce4, process_name=uvskStupidsEarlyRehrenment_sub, start_date=2026-03-02T06:59:29.450Z, hours_running=9, var_caseId=9303acda-d119-41c1-81d1-6f69710ad4fb}
+{process_id=psi-fl-cc_f5127bf9-ca16-47c8-97f7-6cfb75a8e84a, process_name=tappeal_p2p_receiver, start_date=2026-03-02T07:31:30.585Z, hours_running=8, var_caseId=be30f433-d1cf-4a43-8612-d3f4ea3b7adc}
+{process_id=ift-5g-rb_f9f2feda-e263-4b4e-abe0-224306aa40b4, process_name=tappeal_p2p_receiver, start_date=2026-03-02T08:12:30.363Z, hours_running=8, var_caseId=1cdbf113-c7d8-495d-a1f7-1640d92c438c}
+{process_id=psi-5g-fl-mpz1_6c7579dd-039a-4fbc-b94f-5d550e227ad4, process_name=MassTransferProcessUnif, start_date=2026-03-02T08:39:29.580Z, hours_running=7, var_caseId=f35eb5fa-0498-43fe-8746-dfedc5dae88c}
+16:26:07.668 [main] INFO  Application - Query returned 12 rows
+
+----- query/hybrid/q39_classifier_version.sql -----
+time="2026-03-02T19:26:09+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:26:14.465 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:26:15.400 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:26:15.451 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:26:15.452 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:26:15.454 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:26:15.455 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:26:15.457 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:26:16.241 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 39: Classifier version usage
+SELECT 
+    var_staticData_classifierVersion as classifier_version,
+    COUNT(*) as cnt_total
+FROM process_hybrid
+WHERE var_staticData_classifierVersion IS N
+16:26:18.502 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:26:19.822 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{classifier_version=46, cnt_total=1}
+{classifier_version=40, cnt_total=1}
+{classifier_version=38, cnt_total=1}
+{classifier_version=37, cnt_total=1}
+{classifier_version=35, cnt_total=1}
+{classifier_version=34, cnt_total=1}
+{classifier_version=33, cnt_total=1}
+{classifier_version=32, cnt_total=1}
+{classifier_version=30, cnt_total=1}
+{classifier_version=28, cnt_total=1}
+{classifier_version=27, cnt_total=1}
+{classifier_version=25, cnt_total=1}
+{classifier_version=16, cnt_total=1}
+{classifier_version=15, cnt_total=1}
+{classifier_version=13, cnt_total=1}
+{classifier_version=12, cnt_total=1}
+{classifier_version=11, cnt_total=1}
+{classifier_version=10, cnt_total=2}
+{classifier_version=5, cnt_total=2}
+{classifier_version=3, cnt_total=1}
+{classifier_version=2, cnt_total=1}
+{classifier_version=1, cnt_total=2}
+16:26:20.397 [main] INFO  Application - Query returned 22 rows
+
+----- query/hybrid/q40_client_status.sql -----
+time="2026-03-02T19:26:22+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:26:26.979 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:26:27.906 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:26:27.954 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:26:27.959 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:26:27.960 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:26:27.962 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:26:27.963 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:26:28.894 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 40: Client status distribution
+SELECT 
+    var_epkData_clientStatus,
+    var_epkData_gender,
+    COUNT(*) as cnt_total
+FROM process_hybrid
+WHERE var_epkData_clientStatus IS NOT NULL
+GR
+16:26:31.040 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:26:32.239 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{var_epkData_clientStatus=1, var_epkData_gender=2, cnt_total=14}
+{var_epkData_clientStatus=1, var_epkData_gender=1, cnt_total=11}
+16:26:32.590 [main] INFO  Application - Query returned 2 rows
+
+----- query/hybrid/q41_gfl_check.sql -----
+time="2026-03-02T19:26:34+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:26:38.986 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:26:39.861 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:26:39.896 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:26:39.909 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:26:39.921 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:26:39.924 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:26:39.925 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:26:40.574 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 41: Processes with answerGFL data
+SELECT 
+    process_id,
+    process_name,
+    var_answerGFL_json IS NOT NULL as has_gfl_answer
+FROM process_hybrid
+WHERE var_answerGFL_json IS NOT NULL
+16:26:42.285 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:26:43.132 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{process_id=psi-5g-fl-mpz1_a63d1b0b-bfe0-4fc3-b899-17193fa5eb6f, process_name=uvskFraudFin_front, has_gfl_answer=true}
+{process_id=ift-5g-rb_fa294fe0-4a46-41c9-a6ad-7598df251a81, process_name=tappeal_p2p_receiver, has_gfl_answer=true}
+{process_id=psi-fl-5g_69f5e187-a7f1-4747-944b-4f1d635e0660, process_name=uvskRemainderReturnCR-Service, has_gfl_answer=true}
+{process_id=psi-fl-cc_4c615ea9-8ede-4fd7-b00c-8f035f8a8f10, process_name=uvskFraudFin_front, has_gfl_answer=true}
+{process_id=psi-5g-fl-mpz1_22027b76-1504-4d7d-b2b3-47429f695d72, process_name=MassTransferProcessUnif, has_gfl_answer=true}
+{process_id=psi-fl-cc_cd1dcaba-737e-4015-a670-f83fee48989e, process_name=uvskFraudFin_front, has_gfl_answer=true}
+{process_id=ift-5g-rb_70f8959c-7899-4bbe-98c1-f420a5a379b8, process_name=uvskStupidsEarlyRehrenment_sub, has_gfl_answer=true}
+{process_id=psi-fl-5g_264f86d4-4256-4519-8f7e-255c7a23b93e, process_name=uvskRemainderReturnCR-Service, has_gfl_answer=true}
+{process_id=psi-fl-cc_0dc5a4ff-7647-4b86-b2cb-8cc0fc02187e, process_name=tappeal_p2p_receiver, has_gfl_answer=true}
+{process_id=psi-5g-fl-mpz1_c3c95215-e24f-4426-8737-477731739cd6, process_name=MassTransferProcessUnif, has_gfl_answer=true}
+{process_id=ift-5g-rb_ae2d0a58-9e41-4a8e-a562-4c22a72e76c4, process_name=uvskFraudFin_front, has_gfl_answer=true}
+{process_id=ift-5g-rb_679419a8-7c89-4032-83bc-2dcb2f35a853, process_name=uvskRemainderReturnCR-Service, has_gfl_answer=true}
+{process_id=psi-5g-fl-mpz1_52dc05a7-f66a-49a5-854c-44d9047500e2, process_name=uvskFraudFin_front, has_gfl_answer=true}
+{process_id=ift-5g-rb_8e3ee38a-0f41-4f1c-add4-2ddf96d26ce4, process_name=uvskStupidsEarlyRehrenment_sub, has_gfl_answer=true}
+{process_id=ift-5g-rb_f9f2feda-e263-4b4e-abe0-224306aa40b4, process_name=tappeal_p2p_receiver, has_gfl_answer=true}
+{process_id=psi-5g-fl-mpz1_6c7579dd-039a-4fbc-b94f-5d550e227ad4, process_name=MassTransferProcessUnif, has_gfl_answer=true}
+{process_id=psi-fl-cc_8af16537-67d9-4236-b98d-a125163d1915, process_name=tappeal_p2p_receiver, has_gfl_answer=true}
+16:26:43.798 [main] INFO  Application - Query returned 17 rows
+
+----- query/hybrid/q41_json_answerGFL_check.sql -----
+time="2026-03-02T19:26:45+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:26:51.596 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:26:53.063 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:26:53.167 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:26:53.170 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:26:53.172 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:26:53.182 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:26:53.186 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:26:54.151 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 41: Processes with answerGFL data
+SELECT 
+    process_id,
+    process_name,
+    var_answerGFL_json IS NOT NULL as has_gfl_answer,
+    JSON_VALUE(var_answerGFL_json, '$.Status.StatusCode'
+16:26:56.358 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:26:57.449 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{process_id=psi-5g-fl-mpz1_a63d1b0b-bfe0-4fc3-b899-17193fa5eb6f, process_name=uvskFraudFin_front, has_gfl_answer=true, gfl_status_code=null}
+{process_id=ift-5g-rb_fa294fe0-4a46-41c9-a6ad-7598df251a81, process_name=tappeal_p2p_receiver, has_gfl_answer=true, gfl_status_code=null}
+{process_id=psi-fl-5g_69f5e187-a7f1-4747-944b-4f1d635e0660, process_name=uvskRemainderReturnCR-Service, has_gfl_answer=true, gfl_status_code=null}
+{process_id=psi-fl-cc_4c615ea9-8ede-4fd7-b00c-8f035f8a8f10, process_name=uvskFraudFin_front, has_gfl_answer=true, gfl_status_code=null}
+{process_id=psi-5g-fl-mpz1_22027b76-1504-4d7d-b2b3-47429f695d72, process_name=MassTransferProcessUnif, has_gfl_answer=true, gfl_status_code=null}
+{process_id=psi-fl-cc_cd1dcaba-737e-4015-a670-f83fee48989e, process_name=uvskFraudFin_front, has_gfl_answer=true, gfl_status_code=null}
+{process_id=ift-5g-rb_70f8959c-7899-4bbe-98c1-f420a5a379b8, process_name=uvskStupidsEarlyRehrenment_sub, has_gfl_answer=true, gfl_status_code=null}
+{process_id=psi-fl-5g_264f86d4-4256-4519-8f7e-255c7a23b93e, process_name=uvskRemainderReturnCR-Service, has_gfl_answer=true, gfl_status_code=null}
+{process_id=psi-fl-cc_0dc5a4ff-7647-4b86-b2cb-8cc0fc02187e, process_name=tappeal_p2p_receiver, has_gfl_answer=true, gfl_status_code=null}
+{process_id=psi-5g-fl-mpz1_c3c95215-e24f-4426-8737-477731739cd6, process_name=MassTransferProcessUnif, has_gfl_answer=true, gfl_status_code=null}
+{process_id=ift-5g-rb_ae2d0a58-9e41-4a8e-a562-4c22a72e76c4, process_name=uvskFraudFin_front, has_gfl_answer=true, gfl_status_code=null}
+{process_id=ift-5g-rb_679419a8-7c89-4032-83bc-2dcb2f35a853, process_name=uvskRemainderReturnCR-Service, has_gfl_answer=true, gfl_status_code=null}
+{process_id=psi-5g-fl-mpz1_52dc05a7-f66a-49a5-854c-44d9047500e2, process_name=uvskFraudFin_front, has_gfl_answer=true, gfl_status_code=null}
+{process_id=ift-5g-rb_8e3ee38a-0f41-4f1c-add4-2ddf96d26ce4, process_name=uvskStupidsEarlyRehrenment_sub, has_gfl_answer=true, gfl_status_code=null}
+{process_id=ift-5g-rb_f9f2feda-e263-4b4e-abe0-224306aa40b4, process_name=tappeal_p2p_receiver, has_gfl_answer=true, gfl_status_code=null}
+{process_id=psi-5g-fl-mpz1_6c7579dd-039a-4fbc-b94f-5d550e227ad4, process_name=MassTransferProcessUnif, has_gfl_answer=true, gfl_status_code=null}
+{process_id=psi-fl-cc_8af16537-67d9-4236-b98d-a125163d1915, process_name=tappeal_p2p_receiver, has_gfl_answer=true, gfl_status_code=null}
+16:26:57.916 [main] INFO  Application - Query returned 17 rows
+
+----- query/hybrid/q42_json_phone_extract.sql -----
+time="2026-03-02T19:26:59+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:27:05.049 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:27:06.118 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:27:06.164 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:27:06.167 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:27:06.171 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:27:06.172 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:27:06.174 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:27:06.845 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 42: Extract phone from epkData JSON
+SELECT 
+    process_id,
+    var_fio,
+    JSON_VALUE(var_epkData_json, '$.epkEntity.phoneNumbers[0].phoneNumber') as phone
+FROM process_hybrid
+WHERE v
+16:27:08.877 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:27:09.639 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{process_id=ift-5g-rb_badb1804-3165-4162-8120-0e0ab8fe2035, var_fio=╨Т╨Ю╨Ы╨Ъ╨Ю╨Т ╨Э╨Ш╨Ъ╨Ю╨Ы╨Р╨Щ ╨Ф╨Ь╨Ш╨в╨а╨Ш╨Х╨Т╨Ш╨з, phone=null}
+{process_id=psi-5g-fl-mpz1_a63d1b0b-bfe0-4fc3-b899-17193fa5eb6f, var_fio=╨Я╨Р╨Т╨Ы╨Ю╨Т ╨Р╨Ы╨Х╨Ъ╨б╨Х╨Щ ╨Р╨Ы╨Х╨Ъ╨б╨Х╨Х╨Т╨Ш╨з, phone=null}
+{process_id=ift-5g-rb_fa294fe0-4a46-41c9-a6ad-7598df251a81, var_fio=╨Э╨Ю╨Т╨Ш╨Ъ╨Ю╨Т ╨Ь╨Р╨Ъ╨б╨Ш╨Ь ╨Ш╨Т╨Р╨Э╨Ю╨Т╨Э╨Р, phone=null}
+{process_id=psi-fl-5g_69f5e187-a7f1-4747-944b-4f1d635e0660, var_fio=╨б╨Х╨Ь╨Х╨Э╨Ю╨Т ╨Ф╨Х╨Э╨Ш╨б ╨б╨Х╨а╨У╨Х╨Х╨Т╨Э╨Р, phone=null}
+{process_id=psi-fl-cc_4c615ea9-8ede-4fd7-b00c-8f035f8a8f10, var_fio=╨в╨Р╨а╨Р╨б╨Ю╨Т ╨Ь╨Р╨а╨Ш╨п ╨Ш╨Т╨Р╨Э╨Ю╨Т╨Ш╨з, phone=null}
+{process_id=psi-5g-fl-mpz1_22027b76-1504-4d7d-b2b3-47429f695d72, var_fio=╨б╨Х╨Ь╨Х╨Э╨Ю╨Т ╨Э╨Р╨в╨Р╨Ы╨м╨п ╨б╨Х╨а╨У╨Х╨Х╨Т╨Э╨Р, phone=null}
+{process_id=psi-fl-cc_cd1dcaba-737e-4015-a670-f83fee48989e, var_fio=╨б╨Ю╨Ъ╨Ю╨Ы╨Ю╨Т ╨Ь╨Р╨а╨Ш╨п ╨Ш╨Т╨Р╨Э╨Ю╨Т╨Ш╨з, phone=null}
+{process_id=ift-5g-rb_70f8959c-7899-4bbe-98c1-f420a5a379b8, var_fio=╨С╨Х╨Ы╨Ю╨Т ╨Ф╨Х╨Э╨Ш╨б ╨Р╨Э╨Ф╨а╨Х╨Х╨Т╨Э╨Р, phone=null}
+{process_id=psi-fl-5g_264f86d4-4256-4519-8f7e-255c7a23b93e, var_fio=╨Ш╨Т╨Р╨Э╨Ю╨Т ╨Х╨Т╨У╨Х╨Э╨Ш╨Щ ╨Р╨Ы╨Х╨Ъ╨б╨Р╨Э╨Ф╨а╨Ю╨Т╨Ш╨з, phone=null}
+{process_id=psi-fl-cc_0dc5a4ff-7647-4b86-b2cb-8cc0fc02187e, var_fio=╨б╨Ю╨Ъ╨Ю╨Ы╨Ю╨Т ╨Ю╨Ы╨м╨У╨Р ╨Т╨Ы╨Р╨Ф╨Ш╨Ь╨Ш╨а╨Ю╨Т╨Ш╨з, phone=null}
+{process_id=ift-5g-rb_f32b491d-6da1-4370-83dd-705ae6a25f5a, var_fio=╨Ш╨Т╨Р╨Э╨Ю╨Т ╨Ъ╨Ю╨Э╨б╨в╨Р╨Э╨в╨Ш╨Э ╨Ф╨Ь╨Ш╨в╨а╨Ш╨Х╨Т╨Ш╨з, phone=null}
+{process_id=psi-5g-fl-mpz1_c3c95215-e24f-4426-8737-477731739cd6, var_fio=╨Т╨Ю╨а╨Ю╨С╨м╨Х╨Т ╨Р╨Ы╨Х╨Ъ╨б╨Р╨Э╨Ф╨а ╨Ш╨Т╨Р╨Э╨Ю╨Т╨Ш╨з, phone=null}
+{process_id=ift-5g-rb_ae2d0a58-9e41-4a8e-a562-4c22a72e76c4, var_fio=╨б╨Х╨Ь╨Х╨Э╨Ю╨Т ╨Х╨Т╨У╨Х╨Э╨Ш╨Щ ╨Т╨Ы╨Р╨Ф╨Ш╨Ь╨Ш╨а╨Ю╨Т╨Ш╨з, phone=null}
+{process_id=ift-5g-rb_282da1f1-ecb8-4145-8d25-dfca80eb3ed6, var_fio=╨Я╨Р╨Т╨Ы╨Ю╨Т ╨Ф╨Х╨Э╨Ш╨б ╨Ш╨Т╨Р╨Э╨Ю╨Т╨Э╨Р, phone=null}
+{process_id=psi-5g-fl-mpz1_4377cb54-ad44-4d48-88f7-305309070717, var_fio=╨в╨Р╨а╨Р╨б╨Ю╨Т ╨Э╨Ш╨Ъ╨Ю╨Ы╨Р╨Щ ╨б╨Х╨а╨У╨Х╨Х╨Т╨Ш╨з, phone=null}
+{process_id=ift-5g-rb_679419a8-7c89-4032-83bc-2dcb2f35a853, var_fio=╨Ш╨Т╨Р╨Э╨Ю╨Т ╨Ь╨Р╨а╨Ш╨п ╨Р╨Э╨Ф╨а╨Х╨Х╨Т╨Ш╨з, phone=null}
+{process_id=psi-5g-fl-mpz1_09c352dc-7735-423c-96c1-675ea5559276, var_fio=╨Т╨Ю╨Ы╨Ъ╨Ю╨Т ╨Э╨Ш╨Ъ╨Ю╨Ы╨Р╨Щ ╨Р╨Э╨Ф╨а╨Х╨Х╨Т╨Ш╨з, phone=null}
+{process_id=psi-5g-fl-mpz1_52dc05a7-f66a-49a5-854c-44d9047500e2, var_fio=╨С╨Ю╨У╨Ф╨Р╨Э╨Ю╨Т ╨Ъ╨Ю╨Э╨б╨в╨Р╨Э╨в╨Ш╨Э ╨Т╨Ы╨Р╨Ф╨Ш╨Ь╨Ш╨а╨Ю╨Т╨Ш╨з, phone=null}
+{process_id=ift-5g-rb_9a5be65b-2d04-4519-819a-a1b3ff1c4aa7, var_fio=╨Ш╨Т╨Р╨Э╨Ю╨Т ╨Ш╨Т╨Р╨Э ╨Ь╨Р╨Ъ╨б╨Ш╨Ь╨Ю╨Т╨Ш╨з, phone=null}
+{process_id=ift-5g-rb_8e3ee38a-0f41-4f1c-add4-2ddf96d26ce4, var_fio=╨Ъ╨Ю╨Ь╨Р╨а╨Ю╨Т ╨Ъ╨Ю╨Э╨б╨в╨Р╨Э╨в╨Ш╨Э ╨Ф╨Ь╨Ш╨в╨а╨Ш╨Х╨Т╨Ш╨з, phone=null}
+{process_id=psi-fl-cc_f5127bf9-ca16-47c8-97f7-6cfb75a8e84a, var_fio=╨Э╨Ю╨Т╨Ш╨Ъ╨Ю╨Т ╨Я╨Р╨Т╨Х╨Ы ╨Р╨Ы╨Х╨Ъ╨б╨Х╨Х╨Т╨Ш╨з, phone=null}
+{process_id=ift-5g-rb_f9f2feda-e263-4b4e-abe0-224306aa40b4, var_fio=╨Ш╨Т╨Р╨Э╨Ю╨Т ╨Р╨Ы╨Х╨Ъ╨б╨Р╨Э╨Ф╨а ╨Ф╨Ь╨Ш╨в╨а╨Ш╨Х╨Т╨Э╨Р, phone=null}
+{process_id=psi-5g-fl-mpz1_6c7579dd-039a-4fbc-b94f-5d550e227ad4, var_fio=╨б╨Ш╨Ф╨Ю╨а╨Ю╨Т ╨Ю╨Ы╨м╨У╨Р ╨Ь╨Р╨Ъ╨б╨Ш╨Ь╨Ю╨Т╨Ш╨з, phone=null}
+{process_id=psi-fl-cc_8af16537-67d9-4236-b98d-a125163d1915, var_fio=╨Ъ╨Ю╨Ч╨Ы╨Ю╨Т ╨Э╨Ш╨Ъ╨Ю╨Ы╨Р╨Щ ╨Ш╨Т╨Р╨Э╨Ю╨Т╨Э╨Р, phone=null}
+{process_id=ift-5g-fl-cc_ea5f68c5-feca-4869-8679-93e01b2acb04, var_fio=╨Т╨Ю╨Ы╨Ъ╨Ю╨Т ╨Р╨Э╨Э╨Р ╨б╨Х╨а╨У╨Х╨Х╨Т╨Ш╨з, phone=null}
+16:27:09.984 [main] INFO  Application - Query returned 25 rows
+
+----- query/hybrid/q43_min_max_time.sql -----
+time="2026-03-02T19:27:11+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:27:15.628 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:27:16.664 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:27:16.737 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:27:16.747 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:27:16.749 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:27:16.751 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:27:16.753 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:27:17.529 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 43: Min/max timestamps per process name
+SELECT 
+    process_name,
+    MIN(__time) as first_seen,
+    MAX(__time) as last_seen,
+    COUNT(*) as total
+FROM process_hybrid
+GROUP BY proces
+16:27:19.302 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:27:20.275 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{process_name=uvskRemainderReturnCR-Service, first_seen=2026-03-01T17:02:23.372Z, last_seen=2026-03-02T13:58:29.135Z, total=5}
+{process_name=tappeal_p2p_receiver, first_seen=2026-03-01T15:55:30.419Z, last_seen=2026-03-02T11:03:30.259Z, total=5}
+{process_name=MassTransferProcessUnif, first_seen=2026-03-01T17:31:29.958Z, last_seen=2026-03-02T08:39:29.580Z, total=5}
+{process_name=uvskStupidsEarlyRehrenment_sub, first_seen=2026-03-01T14:25:29.377Z, last_seen=2026-03-02T06:59:29.450Z, total=5}
+{process_name=uvskFraudFin_front, first_seen=2026-03-01T14:43:30.116Z, last_seen=2026-03-02T04:21:30.177Z, total=5}
+16:27:20.685 [main] INFO  Application - Query returned 5 rows
+
+----- query/hybrid/q44_duplicate_caseId.sql -----
+time="2026-03-02T19:27:23+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:27:28.365 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:27:29.710 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:27:29.760 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:27:29.764 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:27:29.771 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:27:29.772 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:27:29.774 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:27:30.592 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 44: Find duplicate caseIds
+SELECT 
+    var_caseId,
+    COUNT(*) as process_count
+FROM process_hybrid
+WHERE var_caseId IS NOT NULL
+GROUP BY var_caseId
+HAVING COUNT(*) > 1
+ORDER BY proc
+16:27:32.529 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:27:33.319 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+16:27:33.613 [main] INFO  Application - Query returned 0 rows
+
+----- query/hybrid/q45_coalesce_ids.sql -----
+time="2026-03-02T19:27:35+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:27:41.454 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:27:42.606 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:27:42.648 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:27:42.650 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:27:42.652 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:27:42.653 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:27:42.655 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:27:43.308 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 45: Use COALESCE for ID fields
+SELECT 
+    process_id,
+    COALESCE(var_caseId, var_staticData_caseId, 'NO_CASE_ID') as effective_caseId,
+    COALESCE(var_ucpId, var_epkData_ucpId, 'NO_UC
+16:27:45.829 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:27:47.003 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{process_id=ift-5g-rb_badb1804-3165-4162-8120-0e0ab8fe2035, effective_caseId=fdc61bc2-dce7-4b6a-88db-e984966736b0, effective_ucpId=1806364146839605725}
+{process_id=psi-5g-fl-mpz1_a63d1b0b-bfe0-4fc3-b899-17193fa5eb6f, effective_caseId=21451d2f-1da2-4956-a15e-66606376bc2a, effective_ucpId=1383651398222372694}
+{process_id=ift-5g-rb_fa294fe0-4a46-41c9-a6ad-7598df251a81, effective_caseId=27b05346-382e-42b6-9fba-ae81ff93821b, effective_ucpId=1654400186617408404}
+{process_id=psi-fl-5g_69f5e187-a7f1-4747-944b-4f1d635e0660, effective_caseId=40bb21c7-eec8-4b62-9c15-6c2c67789415, effective_ucpId=1574484158656019404}
+{process_id=psi-fl-cc_4c615ea9-8ede-4fd7-b00c-8f035f8a8f10, effective_caseId=25015313-efbe-433e-ac5b-c85a66989446, effective_ucpId=1976213511571750809}
+{process_id=psi-5g-fl-mpz1_22027b76-1504-4d7d-b2b3-47429f695d72, effective_caseId=6c57e330-8fbf-4713-ab20-76037c2acc50, effective_ucpId=1342434201625758226}
+{process_id=psi-fl-cc_cd1dcaba-737e-4015-a670-f83fee48989e, effective_caseId=9eba45bb-7c8a-4fb3-91eb-0d3f0b638f9e, effective_ucpId=1102140635514902772}
+{process_id=ift-5g-rb_70f8959c-7899-4bbe-98c1-f420a5a379b8, effective_caseId=6b8d5ea6-e74b-4615-891f-6b0f751cf4b8, effective_ucpId=1798653353122171389}
+{process_id=psi-fl-5g_264f86d4-4256-4519-8f7e-255c7a23b93e, effective_caseId=cc4b5c29-3cc3-46ba-9764-11d31af0875b, effective_ucpId=1768379372034280478}
+{process_id=psi-fl-cc_0dc5a4ff-7647-4b86-b2cb-8cc0fc02187e, effective_caseId=e1e1879a-0bbe-4d18-bdf6-fe6b97a02470, effective_ucpId=1650833957351189456}
+{process_id=ift-5g-rb_f32b491d-6da1-4370-83dd-705ae6a25f5a, effective_caseId=21751a91-4481-4222-af0a-e9250db4d9a6, effective_ucpId=1870333721405869535}
+{process_id=psi-5g-fl-mpz1_c3c95215-e24f-4426-8737-477731739cd6, effective_caseId=a4adab1e-9709-43ec-b4c0-31e108b6bcff, effective_ucpId=1403127209022859158}
+{process_id=ift-5g-rb_ae2d0a58-9e41-4a8e-a562-4c22a72e76c4, effective_caseId=2e4c5e23-098f-4272-a33d-d3fe70f99eec, effective_ucpId=1261655312022573162}
+{process_id=ift-5g-rb_282da1f1-ecb8-4145-8d25-dfca80eb3ed6, effective_caseId=af8776af-d6c9-46e9-b419-e40ae484a507, effective_ucpId=1262599855494917666}
+{process_id=psi-5g-fl-mpz1_4377cb54-ad44-4d48-88f7-305309070717, effective_caseId=7d6f3da8-8a5f-4c64-a6e2-ca83d4db7360, effective_ucpId=1351102856683062804}
+{process_id=ift-5g-rb_679419a8-7c89-4032-83bc-2dcb2f35a853, effective_caseId=313f45a6-65df-4c41-b78b-5bc02331c9d7, effective_ucpId=1613061580120551352}
+{process_id=psi-5g-fl-mpz1_09c352dc-7735-423c-96c1-675ea5559276, effective_caseId=95a1fc79-b523-4206-9db1-c8397bfc63f3, effective_ucpId=1236348007574066677}
+{process_id=psi-5g-fl-mpz1_52dc05a7-f66a-49a5-854c-44d9047500e2, effective_caseId=71e70b41-2c91-4601-8406-a4e602c41817, effective_ucpId=1989325215196586495}
+{process_id=ift-5g-rb_9a5be65b-2d04-4519-819a-a1b3ff1c4aa7, effective_caseId=e0f8079f-4e8a-425c-ac3e-7bef31f62d7b, effective_ucpId=1276159925387490579}
+{process_id=ift-5g-rb_8e3ee38a-0f41-4f1c-add4-2ddf96d26ce4, effective_caseId=9303acda-d119-41c1-81d1-6f69710ad4fb, effective_ucpId=1179285358443998076}
+{process_id=psi-fl-cc_f5127bf9-ca16-47c8-97f7-6cfb75a8e84a, effective_caseId=be30f433-d1cf-4a43-8612-d3f4ea3b7adc, effective_ucpId=1891790929512996763}
+{process_id=ift-5g-rb_f9f2feda-e263-4b4e-abe0-224306aa40b4, effective_caseId=1cdbf113-c7d8-495d-a1f7-1640d92c438c, effective_ucpId=1396546818855048169}
+{process_id=psi-5g-fl-mpz1_6c7579dd-039a-4fbc-b94f-5d550e227ad4, effective_caseId=f35eb5fa-0498-43fe-8746-dfedc5dae88c, effective_ucpId=1342044577220996147}
+{process_id=psi-fl-cc_8af16537-67d9-4236-b98d-a125163d1915, effective_caseId=70d75ac3-c7b6-449b-a08a-c8433bad9d0a, effective_ucpId=1884016938606332829}
+{process_id=ift-5g-fl-cc_ea5f68c5-feca-4869-8679-93e01b2acb04, effective_caseId=1d4d6aff-76e6-4a77-aded-473b4f197866, effective_ucpId=1383087764587702530}
+16:27:47.865 [main] INFO  Application - Query returned 25 rows
+
+----- query/hybrid/q46_null_analysis.sql -----
+time="2026-03-02T19:27:50+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:27:55.620 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:27:56.931 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:27:56.981 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:27:56.988 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:27:56.990 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:27:56.991 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:27:56.993 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:27:57.824 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 46: Null value analysis
+SELECT 
+    COUNT(*) as total,
+    SUM(CASE WHEN var_caseId IS NULL THEN 1 ELSE 0 END) as null_caseId,
+    SUM(CASE WHEN var_epkId IS NULL THEN 1 ELSE 0 END) as nu
+16:27:59.757 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:28:01.247 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{total=25, null_caseId=0, null_epkId=0, null_fio=0, null_clientEpkId=0}
+16:28:01.738 [main] INFO  Application - Query returned 1 rows
+
+----- query/hybrid/q47_percentiles.sql -----
+time="2026-03-02T19:28:03+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:28:07.429 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:28:08.763 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:28:08.857 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:28:08.861 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:28:08.864 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:28:08.866 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:28:08.867 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:28:09.440 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 47: Duration percentiles by process name
+SELECT 
+    process_name,
+    COUNT(*) as total,
+    MIN(__time) as first_seen,
+    MAX(__time) as last_seen
+FROM process_hybrid
+GROUP BY proce
+16:28:11.236 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:28:12.113 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{process_name=MassTransferProcessUnif, total=5, first_seen=2026-03-01T17:31:29.958Z, last_seen=2026-03-02T08:39:29.580Z}
+{process_name=tappeal_p2p_receiver, total=5, first_seen=2026-03-01T15:55:30.419Z, last_seen=2026-03-02T11:03:30.259Z}
+{process_name=uvskFraudFin_front, total=5, first_seen=2026-03-01T14:43:30.116Z, last_seen=2026-03-02T04:21:30.177Z}
+{process_name=uvskRemainderReturnCR-Service, total=5, first_seen=2026-03-01T17:02:23.372Z, last_seen=2026-03-02T13:58:29.135Z}
+{process_name=uvskStupidsEarlyRehrenment_sub, total=5, first_seen=2026-03-01T14:25:29.377Z, last_seen=2026-03-02T06:59:29.450Z}
+16:28:12.462 [main] INFO  Application - Query returned 5 rows
+
+----- query/hybrid/q48_top_clients_count.sql -----
+time="2026-03-02T19:28:14+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:28:18.763 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:28:19.756 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:28:19.834 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:28:19.836 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:28:19.838 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:28:19.839 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:28:19.840 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:28:20.506 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 48: Top clients by process count
+SELECT 
+    var_epkId,
+    var_fio,
+    COUNT(*) as process_count,
+    COUNT(DISTINCT process_name) as distinct_processes
+FROM process_hybrid
+WHERE var
+16:28:22.155 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:28:23.008 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{var_epkId=1004877928979401063, var_fio=╨Ш╨Т╨Р╨Э╨Ю╨Т ╨Х╨Т╨У╨Х╨Э╨Ш╨Щ ╨Р╨Ы╨Х╨Ъ╨б╨Р╨Э╨Ф╨а╨Ю╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+{var_epkId=1030985081421224716, var_fio=╨Я╨Р╨Т╨Ы╨Ю╨Т ╨Р╨Ы╨Х╨Ъ╨б╨Х╨Щ ╨Р╨Ы╨Х╨Ъ╨б╨Х╨Х╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+{var_epkId=1038276726142823068, var_fio=╨Э╨Ю╨Т╨Ш╨Ъ╨Ю╨Т ╨Ь╨Р╨Ъ╨б╨Ш╨Ь ╨Ш╨Т╨Р╨Э╨Ю╨Т╨Э╨Р, process_count=1, distinct_processes=1}
+{var_epkId=1094135292107984073, var_fio=╨б╨Х╨Ь╨Х╨Э╨Ю╨Т ╨Х╨Т╨У╨Х╨Э╨Ш╨Щ ╨Т╨Ы╨Р╨Ф╨Ш╨Ь╨Ш╨а╨Ю╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+{var_epkId=1153876002100362386, var_fio=╨Т╨Ю╨а╨Ю╨С╨м╨Х╨Т ╨Р╨Ы╨Х╨Ъ╨б╨Р╨Э╨Ф╨а ╨Ш╨Т╨Р╨Э╨Ю╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+{var_epkId=1206583762753466164, var_fio=╨Ш╨Т╨Р╨Э╨Ю╨Т ╨Ъ╨Ю╨Э╨б╨в╨Р╨Э╨в╨Ш╨Э ╨Ф╨Ь╨Ш╨в╨а╨Ш╨Х╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+{var_epkId=1243703939889051430, var_fio=╨б╨Ю╨Ъ╨Ю╨Ы╨Ю╨Т ╨Ь╨Р╨а╨Ш╨п ╨Ш╨Т╨Р╨Э╨Ю╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+{var_epkId=1273249744263995388, var_fio=╨С╨Ю╨У╨Ф╨Р╨Э╨Ю╨Т ╨Ъ╨Ю╨Э╨б╨в╨Р╨Э╨в╨Ш╨Э ╨Т╨Ы╨Р╨Ф╨Ш╨Ь╨Ш╨а╨Ю╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+{var_epkId=1280039151500549348, var_fio=╨б╨Х╨Ь╨Х╨Э╨Ю╨Т ╨Э╨Р╨в╨Р╨Ы╨м╨п ╨б╨Х╨а╨У╨Х╨Х╨Т╨Э╨Р, process_count=1, distinct_processes=1}
+{var_epkId=1312238392644949820, var_fio=╨Ъ╨Ю╨Ч╨Ы╨Ю╨Т ╨Э╨Ш╨Ъ╨Ю╨Ы╨Р╨Щ ╨Ш╨Т╨Р╨Э╨Ю╨Т╨Э╨Р, process_count=1, distinct_processes=1}
+{var_epkId=1426686650730617763, var_fio=╨Ш╨Т╨Р╨Э╨Ю╨Т ╨Р╨Ы╨Х╨Ъ╨б╨Р╨Э╨Ф╨а ╨Ф╨Ь╨Ш╨в╨а╨Ш╨Х╨Т╨Э╨Р, process_count=1, distinct_processes=1}
+{var_epkId=1427526433174869083, var_fio=╨б╨Ш╨Ф╨Ю╨а╨Ю╨Т ╨Ю╨Ы╨м╨У╨Р ╨Ь╨Р╨Ъ╨б╨Ш╨Ь╨Ю╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+{var_epkId=1442201349798891977, var_fio=╨в╨Р╨а╨Р╨б╨Ю╨Т ╨Ь╨Р╨а╨Ш╨п ╨Ш╨Т╨Р╨Э╨Ю╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+{var_epkId=1546707393092684401, var_fio=╨Э╨Ю╨Т╨Ш╨Ъ╨Ю╨Т ╨Я╨Р╨Т╨Х╨Ы ╨Р╨Ы╨Х╨Ъ╨б╨Х╨Х╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+{var_epkId=1558048503385181965, var_fio=╨б╨Ю╨Ъ╨Ю╨Ы╨Ю╨Т ╨Ю╨Ы╨м╨У╨Р ╨Т╨Ы╨Р╨Ф╨Ш╨Ь╨Ш╨а╨Ю╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+{var_epkId=1578144867544317361, var_fio=╨Ш╨Т╨Р╨Э╨Ю╨Т ╨Ш╨Т╨Р╨Э ╨Ь╨Р╨Ъ╨б╨Ш╨Ь╨Ю╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+{var_epkId=1581610522297663526, var_fio=╨Ъ╨Ю╨Ь╨Р╨а╨Ю╨Т ╨Ъ╨Ю╨Э╨б╨в╨Р╨Э╨в╨Ш╨Э ╨Ф╨Ь╨Ш╨в╨а╨Ш╨Х╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+{var_epkId=1719863718195456987, var_fio=╨Ш╨Т╨Р╨Э╨Ю╨Т ╨Ь╨Р╨а╨Ш╨п ╨Р╨Э╨Ф╨а╨Х╨Х╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+{var_epkId=1845141606826449015, var_fio=╨Я╨Р╨Т╨Ы╨Ю╨Т ╨Ф╨Х╨Э╨Ш╨б ╨Ш╨Т╨Р╨Э╨Ю╨Т╨Э╨Р, process_count=1, distinct_processes=1}
+{var_epkId=1847668451336176919, var_fio=╨Т╨Ю╨Ы╨Ъ╨Ю╨Т ╨Р╨Э╨Э╨Р ╨б╨Х╨а╨У╨Х╨Х╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+16:28:23.361 [main] INFO  Application - Query returned 20 rows
+
+----- query/hybrid/q49_module_performance.sql -----
+time="2026-03-02T19:28:25+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:28:30.223 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:28:31.690 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:28:31.787 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:28:31.791 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:28:31.792 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:28:31.794 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:28:31.795 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:28:33.051 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 49: Module performance comparison
+SELECT 
+    module_id,
+    COUNT(*) as total,
+    SUM(CASE WHEN state = 2 THEN 1 ELSE 0 END) as completed,
+    SUM(CASE WHEN state = 3 THEN 1 ELSE 0 END
+16:28:35.853 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:28:36.932 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{module_id=psi-5g-fl-mpz1, total=7, completed=3, failed=0, first_seen=2026-03-01T18:56:29.336Z, last_seen=2026-03-02T08:12:30.363Z}
+{module_id=psi-fl-5g, total=7, completed=2, failed=0, first_seen=2026-03-01T15:55:30.419Z, last_seen=2026-03-02T11:03:30.259Z}
+{module_id=ift-5g-fl-cc, total=5, completed=3, failed=0, first_seen=2026-03-01T14:43:30.116Z, last_seen=2026-03-02T07:31:30.585Z}
+{module_id=ift-5g-rb, total=3, completed=1, failed=0, first_seen=2026-03-01T14:25:29.377Z, last_seen=2026-03-02T06:43:29.295Z}
+{module_id=psi-fl-cc, total=3, completed=2, failed=0, first_seen=2026-03-01T20:27:29.216Z, last_seen=2026-03-02T13:58:29.135Z}
+16:28:37.458 [main] INFO  Application - Query returned 5 rows
+
+----- query/hybrid/q50_recent_activity.sql -----
+time="2026-03-02T19:28:39+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:28:43.308 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:28:44.477 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:28:44.557 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:28:44.560 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:28:44.562 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:28:44.569 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:28:44.574 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:28:45.244 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 50: Recent activity summary
+SELECT 
+    TIME_FLOOR(__time, 'PT10M') as time_bucket,
+    process_name,
+    COUNT(*) as started,
+    SUM(CASE WHEN state = 2 THEN 1 ELSE 0 END) as completed
+16:28:46.914 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:28:47.963 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+16:28:48.237 [main] INFO  Application - Query returned 0 rows
+
+----- query/hybrid/q51_json_surname_extract.sql -----
+time="2026-03-02T19:28:49+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:28:53.723 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:28:54.581 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:28:54.625 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:28:54.629 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:28:54.630 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:28:54.632 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:28:54.633 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:28:55.181 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 51: Extract surname from epkData
+SELECT 
+    process_id,
+    JSON_VALUE(var_epkData_json, '$.epkEntity.names[0].surname') as surname,
+    JSON_VALUE(var_epkData_json, '$.epkEntity.names[0
+16:28:57.641 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:28:58.502 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{process_id=ift-5g-rb_badb1804-3165-4162-8120-0e0ab8fe2035, surname=null, name=null}
+{process_id=psi-5g-fl-mpz1_a63d1b0b-bfe0-4fc3-b899-17193fa5eb6f, surname=null, name=null}
+{process_id=ift-5g-rb_fa294fe0-4a46-41c9-a6ad-7598df251a81, surname=null, name=null}
+{process_id=psi-fl-5g_69f5e187-a7f1-4747-944b-4f1d635e0660, surname=null, name=null}
+{process_id=psi-fl-cc_4c615ea9-8ede-4fd7-b00c-8f035f8a8f10, surname=null, name=null}
+{process_id=psi-5g-fl-mpz1_22027b76-1504-4d7d-b2b3-47429f695d72, surname=null, name=null}
+{process_id=psi-fl-cc_cd1dcaba-737e-4015-a670-f83fee48989e, surname=null, name=null}
+{process_id=ift-5g-rb_70f8959c-7899-4bbe-98c1-f420a5a379b8, surname=null, name=null}
+{process_id=psi-fl-5g_264f86d4-4256-4519-8f7e-255c7a23b93e, surname=null, name=null}
+{process_id=psi-fl-cc_0dc5a4ff-7647-4b86-b2cb-8cc0fc02187e, surname=null, name=null}
+{process_id=ift-5g-rb_f32b491d-6da1-4370-83dd-705ae6a25f5a, surname=null, name=null}
+{process_id=psi-5g-fl-mpz1_c3c95215-e24f-4426-8737-477731739cd6, surname=null, name=null}
+{process_id=ift-5g-rb_ae2d0a58-9e41-4a8e-a562-4c22a72e76c4, surname=null, name=null}
+{process_id=ift-5g-rb_282da1f1-ecb8-4145-8d25-dfca80eb3ed6, surname=null, name=null}
+{process_id=psi-5g-fl-mpz1_4377cb54-ad44-4d48-88f7-305309070717, surname=null, name=null}
+{process_id=ift-5g-rb_679419a8-7c89-4032-83bc-2dcb2f35a853, surname=null, name=null}
+{process_id=psi-5g-fl-mpz1_09c352dc-7735-423c-96c1-675ea5559276, surname=null, name=null}
+{process_id=psi-5g-fl-mpz1_52dc05a7-f66a-49a5-854c-44d9047500e2, surname=null, name=null}
+{process_id=ift-5g-rb_9a5be65b-2d04-4519-819a-a1b3ff1c4aa7, surname=null, name=null}
+{process_id=ift-5g-rb_8e3ee38a-0f41-4f1c-add4-2ddf96d26ce4, surname=null, name=null}
+{process_id=psi-fl-cc_f5127bf9-ca16-47c8-97f7-6cfb75a8e84a, surname=null, name=null}
+{process_id=ift-5g-rb_f9f2feda-e263-4b4e-abe0-224306aa40b4, surname=null, name=null}
+{process_id=psi-5g-fl-mpz1_6c7579dd-039a-4fbc-b94f-5d550e227ad4, surname=null, name=null}
+{process_id=psi-fl-cc_8af16537-67d9-4236-b98d-a125163d1915, surname=null, name=null}
+{process_id=ift-5g-fl-cc_ea5f68c5-feca-4869-8679-93e01b2acb04, surname=null, name=null}
+16:28:58.901 [main] INFO  Application - Query returned 25 rows
+
+----- query/hybrid/q52_status_code_dist.sql -----
+time="2026-03-02T19:29:00+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+16:29:06.484 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+16:29:07.511 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+16:29:07.556 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+16:29:07.558 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+16:29:07.559 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+16:29:07.561 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+16:29:07.566 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+16:29:08.310 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: -- Query 52: Status code distribution
+SELECT 
+    var_staticData_statusCode,
+    COUNT(*) as cnt_total,
+    MIN(__time) as first_occurrence,
+    MAX(__time) as last_occurrence
+FROM process_hybri
+16:29:12.288 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+16:29:13.930 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+{var_staticData_statusCode=COMPLETED, cnt_total=8, first_occurrence=2026-03-01T15:55:30.419Z, last_occurrence=2026-03-02T13:58:29.135Z}
+{var_staticData_statusCode=IN_PROGRESS, cnt_total=7, first_occurrence=2026-03-01T14:25:29.377Z, last_occurrence=2026-03-02T08:12:30.363Z}
+{var_staticData_statusCode=REJECTED, cnt_total=7, first_occurrence=2026-03-01T17:06:30.213Z, last_occurrence=2026-03-02T08:39:29.580Z}
+{var_staticData_statusCode=PENDING, cnt_total=2, first_occurrence=2026-03-01T17:31:29.958Z, last_occurrence=2026-03-02T04:08:29.530Z}
+{var_staticData_statusCode=CANCELLED, cnt_total=1, first_occurrence=2026-03-02T01:02:30.077Z, last_occurrence=2026-03-02T01:02:30.077Z}
+16:29:14.443 [main] INFO  Application - Query returned 5 rows

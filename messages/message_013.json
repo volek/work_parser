@@ -1,0 +1,313 @@
+{
+  "id" : "psi-5g-fl-mpz1_6c7579dd-039a-4fbc-b94f-5d550e227ad4",
+  "parentInstanceId" : "psi-5g-fl-mpz1_3f2f1b1b-6932-4147-a963-61ca17885747",
+  "rootInstanceId" : "psi-5g-fl-mpz1_3f2f1b1b-6932-4147-a963-61ca17885747",
+  "processId" : "Process_db00a1d",
+  "processDefinitionId" : "Process_c0aeadd:95:1138023a-de8e-4fbe-b424-46ad1059bd41",
+  "resourceName" : null,
+  "rootProcessId" : "Process_ad6acf4",
+  "processName" : "MassTransferProcessUnif",
+  "startDate" : "2026-03-02T11:39:29.580543344+03:00",
+  "endDate" : null,
+  "state" : 1,
+  "businessKey" : "2603024337582",
+  "version" : 86,
+  "bamProjectId" : "6d6b5c8d-68dd-4615-abd8-c0989f5c7d90",
+  "extIds" : null,
+  "error" : null,
+  "moduleId" : "psi-fl-5g",
+  "engineVersion" : "D-5.5.0-3885",
+  "enginePodName" : "bpmx-engine-psi-fl-5g-94effe5689",
+  "retryCount" : 3,
+  "ownerRole" : "admin",
+  "idempotencyKey" : null,
+  "operation" : null,
+  "nodeInstances" : [ {
+    "id" : "619b9996-e170-4e18-98e2-d960ff02a952",
+    "nodeId" : "Activity_586b191",
+    "nodeDefinitionId" : "Activity_586b191",
+    "nodeName" : "Start",
+    "nodeType" : "startEvent",
+    "error" : null,
+    "state" : 4,
+    "calledProcessInstanceIds" : null,
+    "retries" : [ ],
+    "htmTaskId" : null,
+    "triggerTime" : "2026-03-02T11:39:29.580543344+03:00",
+    "leaveTime" : "2026-03-02T11:39:29.580543344+03:00",
+    "triggerNodeInstanceId" : null,
+    "creationOrder" : 1
+  }, {
+    "id" : "7a84f906-00b2-4854-8344-022cf98b0b56",
+    "nodeId" : "Activity_9b66df0",
+    "nodeDefinitionId" : "Activity_9b66df0",
+    "nodeName" : "DocumentVerification",
+    "nodeType" : "userTask",
+    "error" : null,
+    "state" : 4,
+    "calledProcessInstanceIds" : null,
+    "retries" : [ ],
+    "htmTaskId" : "1732b6a6-36f7-4783-9eef-03b817f0244a",
+    "triggerTime" : "2026-03-02T11:39:33.580543344+03:00",
+    "leaveTime" : "2026-03-02T11:39:53.580543344+03:00",
+    "triggerNodeInstanceId" : null,
+    "creationOrder" : 2
+  }, {
+    "id" : "94c69353-811b-44a2-b9d5-684baa80d33f",
+    "nodeId" : "Activity_672ebaf",
+    "nodeDefinitionId" : "Activity_672ebaf",
+    "nodeName" : "processGfl",
+    "nodeType" : "restTask",
+    "error" : null,
+    "state" : 4,
+    "calledProcessInstanceIds" : null,
+    "retries" : [ ],
+    "htmTaskId" : null,
+    "triggerTime" : "2026-03-02T11:39:53.580543344+03:00",
+    "leaveTime" : "2026-03-02T11:40:13.580543344+03:00",
+    "triggerNodeInstanceId" : null,
+    "creationOrder" : 3
+  }, {
+    "id" : "5194fd59-f96d-42c5-ac96-98f1a75db0a9",
+    "nodeId" : "Activity_9b1b1cb",
+    "nodeDefinitionId" : "Activity_9b1b1cb",
+    "nodeName" : "Gateway_4",
+    "nodeType" : "exclusiveGateway",
+    "error" : null,
+    "state" : 0,
+    "calledProcessInstanceIds" : null,
+    "retries" : [ ],
+    "htmTaskId" : null,
+    "triggerTime" : "2026-03-02T11:40:13.580543344+03:00",
+    "leaveTime" : null,
+    "triggerNodeInstanceId" : null,
+    "creationOrder" : 4
+  } ],
+  "variables" : {
+    "caseId" : "f35eb5fa-0498-43fe-8746-dfedc5dae88c",
+    "epkId" : "1427526433174869083",
+    "ucpId" : "1342044577220996147",
+    "fio" : "СИДОРОВ ОЛЬГА МАКСИМОВИЧ",
+    "globalInstanceId" : "eb4552a4-d687-4e1a-af5e-f722b9b14024",
+    "INTERACTION_ID" : "260302-7000-237211",
+    "INTERACTION_DATE" : "02.03.2026",
+    "theme" : "refundRequest",
+    "result" : "",
+    "status" : "REJECTED",
+    "staticData" : {
+      "classifierVersion" : 11,
+      "caseId" : "f35eb5fa-0498-43fe-8746-dfedc5dae88c",
+      "classifierMasterId" : "1e7a4961-702f-4ef4-ba78-ad5e722ec75e",
+      "classifierParentMasterId" : "83a31594-f1b0-4814-a7db-d1cfc136c795",
+      "casePublicId" : "2603027000960571",
+      "clientEpkId" : 1427526433174869083,
+      "statusCode" : "REJECTED",
+      "statusName" : null,
+      "crmAppealNum" : null,
+      "considerationResultCode" : "APPROVED",
+      "considerationResultName" : "Одобрено",
+      "crmRequestId" : null,
+      "lastUpdateTime" : "2026-03-02T12:06:29.580543344+03:00",
+      "closedTime" : null,
+      "registrationTime" : "2026-03-02T11:39:29.580543344+03:00",
+      "publicDescription" : "Тестовое обращение #4197",
+      "caseEcmFolder" : null,
+      "pprbCase" : false,
+      "contactSettingsStart" : "09:00",
+      "contactSettingsFinish" : "20:00",
+      "contactSettingsTimeZone" : "+03:00",
+      "expirationTime" : "2026-03-03T11:39:29.580543344+03:00",
+      "initialExpirationTime" : "2026-03-03T11:39:29.580543344+03:00",
+      "initialInteractionId" : "91dd753b-8bd2-4695-9c3c-48e38f95a61d",
+      "answers" : [ ]
+    },
+    "epkData" : {
+      "epkEntity" : {
+        "ucpId" : "1342044577220996147",
+        "version" : 46,
+        "names" : [ {
+          "surname" : "СИДОРОВ",
+          "name" : "ОЛЬГА",
+          "patronymic" : "МАКСИМОВИЧ"
+        } ],
+        "clientStatus" : 1,
+        "gender" : 1,
+        "clientGroups" : [ 2904 ],
+        "phoneNumbers" : [ {
+          "phoneNumber" : "+7 (922) 3163148",
+          "startDate" : "2024-03-02T14:19:29.587274454Z",
+          "endDate" : null,
+          "updateDateTime" : "2025-03-26T14:19:29.587390156Z",
+          "contactStatus" : 1,
+          "timeAvailabilityFrom" : null,
+          "timeAvailabilityTo" : null,
+          "usageType" : 14,
+          "flags" : [ 97, 40, 71, 75, 62 ],
+          "flagList" : [ ],
+          "phoneQualityCode" : 511,
+          "region" : 4
+        }, {
+          "phoneNumber" : "+7 (943) 9794495",
+          "startDate" : "2024-03-02T14:19:29.587795366Z",
+          "endDate" : null,
+          "updateDateTime" : "2025-07-27T14:19:29.59889971Z",
+          "contactStatus" : 1,
+          "timeAvailabilityFrom" : null,
+          "timeAvailabilityTo" : null,
+          "usageType" : 15,
+          "flags" : [ 67, 18 ],
+          "flagList" : [ ],
+          "phoneQualityCode" : 511,
+          "region" : 16
+        }, {
+          "phoneNumber" : "+7 (970) 4357171",
+          "startDate" : "2024-03-02T14:19:29.599170889Z",
+          "endDate" : null,
+          "updateDateTime" : "2025-08-26T14:19:29.599257382Z",
+          "contactStatus" : 1,
+          "timeAvailabilityFrom" : null,
+          "timeAvailabilityTo" : null,
+          "usageType" : 15,
+          "flags" : [ 79, 42, 31, 83, 51 ],
+          "flagList" : [ ],
+          "phoneQualityCode" : 511,
+          "region" : 19
+        } ],
+        "electronicAddresses" : [ ],
+        "deathDate" : null,
+        "birthDate" : "2006-03-02T14:19:29.599554126Z",
+        "identifications" : [ {
+          "documentSeries" : "52 93",
+          "documentNumber" : "484543",
+          "documentTypeCode" : 17,
+          "issuedDate" : "2025-03-02T14:19:29.599793019Z",
+          "issuerCode" : "734-118",
+          "issuedByOrganization" : "ОВД района Восточный"
+        } ]
+      },
+      "customerKnowledge" : [ {
+        "value" : "38983",
+        "id" : 1055152801248048178
+      }, {
+        "value" : "40365",
+        "id" : 1728612362252370411
+      } ]
+    },
+    "tracingHeaders" : {
+      "x-request-id" : "b64f0413-5177-4814-9fb5-57a9f85905fd",
+      "x-b3-parentspanid" : "76a440b1ca9b770b",
+      "x-b3-spanid" : "e7453fd24cebfb0f",
+      "x-b3-traceid" : "7b10de2996c882854dbaa777c5644bd1",
+      "x-b3-sampled" : "1"
+    },
+    "startAttributes" : {
+      "caseId" : "f35eb5fa-0498-43fe-8746-dfedc5dae88c",
+      "attributes" : [ {
+        "inputSumm" : "2043"
+      }, {
+        "inputCC" : {
+          "DPAN" : "9223251263634612",
+          "endDate" : "2028-03-02",
+          "accountNum" : "21499485647007274",
+          "processing" : "urn:sbrfsystems:99-way"
+        }
+      }, {
+        "inputDC" : {
+          "DPAN" : "3761280400651474",
+          "endDate" : "2027-03-02",
+          "accountNum" : "99969711544880961",
+          "processing" : "urn:sbrfsystems:99-pci:tw"
+        }
+      } ]
+    },
+    "answerGFL" : {
+      "RqTm" : "2026-03-02T14:19:29.600829312",
+      "RqUID" : "d17f876c31af7037eedf7e01528c819d",
+      "Status" : {
+        "StatusCode" : 0,
+        "StatusDesc" : "SUCCESS",
+        "AdditionalStatus" : [ ]
+      },
+      "OperUID" : "c0a026f1a428989214b747d11f50d3ca",
+      "AcctType" : [ ],
+      "PankAcctRec" : [ {
+        "Mord" : {
+          "SPName" : "urn:sbrfsystems:99-way",
+          "AcctBal" : [ {
+            "CurAmt" : 335476.90214656095,
+            "AcctCur" : "RUB",
+            "BalType" : "Avail"
+          }, {
+            "CurAmt" : 33238.71139668697,
+            "AcctCur" : "RUB",
+            "BalType" : "CR_LIMIT"
+          }, {
+            "CurAmt" : 491940.16352788085,
+            "AcctCur" : "RUB",
+            "BalType" : "OWN_BALANCE"
+          }, {
+            "CurAmt" : 0.0,
+            "AcctCur" : "RUB",
+            "BalType" : "Debt"
+          } ],
+          "MordAcctId" : {
+            "EndDt" : "2030-03-02",
+            "AcctId" : "40817831039395157806",
+            "AcctCur" : "RUB",
+            "MordNum" : "ED2661BFDC172D5F",
+            "MordType" : "DC",
+            "SystemId" : "urn:sbrfsystems:99-way",
+            "MordLevel" : "VG"
+          },
+          "PankAcctStatus" : {
+            "StatusDesc" : "+ - КАРТОЧКА ОТКРЫТА",
+            "StatusClass" : "Valid",
+            "PankAcctStatusCode" : "+"
+          }
+        }
+      }, {
+        "Mord" : {
+          "SPName" : "urn:sbrfsystems:99-way",
+          "AcctBal" : [ {
+            "CurAmt" : 279337.996637972,
+            "AcctCur" : "RUB",
+            "BalType" : "Avail"
+          }, {
+            "CurAmt" : 14244.62297673037,
+            "AcctCur" : "RUB",
+            "BalType" : "CR_LIMIT"
+          }, {
+            "CurAmt" : 238588.04606728413,
+            "AcctCur" : "RUB",
+            "BalType" : "OWN_BALANCE"
+          }, {
+            "CurAmt" : 0.0,
+            "AcctCur" : "RUB",
+            "BalType" : "Debt"
+          } ],
+          "MordAcctId" : {
+            "EndDt" : "2029-03-02",
+            "AcctId" : "40817849167417600482",
+            "AcctCur" : "RUB",
+            "MordNum" : "19A29C26BECAEDBA",
+            "MordType" : "DC",
+            "SystemId" : "urn:sbrfsystems:99-way",
+            "MordLevel" : "ST"
+          },
+          "PankAcctStatus" : {
+            "StatusDesc" : "+ - КАРТОЧКА ОТКРЫТА",
+            "StatusClass" : "Valid",
+            "PankAcctStatusCode" : "+"
+          }
+        }
+      } ]
+    },
+    "unifMetadata" : "45_8622_1",
+    "unifObjectId" : "76ea19d8-9d77-4852-ac12-6c2c8a85c2e0",
+    "rosterId" : "91cd0ec0-2898-43d8-aa9d-49e414047c1e",
+    "durationUnifResult" : "PT1H",
+    "unifPageSize" : 1000,
+    "externalIds" : null
+  },
+  "contextSize" : 137394
+}

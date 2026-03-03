@@ -1,0 +1,64 @@
+# =============================================================================
+# BPM Message Parser - Docker Compose Configuration
+# =============================================================================
+# Запуск только приложения. Druid должен быть запущен отдельно.
+#
+# Варианты подключения к Druid:
+#   1. Внешний Druid (standalone): настройте переменные в .env файле
+#   2. Druid в отдельном docker-compose: используйте docker-compose.druid.yml
+#
+# Запуск:
+#   docker compose up -d
+#
+# С кастомным .env:
+#   docker compose --env-file .env.production up -d
+# =============================================================================
+
+version: "3.8"
+
+services:
+  # ---------------------------------------------------------------------------
+  # BPM Message Parser Application
+  # ---------------------------------------------------------------------------
+  bpm-parser:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bpm-parser
+    environment:
+      # Druid Connection Settings (можно переопределить через .env файл)
+      DRUID_BROKER_URL: ${DRUID_BROKER_URL:-http://host.docker.internal:8082}
+      DRUID_COORDINATOR_URL: ${DRUID_COORDINATOR_URL:-http://host.docker.internal:8081}
+      DRUID_OVERLORD_URL: ${DRUID_OVERLORD_URL:-http://host.docker.internal:8090}
+      DRUID_ROUTER_URL: ${DRUID_ROUTER_URL:-http://host.docker.internal:8888}
+      DRUID_CONNECT_TIMEOUT: ${DRUID_CONNECT_TIMEOUT:-30000}
+      DRUID_READ_TIMEOUT: ${DRUID_READ_TIMEOUT:-60000}
+      DRUID_BATCH_SIZE: ${DRUID_BATCH_SIZE:-1000}
+      JAVA_OPTS: ${JAVA_OPTS:--Xms256m -Xmx512m}
+    volumes:
+      - ./messages:/app/messages
+      - ./query:/app/query
+      - ./samples:/app/samples
+      - parser-logs:/app/logs
+    extra_hosts:
+      # Для доступа к host machine (standalone Druid)
+      - "host.docker.internal:host-gateway"
+    networks:
+      - parser-network
+    stdin_open: true
+    tty: true
+
+# =============================================================================
+# Volumes
+# =============================================================================
+volumes:
+  parser-logs:
+
+# =============================================================================
+# Networks
+# =============================================================================
+networks:
+  parser-network:
+    driver: bridge
+    # Для подключения к внешней сети Druid (если используется docker-compose.druid.yml)
+    # можно использовать external: true и указать имя сети

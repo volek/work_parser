@@ -1,0 +1,1137 @@
+{
+
+                "id": "psi-fl-5g_c198fe9b-98f6-11ee-869b-0a581d403080",
+
+                "parentInstanceId": null,
+
+                "rootInstanceId": "psi-fl-5g_c198fe9b-98f6-11ee-869b-0a581d403080",
+
+                "processId": "Process_bb2018d",
+
+                "processDefinitionId": "Process_bb2018d:1:73f4dd1b-929a-11ee-869b-0a581d403080",
+
+                "resourceName": null,
+
+                "rootProcessId": null,
+
+                "processName": "uvskRemainderReturnCR-Service",
+
+                "startDate": "2023-12-12T17:00:08.364+03:00",
+
+                "endDate": null,
+
+                "state": 1,
+
+                "businessKey": "740c81e9-3b37-4309-987742-2141980781ab",
+
+                "version": 1,
+
+                "bamProjectId": "52595d8d-43f6-4567-a57af-cb9c04aeeddb",
+
+                "extIds": null,
+
+                "error": null,
+
+                "moduleId": "psi-fl-5g",
+
+                "retryCount": 0,
+
+                "ownerRole": null,
+
+                "operation": null,
+
+                "nodeInstances": [
+
+                               {
+
+                                               "id": "c8fc0438-98f6-11ee-8105-0a5871d4031c1",
+
+                                               "nodeId": "Event_0ra7rcp",
+
+                                               "nodeDefinitionId": "Event_0ra7rcp",
+
+                                               "nodeName": "ProcessEpk_end",
+
+                                               "nodeType": "endEvent",
+
+                                               "error": null,
+
+                                               "state": 4,
+
+                                               "calledProcessInstanceIds": null,
+
+                                               "retries": [],
+
+                                               "htmTaskId": null,
+
+                                               "triggerTime": "2023-12-12T17:00:19.64+03:00",
+
+                                               "leaveTime": "2023-12-12T17:00:19.64+03:00",
+
+                                               "triggerNodeInstanceId": null,
+
+                                               "creationOrder": 18
+
+                               },
+
+                               {
+
+                                               "id": "c8fc2b4b-98f6-11ee-8105-0a581d4031c1",
+
+                                               "nodeId": "Activity_1emb75wx",
+
+                                               "nodeDefinitionId": "Activity_1emb75wx",
+
+                                               "nodeName": "ProcessGfl",
+
+                                               "nodeType": "subProcess",
+
+                                               "error": null,
+
+                                               "state": 0,
+
+                                               "calledProcessInstanceIds": null,
+
+                                               "retries": [],
+
+                                               "htmTaskId": null,
+
+                                               "triggerTime": "2023-12-12T17:00:19.641+03:00",
+
+                                               "leaveTime": null,
+
+                                               "triggerNodeInstanceId": null,
+
+                                               "creationOrder": 19
+
+                               },
+
+                               {
+
+                                               "id": "c8fb67f3-98f6-11ee-8105-0a581d4031c1",
+
+                                               "nodeId": "Activity_1iol7tgq",
+
+                                               "nodeDefinitionId": "Activity_1iolt7gq",
+
+                                               "nodeName": "firstMiddleName and TB from EPK",
+
+                                               "nodeType": "scriptTask",
+
+                                               "error": null,
+
+                                               "state": 4,
+
+                                               "calledProcessInstanceIds": null,
+
+                                               "retries": [],
+
+                                               "htmTaskId": null,
+
+                                               "triggerTime": "2023-12-12T17:00:19.636+03:00",
+
+                                               "leaveTime": "2023-12-12T17:00:19.64+03:00",
+
+                                               "triggerNodeInstanceId": null,
+
+                                               "creationOrder": 17
+
+                               },
+
+                               {
+
+                                               "id": "c6a25cbc-98f6-11ee-8105-0a581d4031c1",
+
+                                               "nodeId": "Activity_1rkrvet",
+
+                                               "nodeDefinitionId": "Activity_1rkrvet",
+
+                                               "nodeName": "ProcessEpk",
+
+                                               "nodeType": "subProcess",
+
+                                               "error": null,
+
+                                               "state": 4,
+
+                                               "calledProcessInstanceIds": null,
+
+                                               "retries": [],
+
+                                               "htmTaskId": null,
+
+                                               "triggerTime": "2023-12-12T17:00:15.697+03:00",
+
+                                               "leaveTime": "2023-12-12T17:00:19.64+03:00",
+
+                                               "triggerNodeInstanceId": null,
+
+                                               "creationOrder": 13
+
+                               },
+
+                               {
+
+                                               "id": "c8fc2b4e-98f6-11ee-8105-0a581d4031c1",
+
+                                               "nodeId": "Event_1ter3ls",
+
+                                               "nodeDefinitionId": "Event_1ter3ls",
+
+                                               "nodeName": "ProcessGfl_start",
+
+                                               "nodeType": "startEvent",
+
+                                               "error": null,
+
+                                               "state": 4,
+
+                                               "calledProcessInstanceIds": null,
+
+                                               "retries": [],
+
+                                               "htmTaskId": null,
+
+                                               "triggerTime": "2023-12-12T17:00:19.641+03:00",
+
+                                               "leaveTime": "2023-12-12T17:00:19.641+03:00",
+
+                                               "triggerNodeInstanceId": null,
+
+                                               "creationOrder": 20
+
+                               },
+
+                               {
+
+                                               "id": "c75447a1-98f6-11ee-8105-0a581d4031c1",
+
+                                               "nodeId": "Activity_1k52e83",
+
+                                               "nodeDefinitionId": "Activity_1k52e83",
+
+                                               "nodeName": "getEpkData",
+
+                                               "nodeType": "restTask",
+
+                                               "error": null,
+
+                                               "state": 4,
+
+                                               "calledProcessInstanceIds": null,
+
+                                               "retries": [],
+
+                                               "htmTaskId": null,
+
+                                               "triggerTime": "2023-12-12T17:00:16.863+03:00",
+
+                                               "leaveTime": "2023-12-12T17:00:19.636+03:00",
+
+                                               "triggerNodeInstanceId": null,
+
+                                               "creationOrder": 16
+
+                               },
+
+                               {
+
+                                               "id": "c8fc2b4f-98f6-11ee-8105-0a581d4031c1",
+
+                                               "nodeId": "Activity_1o6bxmh",
+
+                                               "nodeDefinitionId": "Activity_1o6bxmh",
+
+                                               "nodeName": "setCaseStage GetGFL",
+
+                                               "nodeType": "restTask",
+
+                                               "error": null,
+
+                                               "state": 0,
+
+                                               "calledProcessInstanceIds": null,
+
+                                               "retries": [],
+
+                                               "htmTaskId": null,
+
+                                               "triggerTime": "2023-12-12T17:00:19.641+03:00",
+
+                                               "leaveTime": null,
+
+                                               "triggerNodeInstanceId": null,
+
+                                               "creationOrder": 21
+
+                               }
+
+                ],
+
+                "variables": {
+
+                               "spName": "urn:sbrfsystems:99-pprb:uvsk",
+
+                               "stageCodeFoments": "OKS_US",
+
+                               "uvskCLTV_taskTimer": "PT30S",
+
+                               "uvskCrtsWriteOffs_expCorDP": "OKS_EXP",
+
+                               "resultAvt": "",
+
+                               "fio": "ПУПКИН ВАСИЛИЙ ПУПКОВИЧ",
+
+                               "uvskVis_universalStagments": "OKS_US",
+
+                               "stageCodeForUsArestProduct": "OKS_US",
+
+                               "uvskCalty_transferStageCRMReg": "OKS_US",
+
+                               "caseId": "10e896df-ffd2-4897-b6f8-caa59ddd8971a",
+
+                               "classfierIdRemain": "9e9a3e44-12dd-42d3-8c14-fdfa22f9c6010",
+
+                               "us_difficult": "OKS_US",
+
+                               "usCCs": "OKS_US",
+
+                               "stageCodeForAnswer": "uvskitAccount_sendSms",
+
+                               "getCurrSchedule_GrafQL": "1",
+
+                               "usClass": "OKS_US",
+
+                               "cPeriod": 30,
+
+                               "uvskRemainderReturn_uizExeverseCode": "OKS_EXP",
+
+                               "uvskWriteOffs_simpleAmountDays": "5",
+
+                               "startAttributes": {
+
+                                               "caseId": "10e896df-ffd2-4897-b6f8-авcaa5ddd8971a",
+
+                                               "attributes": [
+
+                                                               {
+
+                                                                               "inputSumm": "55"
+
+                                                               },
+
+                                                               {
+
+                                                                               "inputCC": {
+
+                                                                                              "DPAN": "1234567890",
+
+                                                                                              "endDate": "2024-02-01",
+
+                                                                                              "accountNum": "098767557434347",
+
+                                                                                              "processing": "urn:sbrfsys:99-way"
+
+                                                                               }
+
+                                                               },
+
+                                                               {
+
+                                                                               "inputDC": {
+
+                                                                                              "DPAN": "12345677N46564",
+
+                                                                                              "endDate": "2029-09-28",
+
+                                                                                              "accountNum": "08978656756767",
+
+                                                                                              "processing": "urn:sbrfsys:99-pci:tw"
+
+                                                                               }
+
+                                                               }
+
+                                               ]
+
+                               },
+
+                               "uvsk_restTaskTimer": "PT30S",
+
+                               "RegistrationTime": "2023-12-12T17:00:06.671674+03:00",
+
+                               "uvskMailing_expertiseTimer": "PT8H",
+
+                               "DCCrm": "0987654321DD45645",
+
+                               "uvskReturn_StageDurationTimer": "P3D",
+
+                               "uvskPlan_taskTimer": "PT3000S",
+
+                               "uvskCLTV_ExpertiseStage": "ABV_EXP",
+
+                               "uvskWriteOffs_states": "-5",
+
+                               "urlTransfer": "http://url123/c2c/v1/exec",
+
+                               "uvsk_expStageUIZrate": "OKS_EXP",
+
+                               "inputDC": {
+
+                                               "DPAN": "0987654FR274566",
+
+                                               "endDate": "2029-02-28",
+
+                                               "accountNum": "12345678903454",
+
+                                               "processing": "urn:sbrfsys:99-pci:tw"
+
+                               },
+
+                               "uvskVisGo_defectTimer": "PT1M",
+
+                               "corrBranchOffOn": "1",
+
+                               "StageCodeUS_CRM": "OKS_US",
+
+                               "uvskCPy_armTimer": "P3D",
+
+                               "stageCodeUsForRepeats": "OKS_US",
+
+                               "uvskRemainderReturn_avtOnOff": 1,
+
+                               "stageCodeForArments": "uvskTransport_Call",
+
+                               "dcStatus": "-",
+
+                               "uvskCCCLTV_usKiKK": "OKS_US",
+
+                               "stageCodeForUsProduct": "OKS_US",
+
+                               "publicDescription": "фывфв",
+
+                               "stageCodeUsFo": "uvskVis_Us",
+
+                               "uvskVis_taskTimer": "PT30S",
+
+                               "uvskWriteOffs_vsp": "OKS_EXP",
+
+                               "result": "",
+
+                               "uvsk_expStageUIZpolis": "OKS_EXP",
+
+                               "uvskCLTV_armManualOC": "uvskCLTV_rpa",
+
+                                "uvsk_expStageUIZPlat": "OKS_EXP",
+
+                               "usRepeats": "OKS_US",
+
+                               "uvskWriteOffs_2_0_armStagTimer": "P3D",
+
+                               "staticData": {
+
+                                               "classifierVersion": 18,
+
+                                               "caseId": "10e896df-ffd2-4897-b6f8-caa5ddd8971a",
+
+                                               "classifierMasterId": "9e9a3e44-12dd-42d3-8c14-fdfa22fc6010",
+
+                                               "classifierParentMasterId": "9e9a3e44-12dd-42d3-8c14-fdfa22fc6010",
+
+                                               "casePublicId": "2312127000001023",
+
+                                               "clientEpkId": 1637803821768414500,
+
+                                               "statusCode": "IN_PROGRESS",
+
+                                               "statusName": null,
+
+                                               "crmAppealNum": null,
+
+                                               "considerationResultCode": "POSTPONED",
+
+                                               "considerationResultName": "Отложенная обработка",
+
+                                               "crmRequestId": null,
+
+                                               "lastUpdateTime": "2023-12-12T17:00:10.497474+03:00",
+
+                                               "closedTime": null,
+
+                                               "registrationTime": "2023-12-12T17:00:06.671674+03:00",
+
+                                               "publicDescription": "фывфв",
+
+                                               "caseEcmFolder": null,
+
+                                               "pprbCase": true,
+
+                                               "contactSettingsStart": "09:00",
+
+                                               "contactSettingsFinish": "20:00",
+
+                                               "contactSettingsTimeZone": "+03:00",
+
+                                               "expirationTime": "2023-12-13T00:00:06.671674+03:00",
+
+                                               "initialExpirationTime": "2023-12-13T00:00:06.671674+03:00",
+
+                                               "initialInteractionId": "951c2c03-786b-3375-b7e6-1744926478a2",
+
+                                               "answers": []
+
+                               },
+
+                               "stageCodeForEpk": "uvskDepositAccount_Epk_call",
+
+                               "masterIets": "1",
+
+                               "uvskVisGos_usGosDefect": "OKS_US",
+
+                               "systemId": "urn:sbrfsystems:38-usvms",
+
+                               "uvskVisGos_usGosRepeat": "OKS_US",
+
+                               "uvskVisGos_usVisDifficult": "OKS_US",
+
+                               "globalInstanceId": "740c81e9-3b37-4309-9842-2141980781ab",
+
+                               "epkTb": "-",
+
+                               "stageCodeForArmDeposits": "uvskDepositAccount_armCall",
+
+                               "uvskVisGos_usGosDifficult": "OKS_US",
+
+                               "uvskVisGos_usGosSimple": "OKS_US",
+
+                               "stageCodeForUniversalStage": "OKS_US",
+
+                               "urlDPAN": "http://bpm-gateway:8080",
+
+                               "uvskVisGos_expStageCOPPIK": "OKS_EXP",
+
+                               "uvskWriteOffs_addMoneyDayCount": "45",
+
+                               "uvskVis_universalStage": "1",
+
+                               "uvskVisGos_armStage2DurationTimer": "PT2H",
+
+                               "epkIdLong": 1637803821768414500,
+
+                               "uvsk_transferStage": "OKS_US",
+
+                               "uvskUnlock_expStageUIZ": "OKS_EXP",
+
+                               "uvskVisGos_errorTimer": "PT2H",
+
+                               "uvsk_arm2": "uvsk_armPod",
+
+                               "uvskOffs_2_0_expUizDurationTimer": "PT30M",
+
+                               "stageCodeForExpUakdRobot": "uvskMailing_expUakdRobot",
+
+                               "uvskCLTV_expTimer": "P3D",
+
+                               "uvsk_expStageVSP": "OKS_EXP",
+
+                               "uvskWriteOffs_universalStage": "OKS_US",
+
+                               "urlGetInfoByDpan": "http://url1234/getCardInfoByDpan",
+
+                               "uvskWriteOffs_expCorent": "OKS_EXP",
+
+                               "uvskWriteOffs_2_0_taskTimer": "PT30M",
+
+                               "expTimer": "P3D",
+
+                               "urlSrvGetTransaction": "http://url4321/srvGetCardTransaction",
+
+                               "uvskVisGos_universalStage": "OKS_US",
+
+                               "uvskUnlock_expStageCUZ": "OKS_EXP",
+
+                               "uvskCLTV_armOC": "uvskCLTV_rpa",
+
+                               "uvskVisGos_expStageUPKPF": "OKS_EXP",
+
+                               "universalStage": "OKS_US",
+
+                               "firstMiddleName": "ВАСИЛИЙ ПУПКОВИЧ",
+
+                               "uvskCLTV_knowledgeMvsVip": "39514,39515",
+
+                               "uvskCLTV_usClossing": "OKS_US",
+
+                               "uvsksCLTV_usBankruptcy": "OKS_US",
+
+                               "uvskVisGos_usGosGR": "OKS_US",
+
+                               "stageCodeForArm": "uvs_armCall",
+
+                               "stageCodeForUsClassificatorReturn": "OKS_US",
+
+                               "stageCodeForExpCollectionCoarseness": "OKS_EXP",
+
+                               "uvskCriteOffs_enrollTypes": "2,3,4,5",
+
+                               "ucpId": "1637803821768414462",
+
+                               "classfierIdRequisites": "9e9a3e44-12dd-42d3-8c14-fdfa22fc6010_",
+
+                               "tbParametrList": "55",
+
+                               "uvskVis_universalStageTransfer": "OKS_US",
+
+                               "usCRM": "OKS_US",
+
+                               "urlGetCurrentSchedule": "http://url7890/getCurrentScheduleRq",
+
+                               "uvskRemainderReturn_taskTimer": "PT5M",
+
+                               "uvskRemainderReturn_armRefund": "uvskRemainderReturn_armRefund",
+
+                               "uvskVisGos_expTimer": "P30D",
+
+                               "stageCodeForClassificatorReturn": "OKS_US",
+
+                               "uvskVisRemainderAndDetails_restTaskTimer": "PT30S",
+
+                               "uvskdRemainderReturn_repeatUniversalStageCode": "OKS_US",
+
+                               "uvskPenalty_transferStageReturn": "OKS_US",
+
+                               "uvskUnlock_restTaskTimer": "PT30S",
+
+                               "uvskCLTV_usKK": "OKS_US",
+
+                               "stageCodeForProofreading": "uvskVist_proofreadingArm",
+
+                               "stageCodeForStartingEventHandling": "uvskt_startingEventHandling",
+
+                               "uvskVisGos_defectNow": "0",
+
+                               "uvskRemainderReturn_contractPositiveStatus": "+-Активный ghbh",
+
+                               "taskTimer": "PT30S",
+
+                               "uvskVisSearch_expirationPeriod": "P3D",
+
+                               "uvskWriteOffs_expRefund": "OKS_EXP",
+
+                               "uvskVis_armStageDurationTimer": "P3D",
+
+                               "uvskCLTV_expertiseStage": "OKS_EXP",
+
+                               "timerARM": "PT73H",
+
+                               "stageCodeForDefaultUs": "OKS_US",
+
+                               "uvskPenalty_transferStageCsSt": "OKS_US",
+
+                               "uvskVis_universalStageClass": "OKS_US",
+
+                               "usDC": "OKS_US",
+
+                               "stageCodeFor": "OKS_US",
+
+                               "uvskVisC_universalStage": "OKS_US",
+
+                               "uvskWriteOffs_opKinds": "3,2,16",
+
+                               "uvskRemainderReturn_ccpprbPositiveStatus": "+,g",
+
+                               "uvsk_expStageMOIK": "OKS_EXP",
+
+                               "INTERACTION_ID": "231212-7000-001023",
+
+                               "us_dc": "OKS_US",
+
+                               "uvskCsCLTV_RobotTimer": 100,
+
+                               "uvskUnlock_expStageUIZZakl": "OKS_EXP",
+
+                               "epkData": {
+
+                                               "epkEntity": {
+
+                                                               "ucpId": "1637803821768414462",
+
+                                                               "version": 27,
+
+                                                               "names": [
+
+                                                                               {
+
+                                                                                              "surname": "ПУПКИН",
+
+                                                                                              "name": "ВАСИЛИЙ",
+
+                                                                                              "patronymic": "ПУПКОВИЧ"
+
+                                                                               }
+
+                                                               ],
+
+                                                               "clientStatus": 1,
+
+                                                               "gender": 1,
+
+                                                               "clientGroups": [
+
+                                                                               957,
+
+                                                                               774,
+
+                                                                               579,
+
+                                                                               1074,
+
+                                                                               2713,
+
+                                                                               1575,
+
+                                                                               17
+
+                                                               ],
+
+                                                               "phoneNumbers": [
+
+                                                                               {
+
+                                                                                              "phoneNumber": "+7 (905) 1234567",
+
+                                                                                              "startDate": "2023-01-31T16:15:18.372+00:00",
+
+                                                                                              "endDate": "2023-11-23T12:38:17.121+00:00",
+
+                                                                                              "updateDateTime": "2022-11-23T12:38:17.121+00:00",
+
+                                                                                              "contactStatus": 1,
+
+                                                                                              "timeAvailabilityFrom": null,
+
+                                                                                              "timeAvailabilityTo": null,
+
+                                                                                              "usageType": 14,
+
+                                                                                              "flags": [],
+
+                                                                                              "flagList": [],
+
+                                                                                              "phoneQualityCode": 511,
+
+                                                                                              "region": 35
+
+                                                                               },
+
+                                                                               {
+
+                                                                                              "phoneNumber": "+7 (905) 9883809",
+
+                                                                                              "startDate": "2023-01-31T16:17:14.643+00:00",
+
+                                                                                              "endDate": null,
+
+                                                                                              "updateDateTime": "2024-08-30T15:38:14.347+00:00",
+
+                                                                                              "contactStatus": 1,
+
+                                                                                              "timeAvailabilityFrom": null,
+
+                                                                                              "timeAvailabilityTo": null,
+
+                                                                                              "usageType": 15,
+
+                                                                                              "flags": [
+
+                                                                                                              677,
+
+                                                                                                              57,
+
+                                                                                                              574,
+
+                                                                                                              177
+
+                                                                                              ],
+
+                                                                                              "flagList": [
+
+                                                                                                              {
+
+                                                                                                                              "type": 677,
+
+                                                                                                                              "dateEnd": "2023-08-30T15:38:14.347+00:00"
+
+                                                                                                              },
+
+                                                                                                              {
+
+                                                                                                                              "type": 57,
+
+                                                                                                                              "dateEnd": null
+
+                                                                                                              },
+
+                                                                                                              {
+
+                                                                                                                              "type": 574,
+
+                                                                                                                              "dateEnd": null
+
+                                                                                                              },
+
+                                                                                                              {
+
+                                                                                                                              "type": 177,
+
+                                                                                                                              "dateEnd": null
+
+                                                                                                              }
+
+                                                                                              ],
+
+                                                                                              "phoneQualityCode": 511,
+
+                                                                                              "region": 375
+
+                                                                               },
+
+                                                                               {
+
+                                                                                              "phoneNumber": "+7 (905) 1234567",
+
+                                                                                              "startDate": "2023-11-23T12:39:05.497+00:00",
+
+                                                                                              "endDate": null,
+
+                                                                                              "updateDateTime": "2023-11-23T12:38:17.121+00:00",
+
+                                                                                              "contactStatus": 1,
+
+                                                                                              "timeAvailabilityFrom": null,
+
+                                                                                              "timeAvailabilityTo": null,
+
+                                                                                              "usageType": 14,
+
+                                                                                              "flags": [],
+
+                                                                                              "flagList": [],
+
+                                                                                              "phoneQualityCode": 511,
+
+                                                                                              "region": 377
+
+                                                                               }
+
+                                                               ],
+
+                                                               "electronicAddresses": [],
+
+                                                               "deathDate": null,
+
+                                                               "birthDate": "1890-03-30T04:00:00.000+00:00",
+
+                                                               "identifications": [
+
+                                                                               {
+
+                                                                                              "documentSeries": "1234",
+
+                                                                                              "documentNumber": "567890",
+
+                                                                                              "documentTypeCode": 177,
+
+                                                                                              "issuedDate": "2023-01-30T03:00:00.000+00:00",
+
+                                                                                              "issuerCode": "5737-7772",
+
+                                                                                              "issuedByOrganization": "ОВД РАЙОНА ВЕДЬМИНА ГОРА"
+
+                                                                               }
+
+                                                               ]
+
+                                               },
+
+                                               "customerKnowledge": []
+
+                               },
+
+                               "uvskVis_universalStage_CRM": "OKS_US",
+
+                               "fixGFL": 1,
+
+                               "stageCodeForUniversalStage_CRM": "OKS_US",
+
+                               "uvsk_expPpikOnOff": 1,
+
+                               "uvskUnlock_expStageAlfa": "OKS_EXP",
+
+                               "uvskeOffs_expUreg": "OKS_EXP",
+
+                               "epkPhRegions": "4,*3809#4,*3779",
+
+                               "stageCodeForExpEditClientProfile": "OKS_EXP",
+
+                               "uvskVisC_taskTimer": "PT30S",
+
+                               "usArests": "OKS_US",
+
+                               "uvskVisGos_date20240115": "2024-01-15",
+
+                               "uvskVisCd_universalStageCit": "OKS_US",
+
+                               "urlEpk": "http://bpm-gateway:8080",
+
+                               "stageUS_class": "OKS_US",
+
+                               "default_us": "OKS_US",
+
+                               "uvsk_expStagePPiIK": "OKS_EXP",
+
+                               "uvskVis_universalStageRep": "OKS_US",
+
+                               "uvskVis_universalStage_Class": "OKS_US",
+
+                               "us_deposits": "OKS_US",
+
+                               "stageUS_CRM": "OKS_US",
+
+                               "uvskdRemainderReturn_fixGFLDate": 1,
+
+                               "uvskCLTV_usKKRepeat": "OKS_US",
+
+                               "modelAnalysisResult": "",
+
+                               "uvskVisGos_debug": "0",
+
+                               "uvskVisunt_us": "OKS_US",
+
+                               "uvskemainderReturn_universalStage": "OKS_US",
+
+                               "tracingHeaders": {
+
+                                               "x-request-id": "157491f8-be0d-9dca-88781-76771fa698ad",
+
+                                               "x-b3-parentspanid": "b7e777af37e4c7af9",
+
+                                               "x-b3-spanid": "9c4d237297b1c277c",
+
+                                               "x-b3-traceid": "92d2a444227552a02c1ff1562a40cf2be",
+
+                                               "x-b3-sampled": "1"
+
+                               },
+
+                               "usStage": "OKS_US",
+
+                               "INTERACTION_DATE": "12.12.2023",
+
+                               "uvskUnlock_expStagePCP": "OKS_EXP",
+
+                               "uvskWriteOffs_opCodes": "403,55,99",
+
+                               "uvskRemainderReturn_operationPeriod": 30,
+
+                               "uvskVis_debug": "0",
+
+                               "uvskCLTV_US": "OKS_US",
+
+                               "uvskVisRemainderAndDetails_expirationPeriod": "P3D",
+
+                               "uvskVis_universalStageDif": "OKS_US",
+
+                               "uvskUnlock_expStageOSIP": "OKS_EXP",
+
+                               "uvsk_expStageAsStr": "OKS_EXP",
+
+                               "stageCodeForExp230fz": "OKS_EXP",
+
+                               "theme": "incorrectComunication",
+
+                               "uvWriteOffs_2_0_answerTimeout": "PT2M",
+
+                               "stageCodeForTransfers": "OKS_US",
+
+                               "uvs_actionOnOFF": 1,
+
+                               "uvskemainderReturn_ccWay4NegativeStatus": "F,f,D,d,o,R,r,B,Z,y,W",
+
+                               "stageCodeForExpCollection230fz": "OKS_EXP",
+
+                               "urlGFL": "http://url12345",
+
+                               "stageCodeForArm": "uvskunt_armCall",
+
+                               "stageCodeForUsepeat": "OKS_US",
+
+                               "contractStatus": "-",
+
+                               "uvs_armTimer": "PT2H",
+
+                               " transferStageC": "OKS_US",
+
+                               "uvskVisGos_knowledgeMvsVip": "39514,39515",
+
+                               "uvskC_expStageUIZSt": "OKS_EXP",
+
+                               "FLOW_PID": "psi-fl-5g_c198f8e9b-98f6-11ee-869b-0a5891d403080",
+
+                               "uvskUnlock_expStageCC": "OKS_EXP",
+
+                               "uvskVisGos_expStageInsurance": "OKS_EXP",
+
+                               "url": "http://url:8080",
+
+                               "usStageCode_Class": "OKS_US",
+
+                               "uvskVisGos_usGosKentavr": "OKS_US",
+
+                               "uvskCCLTV_armTimer": "P3D",
+
+                               "uvskVisGos_armStage1DurationTimer": "PT2H",
+
+                               "uvsRemainderReturn_startMessageServiceAttributes": "{\"clientEpkId\":3643785368774764,\"ecmSyncResult\":\"unknown\"}",
+
+                               "uvskVAnrds_atypicalUs": "OKS_US",
+
+                               "stageCodeForReRegistration": "OKS_US",
+
+                               "uvskWriteOffs_legalDayCount": "14",
+
+                               "UIZ_timer": "P3D",
+
+                               "inpucc": {
+
+                                               "DPAN": "1643564756757",
+
+                                               "endDate": "2029-02-01",
+
+                                               "accountNum": "21354364574747463",
+
+                                               "processing": "urn:sbrfsystems:99-way"
+
+                               },
+
+                               "uvskWriteOffs_expSud": "OKS_EXP",
+
+                               "uvskRemainderReturn_expUizStageCode": "OKS_EXP",
+
+                               "uvskVisGos_expStageBroker": "OKS_EXP",
+
+                               "uvskVisGos_taskTimer": "PT30S",
+
+                               "stageCodeFor": "OKS_US",
+
+                               "caseNumber": "23121270004576457001023",
+
+                               "epkId": "43574637476456245646",
+
+                               "uvskVis_universalStageDeposit": "OKS_US",
+
+                               "uvskty_transferStagPovt": "OKS_US",
+
+                               "uvskWriteOffs_allToMain": "0",
+
+                               "tbParametr": "1",
+
+                               "startMessage": "uvskCinderReturn_startMessageService",
+
+                               "uvskalty_transferStages": "OKS_US",
+
+                               "urlGFL1": "http://url568/srvgetfullproductlist",
+
+                               "uvskUnlock_armStageDurationTimer": "P3D",
+
+                               "stageCodeForDs": "OKS_US",
+
+                               "cCrm": "34756856745746",
+
+                               "restTimer": "PT30S",
+
+                               "uvskPenalty_expTimer": "PT2H",
+
+                               "uvskVis_armStageDurationTimer": "P3D",
+
+                               "uvskty_expVspOnOff": 1,
+
+                               "uvskalty_expStageUIZobespech": "OKS_EXP",
+
+                               "usStageCode_CRM": "OKS_US",
+
+                               "uvskCLTV_usHelp": "OKS_US",
+
+                               "us_crs": "OKS_US",
+
+                               "uvriteOffs_cardWriteOffKeys": "BRCH,BR;Ared,AR;PLAH PO,UL",
+
+                               "uvsksCLTV_isComnQuestion": "1",
+
+                               "uvskemainderReturn_classUniversalStageCode": "OKS_US",
+
+                               "uvmainderReturn_dersalStageCode": "OKS_US",
+
+                               "uvskVisGos_date20240101": "2024-01-01",
+
+                               "uvskCCLTV_usArest": "OKS_US",
+
+                               "stageCodeForUs": "OKS_US",
+
+                               "uvskCLTV_usKiCed": "OKS_US",
+
+                               "stageCodeForExpCollectionMailing": "OKS_EXP",
+
+                               "stageCodeForDifficult": "OKS_US",
+
+                               "uvskMailing_expirationPeriod": "P3D",
+
+                               "inputSumm": "55",
+
+                               "us_crts": "OKS_US",
+
+                               "stageCodeForMiniGetInteractions": "uvsknt_Tb_request",
+
+                               "masterIdDeposit": "0",
+
+                               "urlOpHistory": "http://url9787/opetionHistory",
+
+                               "stageCodeForVisDud": "OKS_US",
+
+                               "stageCodeForBankrotProductUs": "OKS_US",
+
+                               "urlInteraction": "http://url67458/tetionExp",
+
+                               "armTimer": "PT73H",
+
+                               "stageCodeForUsCrm": "OKS_US",
+
+                               "usBupt": "OKS_US",
+
+                               "uvskCsWriteOffs_expIP": "OKS_EXP",
+
+                               "uvskCalty_stageCodeForUe": "OKS_US",
+
+                               "uvskVisGos_gosySwitcher": "1",
+
+                               "uvskVisGos_expStageInvest": "OKS_EXP",
+
+                               "uvskCay_US": "OKS_US",
+
+                               "uvsdsCLTV_usDK": "OKS_US",
+
+                               "defectNow": "0",
+
+                               "uvskCriteOffs_universalStageRepeat": "OKS_US",
+
+                               "uvskUnlock_expStageFraud": "OKS_EXP",
+
+                               "casePublicId": "46758674576587587",
+
+                               "uvskriteOffs_autoStatus": "0"
+
+                },
+
+                "contextSize": 116448
+
+}
