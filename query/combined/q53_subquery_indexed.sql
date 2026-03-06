@@ -22,7 +22,7 @@ SELECT *
 FROM process_main
 WHERE process_id IN (
     SELECT DISTINCT process_id
-    FROM process_main
+    FROM process_variables_indexed
     WHERE var_category = 'epkData'
 )
 LIMIT 50

@@ -24,7 +24,7 @@ SELECT
     process_id,
     var_path,
     var_value as phone
-FROM process_main
+FROM process_variables
 WHERE var_path LIKE '%phoneNumber%'
   AND var_type = 'string'
 LIMIT 100

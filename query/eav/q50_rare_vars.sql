@@ -24,7 +24,7 @@
 SELECT 
     var_path,
     COUNT(*) as occurrences
-FROM process_main
+FROM process_variables
 GROUP BY var_path
 HAVING COUNT(DISTINCT process_id) = 1
 ORDER BY occurrences DESC

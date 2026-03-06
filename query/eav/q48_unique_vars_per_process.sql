@@ -23,7 +23,7 @@
 SELECT 
     pe.process_id,
     COUNT(DISTINCT pv.var_path) as unique_paths
-FROM process_main pe
-JOIN process_main pv ON pe.process_id = pv.process_id
+FROM process_events pe
+JOIN process_variables pv ON pe.process_id = pv.process_id
 GROUP BY pe.process_id
 ORDER BY unique_paths DESC

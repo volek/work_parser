@@ -23,7 +23,7 @@
 SELECT 
     var_path,
     COUNT(*) as cnt
-FROM process_main
+FROM process_variables
 WHERE var_path LIKE '%address%'
    OR var_path LIKE '%Address%'
 GROUP BY var_path

@@ -26,7 +26,7 @@ SELECT
     var_category,
     var_path,
     COUNT(*) as cnt
-FROM process_main
+FROM process_variables_indexed
 WHERE var_type = 'number'
 GROUP BY var_category, var_path
 ORDER BY cnt DESC

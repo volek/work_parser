@@ -22,6 +22,6 @@
 SELECT 
     process_id,
     JSON_VALUE(var_value, '$.nodeInstances[0].nodeId') as first_node_id
-FROM process_main
+FROM process_variables_indexed
 WHERE var_type = 'json'
 LIMIT 50

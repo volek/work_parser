@@ -1,0 +1,205 @@
+{
+  "id" : "ift-5g-rb_5a9d9de7-297d-4ef6-8017-a1a599d0cced",
+  "parentInstanceId" : null,
+  "rootInstanceId" : "ift-5g-rb_5a9d9de7-297d-4ef6-8017-a1a599d0cced",
+  "processId" : "Process_c337b24",
+  "processDefinitionId" : "Process_1162cc4:15:81c28699-6f15-4022-9c52-1734aa159306",
+  "resourceName" : null,
+  "rootProcessId" : null,
+  "processName" : "uvskStupidsEarlyRehrenment_sub",
+  "startDate" : "2026-03-06T06:45:13.892478998+03:00",
+  "endDate" : null,
+  "state" : 0,
+  "businessKey" : "2603069529867",
+  "version" : 94,
+  "bamProjectId" : "05c507b3-b399-48ac-a60c-55fcdd330558",
+  "extIds" : null,
+  "error" : null,
+  "moduleId" : "psi-fl-cc",
+  "engineVersion" : "D-5.5.0-3135",
+  "enginePodName" : "bpmx-engine-psi-fl-5g-37b29cbd7e",
+  "retryCount" : 2,
+  "ownerRole" : null,
+  "idempotencyKey" : null,
+  "operation" : null,
+  "nodeInstances" : [ {
+    "id" : "59c1907c-93ad-4c1d-a7fe-cc4a211eec6f",
+    "nodeId" : "Activity_a30baee",
+    "nodeDefinitionId" : "Activity_a30baee",
+    "nodeName" : "Start",
+    "nodeType" : "startEvent",
+    "error" : null,
+    "state" : 4,
+    "calledProcessInstanceIds" : null,
+    "retries" : [ ],
+    "htmTaskId" : null,
+    "triggerTime" : "2026-03-06T06:45:13.892478998+03:00",
+    "leaveTime" : "2026-03-06T06:45:13.892478998+03:00",
+    "triggerNodeInstanceId" : null,
+    "creationOrder" : 1
+  }, {
+    "id" : "cf81320d-56ee-4d60-99e8-a73aa3085d33",
+    "nodeId" : "Activity_1fbf258",
+    "nodeDefinitionId" : "Activity_1fbf258",
+    "nodeName" : "ApprovalTask",
+    "nodeType" : "userTask",
+    "error" : null,
+    "state" : 4,
+    "calledProcessInstanceIds" : null,
+    "retries" : [ ],
+    "htmTaskId" : "fefcefb3-ceb6-40ea-befc-02f3876f2400",
+    "triggerTime" : "2026-03-06T06:45:14.892478998+03:00",
+    "leaveTime" : "2026-03-06T06:45:37.892478998+03:00",
+    "triggerNodeInstanceId" : null,
+    "creationOrder" : 2
+  }, {
+    "id" : "29ad3e9a-6e2e-4fc7-b4ce-79feb1e09599",
+    "nodeId" : "Activity_ccc9f60",
+    "nodeDefinitionId" : "Activity_ccc9f60",
+    "nodeName" : "calculateAmount",
+    "nodeType" : "scriptTask",
+    "error" : null,
+    "state" : 4,
+    "calledProcessInstanceIds" : null,
+    "retries" : [ ],
+    "htmTaskId" : null,
+    "triggerTime" : "2026-03-06T06:45:37.892478998+03:00",
+    "leaveTime" : "2026-03-06T06:45:55.892478998+03:00",
+    "triggerNodeInstanceId" : null,
+    "creationOrder" : 3
+  }, {
+    "id" : "f4f214b3-2a89-4d58-9b3e-af00e4492c94",
+    "nodeId" : "Activity_30993ea",
+    "nodeDefinitionId" : "Activity_30993ea",
+    "nodeName" : "checkConditions",
+    "nodeType" : "scriptTask",
+    "error" : null,
+    "state" : 4,
+    "calledProcessInstanceIds" : null,
+    "retries" : [ ],
+    "htmTaskId" : null,
+    "triggerTime" : "2026-03-06T06:45:55.892478998+03:00",
+    "leaveTime" : "2026-03-06T06:46:01.892478998+03:00",
+    "triggerNodeInstanceId" : null,
+    "creationOrder" : 4
+  } ],
+  "variables" : {
+    "caseId" : "8e92f5a1-294b-438c-8812-b8a2920527fc",
+    "epkId" : "1875807038802242958",
+    "ucpId" : "1642408107474894646",
+    "fio" : "МОРОЗОВ ДЕНИС ИВАНОВИЧ",
+    "globalInstanceId" : "a1833a36-810c-44eb-9932-e48850b2781b",
+    "INTERACTION_ID" : "260306-7000-042340",
+    "INTERACTION_DATE" : "06.03.2026",
+    "theme" : "refundRequest",
+    "result" : "",
+    "status" : "CANCELLED",
+    "staticData" : {
+      "classifierVersion" : 39,
+      "caseId" : "8e92f5a1-294b-438c-8812-b8a2920527fc",
+      "classifierMasterId" : "34fbeb82-2252-4f6c-b58a-2f7d76d82b6d",
+      "classifierParentMasterId" : "ca8cdea7-96cf-46ef-bb6e-b8851885c8a3",
+      "casePublicId" : "2603067000950307",
+      "clientEpkId" : 1875807038802242958,
+      "statusCode" : "REJECTED",
+      "statusName" : null,
+      "crmAppealNum" : null,
+      "considerationResultCode" : "POSTPONED",
+      "considerationResultName" : "Отложенная обработка",
+      "crmRequestId" : null,
+      "lastUpdateTime" : "2026-03-06T06:57:13.892478998+03:00",
+      "closedTime" : null,
+      "registrationTime" : "2026-03-06T06:45:13.892478998+03:00",
+      "publicDescription" : "Тестовое обращение #4437",
+      "caseEcmFolder" : null,
+      "pprbCase" : false,
+      "contactSettingsStart" : "09:00",
+      "contactSettingsFinish" : "20:00",
+      "contactSettingsTimeZone" : "+03:00",
+      "expirationTime" : "2026-03-07T06:45:13.892478998+03:00",
+      "initialExpirationTime" : "2026-03-07T06:45:13.892478998+03:00",
+      "initialInteractionId" : "4b3b96a7-b085-4499-b175-a0960d8be375",
+      "answers" : [ ]
+    },
+    "epkData" : {
+      "epkEntity" : {
+        "ucpId" : "1642408107474894646",
+        "version" : 95,
+        "names" : [ {
+          "surname" : "МОРОЗОВ",
+          "name" : "ДЕНИС",
+          "patronymic" : "ИВАНОВИЧ"
+        } ],
+        "clientStatus" : 1,
+        "gender" : 1,
+        "clientGroups" : [ 2529, 2767, 2110 ],
+        "phoneNumbers" : [ {
+          "phoneNumber" : "+7 (911) 5363031",
+          "startDate" : "2023-03-06T13:27:13.896172049Z",
+          "endDate" : null,
+          "updateDateTime" : "2025-05-03T13:27:13.896243627Z",
+          "contactStatus" : 1,
+          "timeAvailabilityFrom" : null,
+          "timeAvailabilityTo" : null,
+          "usageType" : 15,
+          "flags" : [ 39, 17, 10, 93, 38 ],
+          "flagList" : [ ],
+          "phoneQualityCode" : 511,
+          "region" : 51
+        } ],
+        "electronicAddresses" : [ ],
+        "deathDate" : null,
+        "birthDate" : "1969-03-06T13:27:13.89633993Z",
+        "identifications" : [ {
+          "documentSeries" : "55 36",
+          "documentNumber" : "279149",
+          "documentTypeCode" : 177,
+          "issuedDate" : "2010-03-06T13:27:13.896434909Z",
+          "issuerCode" : "534-400",
+          "issuedByOrganization" : "ОВД района Западный"
+        } ]
+      },
+      "customerKnowledge" : [ {
+        "value" : "36580",
+        "id" : 1383641754385823447
+      } ]
+    },
+    "tracingHeaders" : {
+      "x-request-id" : "137c056a-ed87-44eb-8679-bdd0804d6361",
+      "x-b3-parentspanid" : "8566be36a17ff97b",
+      "x-b3-spanid" : "41a40b8eb44e8a92",
+      "x-b3-traceid" : "53d105297c19fef79f271717d6229a8b",
+      "x-b3-sampled" : "1"
+    },
+    "startAttributes" : {
+      "caseId" : "8e92f5a1-294b-438c-8812-b8a2920527fc",
+      "attributes" : [ {
+        "inputSumm" : "1717"
+      }, {
+        "inputCC" : {
+          "DPAN" : "6904480139295853",
+          "endDate" : "2027-03-06",
+          "accountNum" : "62728775942246010",
+          "processing" : "urn:sbrfsystems:99-way"
+        }
+      }, {
+        "inputDC" : {
+          "DPAN" : "4752292237157616",
+          "endDate" : "2027-03-06",
+          "accountNum" : "66187809552322259",
+          "processing" : "urn:sbrfsystems:99-pci:tw"
+        }
+      } ]
+    },
+    "uvsk_restTaskTimer" : "PT30S",
+    "uvskCLTV_taskTimer" : "PT30S",
+    "uvskVis_armStageDurationTimer" : "P3D",
+    "expTimer" : "P3D",
+    "armTimer" : "PT73H",
+    "taskTimer" : "PT30S",
+    "universalStage" : "OKS_US",
+    "urlGFL" : "http://gfl-service:8080",
+    "urlEpk" : "http://bpm-gateway:8080"
+  },
+  "contextSize" : 93652
+}

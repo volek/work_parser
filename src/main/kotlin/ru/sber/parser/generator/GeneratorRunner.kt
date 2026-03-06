@@ -31,6 +31,6 @@ import java.io.File
 fun main() {
     val generator = MessageGenerator()
     val outputDir = File("messages")
-    generator.generateAll(outputDir, 25)
+    generator.generateAll(outputDir, 100)
     println("Messages generated in: ${outputDir.absolutePath}")
 }

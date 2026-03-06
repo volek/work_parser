@@ -21,9 +21,10 @@
 --   - case_public_id: идентификатор (STRING/UUID/INTEGER по схеме источника).
 -- ============================================================================
 SELECT 
-    process_id,
-    process_id as process_name,
-    var_value as case_public_id
-FROM process_main
-WHERE var_path = 'casePublicId' AND var_value IS NOT NULL
+    pm.process_id,
+    pm.process_name,
+    pv.var_value as case_public_id
+FROM process_main pm
+JOIN process_variables_indexed pv ON pm.process_id = pv.process_id
+    AND pv.var_category = 'staticData' AND pv.var_path = 'casePublicId' AND pv.var_value IS NOT NULL
 LIMIT 50

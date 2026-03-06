@@ -24,10 +24,10 @@
 -- ============================================================================
 SELECT 
     process_id,
-    process_id,
-    var_value,
+    process_name,
+    state,
     __time as start_date,
-    var_path
-FROM process_main
+    module_id
+FROM process_events
 ORDER BY __time DESC
 LIMIT 100

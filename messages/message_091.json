@@ -1,0 +1,175 @@
+{
+  "id" : "psi-fl-5g_ccd9513c-4729-43e9-b90f-3b2b4b02ad0c",
+  "parentInstanceId" : null,
+  "rootInstanceId" : "psi-fl-5g_ccd9513c-4729-43e9-b90f-3b2b4b02ad0c",
+  "processId" : "Process_f2610be",
+  "processDefinitionId" : "Process_e5f216a:97:0daa66ff-3ba9-4ebe-a3a5-a72777c62f9c",
+  "resourceName" : null,
+  "rootProcessId" : null,
+  "processName" : "tappeal_p2p_receiver",
+  "startDate" : "2026-03-06T00:31:17.439629591+03:00",
+  "endDate" : null,
+  "state" : 1,
+  "businessKey" : "2603062722478",
+  "version" : 94,
+  "bamProjectId" : "f8bf5b1d-9976-4007-8c54-8e9149052bec",
+  "extIds" : null,
+  "error" : null,
+  "moduleId" : "ift-5g-fl-cc",
+  "engineVersion" : "D-5.5.0-3390",
+  "enginePodName" : "bpmx-engine-ift-5g-rb-da60adc54f",
+  "retryCount" : 3,
+  "ownerRole" : null,
+  "idempotencyKey" : null,
+  "operation" : null,
+  "nodeInstances" : [ {
+    "id" : "6c35e63e-422a-4b21-b489-c10d37510fb0",
+    "nodeId" : "Activity_06e67e3",
+    "nodeDefinitionId" : "Activity_06e67e3",
+    "nodeName" : "Start",
+    "nodeType" : "startEvent",
+    "error" : null,
+    "state" : 4,
+    "calledProcessInstanceIds" : null,
+    "retries" : [ ],
+    "htmTaskId" : null,
+    "triggerTime" : "2026-03-06T00:31:17.439629591+03:00",
+    "leaveTime" : "2026-03-06T00:31:17.439629591+03:00",
+    "triggerNodeInstanceId" : null,
+    "creationOrder" : 1
+  }, {
+    "id" : "5633edeb-89f9-4ae2-ba0c-ffca7e4326e3",
+    "nodeId" : "Activity_9df377f",
+    "nodeDefinitionId" : "Activity_9df377f",
+    "nodeName" : "NotificationFlow",
+    "nodeType" : "subProcess",
+    "error" : null,
+    "state" : 0,
+    "calledProcessInstanceIds" : null,
+    "retries" : [ ],
+    "htmTaskId" : null,
+    "triggerTime" : "2026-03-06T00:31:26.439629591+03:00",
+    "leaveTime" : null,
+    "triggerNodeInstanceId" : null,
+    "creationOrder" : 2
+  } ],
+  "variables" : {
+    "caseId" : "c8359d8a-1168-4d82-af78-1a58a2c15caa",
+    "epkId" : "1918157503963379165",
+    "ucpId" : "1679728871383871075",
+    "fio" : "КОМАРОВ МИХАИЛ АЛЕКСЕЕВИЧ",
+    "globalInstanceId" : "ab6f91a0-95da-4267-b539-45bd9875d1cf",
+    "INTERACTION_ID" : "260306-7000-131426",
+    "INTERACTION_DATE" : "06.03.2026",
+    "theme" : "fraudAlert",
+    "result" : "",
+    "status" : "PENDING",
+    "staticData" : {
+      "classifierVersion" : 36,
+      "caseId" : "c8359d8a-1168-4d82-af78-1a58a2c15caa",
+      "classifierMasterId" : "1cec19c5-6b9b-42c4-81a0-f23f1488b120",
+      "classifierParentMasterId" : "aca7303e-f6d3-4699-b0a1-dc0670d8cf82",
+      "casePublicId" : "2603067000215488",
+      "clientEpkId" : 1918157503963379165,
+      "statusCode" : "IN_PROGRESS",
+      "statusName" : null,
+      "crmAppealNum" : null,
+      "considerationResultCode" : "ESCALATED",
+      "considerationResultName" : "Эскалировано",
+      "crmRequestId" : null,
+      "lastUpdateTime" : "2026-03-06T00:56:17.439629591+03:00",
+      "closedTime" : null,
+      "registrationTime" : "2026-03-06T00:31:17.439629591+03:00",
+      "publicDescription" : "Тестовое обращение #2248",
+      "caseEcmFolder" : null,
+      "pprbCase" : true,
+      "contactSettingsStart" : "09:00",
+      "contactSettingsFinish" : "20:00",
+      "contactSettingsTimeZone" : "+03:00",
+      "expirationTime" : "2026-03-07T00:31:17.439629591+03:00",
+      "initialExpirationTime" : "2026-03-07T00:31:17.439629591+03:00",
+      "initialInteractionId" : "1424ea97-a0b2-481b-8096-d697a7bfaef3",
+      "answers" : [ ]
+    },
+    "epkData" : {
+      "epkEntity" : {
+        "ucpId" : "1679728871383871075",
+        "version" : 4,
+        "names" : [ {
+          "surname" : "КОМАРОВ",
+          "name" : "МИХАИЛ",
+          "patronymic" : "АЛЕКСЕЕВИЧ"
+        } ],
+        "clientStatus" : 1,
+        "gender" : 2,
+        "clientGroups" : [ 1986 ],
+        "phoneNumbers" : [ {
+          "phoneNumber" : "+7 (957) 2505592",
+          "startDate" : "2024-03-06T13:27:17.441395618Z",
+          "endDate" : null,
+          "updateDateTime" : "2025-05-17T13:27:17.441421599Z",
+          "contactStatus" : 1,
+          "timeAvailabilityFrom" : null,
+          "timeAvailabilityTo" : null,
+          "usageType" : 14,
+          "flags" : [ 69, 69, 60, 51, 36 ],
+          "flagList" : [ ],
+          "phoneQualityCode" : 511,
+          "region" : 99
+        } ],
+        "electronicAddresses" : [ ],
+        "deathDate" : null,
+        "birthDate" : "1974-03-06T13:27:17.441481665Z",
+        "identifications" : [ {
+          "documentSeries" : "21 94",
+          "documentNumber" : "490335",
+          "documentTypeCode" : 177,
+          "issuedDate" : "2008-03-06T13:27:17.441508578Z",
+          "issuerCode" : "231-654",
+          "issuedByOrganization" : "ОВД района Западный"
+        } ]
+      },
+      "customerKnowledge" : [ {
+        "value" : "44686",
+        "id" : 1598607227371933341
+      }, {
+        "value" : "43610",
+        "id" : 1493797482712861803
+      }, {
+        "value" : "34667",
+        "id" : 1586671469834996820
+      } ]
+    },
+    "tracingHeaders" : {
+      "x-request-id" : "0e260122-1c44-46b1-bf7b-88065ffa1f58",
+      "x-b3-parentspanid" : "c07bfda5024f19ee",
+      "x-b3-spanid" : "ad959e0cca5a0bf0",
+      "x-b3-traceid" : "f64686f25efeebb19b414f4b6e0bd0bc",
+      "x-b3-sampled" : "1"
+    },
+    "startAttributes" : {
+      "caseId" : "c8359d8a-1168-4d82-af78-1a58a2c15caa",
+      "attributes" : [ {
+        "inputSumm" : "1811"
+      }, {
+        "inputCC" : {
+          "DPAN" : "5684838273169401",
+          "endDate" : "2028-03-06",
+          "accountNum" : "53913367256802435",
+          "processing" : "urn:sbrfsystems:99-way"
+        }
+      }, {
+        "inputDC" : {
+          "DPAN" : "5650552400501910",
+          "endDate" : "2029-03-06",
+          "accountNum" : "85909261569484401",
+          "processing" : "urn:sbrfsystems:99-pci:tw"
+        }
+      } ]
+    },
+    "appealType" : "GCT",
+    "priority" : 1,
+    "slaDeadline" : "2026-03-08T13:27:17.441979417Z"
+  },
+  "contextSize" : 38498
+}

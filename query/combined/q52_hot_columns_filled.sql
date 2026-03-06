@@ -22,7 +22,7 @@
 -- ============================================================================
 SELECT 
     COUNT(*) as total,
-    SUM(CASE WHEN var_value IS NOT NULL THEN 1 ELSE 0 END) as with_epk,
-    SUM(CASE WHEN var_value IS NOT NULL THEN 1 ELSE 0 END) as with_fio,
-    SUM(CASE WHEN var_value IS NOT NULL THEN 1 ELSE 0 END) as with_case
+    SUM(CASE WHEN var_epkId IS NOT NULL THEN 1 ELSE 0 END) as with_epk,
+    SUM(CASE WHEN var_fio IS NOT NULL THEN 1 ELSE 0 END) as with_fio,
+    SUM(CASE WHEN var_caseId IS NOT NULL THEN 1 ELSE 0 END) as with_case
 FROM process_main

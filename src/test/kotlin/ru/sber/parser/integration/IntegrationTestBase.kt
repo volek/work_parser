@@ -46,7 +46,7 @@ abstract class IntegrationTestBase {
             druid = DruidConfig(
                 brokerUrl = "http://localhost:8082",
                 coordinatorUrl = "http://localhost:8081",
-                overlordUrl = "http://localhost:8090",
+                overlordUrl = "http://localhost:8081",
                 batchSize = 100
             )
         )

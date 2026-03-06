@@ -25,7 +25,7 @@ SELECT
     DATE_TRUNC('day', __time) as day_ts,
     process_id,
     COUNT(*) as cnt_total
-FROM process_main
+FROM process_events
 WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '7' DAY
 GROUP BY 1, 2
 ORDER BY day_ts DESC, cnt_total DESC

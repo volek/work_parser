@@ -26,8 +26,8 @@ SELECT
     pe.process_id,
     pe.process_id,
     pv.var_value as casePublicId
-FROM process_main pe
-JOIN process_main pv ON pe.process_id = pv.process_id
+FROM process_events pe
+JOIN process_variables pv ON pe.process_id = pv.process_id
 WHERE pv.var_path = 'casePublicId'
 ORDER BY pe.__time DESC
 LIMIT 50

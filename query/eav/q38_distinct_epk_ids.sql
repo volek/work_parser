@@ -20,7 +20,7 @@
 -- ============================================================================
 SELECT 
     DISTINCT var_value as epkId
-FROM process_main
+FROM process_variables
 WHERE var_path = 'epkId'
   AND var_value IS NOT NULL
 LIMIT 100

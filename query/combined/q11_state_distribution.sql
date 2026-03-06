@@ -20,8 +20,8 @@
 --   - cnt_total: числовой показатель (INTEGER/NUMERIC).
 -- ============================================================================
 SELECT 
-    var_value,
+    state,
     COUNT(*) as cnt_total
 FROM process_main
-GROUP BY var_value
+GROUP BY state
 ORDER BY cnt_total DESC

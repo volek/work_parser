@@ -22,6 +22,6 @@
 SELECT 
     var_path,
     COUNT(DISTINCT process_id) as process_count
-FROM process_main
+FROM process_variables
 GROUP BY var_path
 ORDER BY process_count DESC

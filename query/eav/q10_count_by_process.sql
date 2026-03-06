@@ -22,6 +22,6 @@
 SELECT 
     process_id,
     COUNT(*) as cnt_total
-FROM process_main
+FROM process_events
 GROUP BY process_id
 ORDER BY cnt_total DESC

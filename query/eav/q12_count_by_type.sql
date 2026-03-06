@@ -22,6 +22,6 @@
 SELECT 
     var_type,
     COUNT(*) as cnt_total
-FROM process_main
+FROM process_variables
 GROUP BY var_type
 ORDER BY cnt_total DESC

@@ -24,6 +24,6 @@ SELECT
     var_path,
     var_value,
     var_type
-FROM process_main
+FROM process_variables
 WHERE process_id = 'ift-5g-rb_example-id'
 ORDER BY __time DESC

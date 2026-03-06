@@ -1,0 +1,288 @@
+{
+  "id" : "ift-5g-rb_aae689a6-3f81-4414-adc4-de156962c2bf",
+  "parentInstanceId" : null,
+  "rootInstanceId" : "ift-5g-rb_aae689a6-3f81-4414-adc4-de156962c2bf",
+  "processId" : "Process_ec55ca7",
+  "processDefinitionId" : "Process_f89e199:11:73175310-1e7c-4b2a-bee7-8c021b509bff",
+  "resourceName" : null,
+  "rootProcessId" : null,
+  "processName" : "uvskStupidsEarlyRehrenment_sub",
+  "startDate" : "2026-03-05T22:43:14.577227607+03:00",
+  "endDate" : null,
+  "state" : 1,
+  "businessKey" : "2603069295325",
+  "version" : 1,
+  "bamProjectId" : "9da39396-97be-45bc-9046-a0ac98287229",
+  "extIds" : null,
+  "error" : null,
+  "moduleId" : "ift-5g-rb",
+  "engineVersion" : "D-5.5.0-3035",
+  "enginePodName" : "bpmx-engine-psi-fl-5g-94326872ca",
+  "retryCount" : 1,
+  "ownerRole" : "admin",
+  "idempotencyKey" : null,
+  "operation" : null,
+  "nodeInstances" : [ {
+    "id" : "89314868-b635-434f-adeb-924272715777",
+    "nodeId" : "Activity_f363fcc",
+    "nodeDefinitionId" : "Activity_f363fcc",
+    "nodeName" : "Start",
+    "nodeType" : "startEvent",
+    "error" : null,
+    "state" : 4,
+    "calledProcessInstanceIds" : null,
+    "retries" : [ ],
+    "htmTaskId" : null,
+    "triggerTime" : "2026-03-05T22:43:14.577227607+03:00",
+    "leaveTime" : "2026-03-05T22:43:14.577227607+03:00",
+    "triggerNodeInstanceId" : null,
+    "creationOrder" : 1
+  }, {
+    "id" : "bb3ca334-0832-4c1d-9af1-37a1c1a8c934",
+    "nodeId" : "Activity_7dc59dc",
+    "nodeDefinitionId" : "Activity_7dc59dc",
+    "nodeName" : "validateInput",
+    "nodeType" : "scriptTask",
+    "error" : null,
+    "state" : 4,
+    "calledProcessInstanceIds" : null,
+    "retries" : [ ],
+    "htmTaskId" : null,
+    "triggerTime" : "2026-03-05T22:43:15.577227607+03:00",
+    "leaveTime" : "2026-03-05T22:43:18.577227607+03:00",
+    "triggerNodeInstanceId" : null,
+    "creationOrder" : 2
+  }, {
+    "id" : "15bf3558-ac8f-4b17-985c-371e0857a273",
+    "nodeId" : "Activity_46787ff",
+    "nodeDefinitionId" : "Activity_46787ff",
+    "nodeName" : "formatOutput",
+    "nodeType" : "scriptTask",
+    "error" : null,
+    "state" : 4,
+    "calledProcessInstanceIds" : null,
+    "retries" : [ ],
+    "htmTaskId" : null,
+    "triggerTime" : "2026-03-05T22:43:18.577227607+03:00",
+    "leaveTime" : "2026-03-05T22:43:40.577227607+03:00",
+    "triggerNodeInstanceId" : null,
+    "creationOrder" : 3
+  }, {
+    "id" : "19faa03b-24e8-4d0c-bb6c-52ec47d19825",
+    "nodeId" : "Activity_72e5f33",
+    "nodeDefinitionId" : "Activity_72e5f33",
+    "nodeName" : "DocumentVerification",
+    "nodeType" : "userTask",
+    "error" : null,
+    "state" : 4,
+    "calledProcessInstanceIds" : null,
+    "retries" : [ ],
+    "htmTaskId" : "914cedd3-4ca6-4a4c-be73-3a9ded2a2da6",
+    "triggerTime" : "2026-03-05T22:43:40.577227607+03:00",
+    "leaveTime" : "2026-03-05T22:43:44.577227607+03:00",
+    "triggerNodeInstanceId" : null,
+    "creationOrder" : 4
+  }, {
+    "id" : "77dd7bf6-53e9-438b-829a-d156489aaf52",
+    "nodeId" : "Activity_60d1378",
+    "nodeDefinitionId" : "Activity_60d1378",
+    "nodeName" : "FraudCheck",
+    "nodeType" : "subProcess",
+    "error" : null,
+    "state" : 4,
+    "calledProcessInstanceIds" : null,
+    "retries" : [ ],
+    "htmTaskId" : null,
+    "triggerTime" : "2026-03-05T22:43:44.577227607+03:00",
+    "leaveTime" : "2026-03-05T22:44:06.577227607+03:00",
+    "triggerNodeInstanceId" : null,
+    "creationOrder" : 5
+  }, {
+    "id" : "0570c8eb-8d67-46e2-b7bf-bac63cecb3fc",
+    "nodeId" : "Activity_856c464",
+    "nodeDefinitionId" : "Activity_856c464",
+    "nodeName" : "getEpkData",
+    "nodeType" : "restTask",
+    "error" : null,
+    "state" : 4,
+    "calledProcessInstanceIds" : null,
+    "retries" : [ ],
+    "htmTaskId" : null,
+    "triggerTime" : "2026-03-05T22:44:06.577227607+03:00",
+    "leaveTime" : "2026-03-05T22:44:10.577227607+03:00",
+    "triggerNodeInstanceId" : null,
+    "creationOrder" : 6
+  }, {
+    "id" : "53fa016a-5662-48c6-8ee7-dceaf61c10b2",
+    "nodeId" : "Activity_8827780",
+    "nodeDefinitionId" : "Activity_8827780",
+    "nodeName" : "FraudCheck",
+    "nodeType" : "subProcess",
+    "error" : null,
+    "state" : 0,
+    "calledProcessInstanceIds" : null,
+    "retries" : [ ],
+    "htmTaskId" : null,
+    "triggerTime" : "2026-03-05T22:44:10.577227607+03:00",
+    "leaveTime" : null,
+    "triggerNodeInstanceId" : null,
+    "creationOrder" : 7
+  } ],
+  "variables" : {
+    "caseId" : "a2ea5586-5ca0-4b23-92a1-343bf8fdd80c",
+    "epkId" : "1373959029328728909",
+    "ucpId" : "1309409421866263865",
+    "fio" : "ПАВЛОВ ПАВЕЛ ВЛАДИМИРОВИЧ",
+    "globalInstanceId" : "d3283395-1ce9-4a6d-aae3-13cb589c3092",
+    "INTERACTION_ID" : "260305-7000-765159",
+    "INTERACTION_DATE" : "05.03.2026",
+    "theme" : "refundRequest",
+    "result" : "",
+    "status" : "COMPLETED",
+    "staticData" : {
+      "classifierVersion" : 29,
+      "caseId" : "a2ea5586-5ca0-4b23-92a1-343bf8fdd80c",
+      "classifierMasterId" : "294c71ba-ce83-4eed-a12f-33e0dc491809",
+      "classifierParentMasterId" : "0e76f15a-0468-483c-9abb-07f52fb8eaae",
+      "casePublicId" : "2603057000119414",
+      "clientEpkId" : 1373959029328728909,
+      "statusCode" : "COMPLETED",
+      "statusName" : null,
+      "crmAppealNum" : null,
+      "considerationResultCode" : "ESCALATED",
+      "considerationResultName" : "Эскалировано",
+      "crmRequestId" : null,
+      "lastUpdateTime" : "2026-03-05T22:54:14.577227607+03:00",
+      "closedTime" : null,
+      "registrationTime" : "2026-03-05T22:43:14.577227607+03:00",
+      "publicDescription" : "Тестовое обращение #9538",
+      "caseEcmFolder" : null,
+      "pprbCase" : false,
+      "contactSettingsStart" : "09:00",
+      "contactSettingsFinish" : "20:00",
+      "contactSettingsTimeZone" : "+03:00",
+      "expirationTime" : "2026-03-06T22:43:14.577227607+03:00",
+      "initialExpirationTime" : "2026-03-06T22:43:14.577227607+03:00",
+      "initialInteractionId" : "259fd254-02fc-4000-9b7d-fde3f07b7bc6",
+      "answers" : [ ]
+    },
+    "epkData" : {
+      "epkEntity" : {
+        "ucpId" : "1309409421866263865",
+        "version" : 60,
+        "names" : [ {
+          "surname" : "ПАВЛОВ",
+          "name" : "ПАВЕЛ",
+          "patronymic" : "ВЛАДИМИРОВИЧ"
+        } ],
+        "clientStatus" : 1,
+        "gender" : 2,
+        "clientGroups" : [ 2570, 1427, 2021, 1641 ],
+        "phoneNumbers" : [ {
+          "phoneNumber" : "+7 (914) 1711297",
+          "startDate" : "2024-03-06T13:27:14.580253203Z",
+          "endDate" : "2026-01-05T13:27:14.580302739Z",
+          "updateDateTime" : "2025-08-27T13:27:14.580331839Z",
+          "contactStatus" : 1,
+          "timeAvailabilityFrom" : null,
+          "timeAvailabilityTo" : null,
+          "usageType" : 14,
+          "flags" : [ 31, 75, 76 ],
+          "flagList" : [ ],
+          "phoneQualityCode" : 511,
+          "region" : 8
+        }, {
+          "phoneNumber" : "+7 (953) 6294454",
+          "startDate" : "2022-03-06T13:27:14.580396694Z",
+          "endDate" : null,
+          "updateDateTime" : "2025-03-23T13:27:14.580419628Z",
+          "contactStatus" : 1,
+          "timeAvailabilityFrom" : null,
+          "timeAvailabilityTo" : null,
+          "usageType" : 14,
+          "flags" : [ 22, 58, 40 ],
+          "flagList" : [ ],
+          "phoneQualityCode" : 511,
+          "region" : 81
+        } ],
+        "electronicAddresses" : [ ],
+        "deathDate" : null,
+        "birthDate" : "1948-03-06T13:27:14.580479443Z",
+        "identifications" : [ {
+          "documentSeries" : "28 71",
+          "documentNumber" : "996307",
+          "documentTypeCode" : 177,
+          "issuedDate" : "2021-03-06T13:27:14.58052202Z",
+          "issuerCode" : "568-621",
+          "issuedByOrganization" : "ОВД района Северный"
+        } ]
+      },
+      "customerKnowledge" : [ {
+        "value" : "35570",
+        "id" : 1913788119797757019
+      } ]
+    },
+    "tracingHeaders" : {
+      "x-request-id" : "b05cc14c-5232-4b43-9398-e0c84c444610",
+      "x-b3-parentspanid" : "842a870f61ea8e39",
+      "x-b3-spanid" : "ef13f5a475e00c8c",
+      "x-b3-traceid" : "5cc86015186449132b6ae4504f08c5f7",
+      "x-b3-sampled" : "1"
+    },
+    "startAttributes" : {
+      "caseId" : "a2ea5586-5ca0-4b23-92a1-343bf8fdd80c",
+      "attributes" : [ {
+        "inputSumm" : "5142"
+      }, {
+        "inputCC" : {
+          "DPAN" : "6711122202400942",
+          "endDate" : "2027-03-06",
+          "accountNum" : "19881903695607626",
+          "processing" : "urn:sbrfsystems:99-way"
+        }
+      }, {
+        "inputDC" : {
+          "DPAN" : "2018250866773770",
+          "endDate" : "2029-03-06",
+          "accountNum" : "78032798438013603",
+          "processing" : "urn:sbrfsystems:99-pci:tw"
+        }
+      } ]
+    },
+    "unifMetadata" : "44_3944_1",
+    "unifObjectId" : "e5d1e074-851f-4ac7-92e2-07f40857317e",
+    "rosterId" : "b96e6092-ecb1-4728-993d-266476239da0",
+    "uvsk_restTaskTimer" : "PT30S",
+    "uvskCLTV_taskTimer" : "PT30S",
+    "uvskVis_armStageDurationTimer" : "P3D",
+    "expTimer" : "P3D",
+    "armTimer" : "PT73H",
+    "taskTimer" : "PT30S",
+    "universalStage" : "OKS_US",
+    "urlGFL" : "http://gfl-service:8080",
+    "urlEpk" : "http://bpm-gateway:8080",
+    "statusHistory" : [ -435190 ],
+    "attachmentIds" : [ "IN_PROGRESS", 10362.092042639459, [ [ {
+      "key" : "k_841",
+      "nested" : 860.5005168669588
+    }, [ -359 ] ] ], null, "CANCELLED" ],
+    "tags" : [ {
+      "key" : "k_876",
+      "nested" : -901069
+    }, -4991, 47726.23442877828, {
+      "id" : "ddc38ceb-9f84-4ec6-99da-c08d71956b5a",
+      "code" : "c_7396",
+      "value" : 1,
+      "active" : false
+    }, [ "CANCELLED" ], {
+      "key" : "k_b84",
+      "nested" : {
+        "id" : 323007,
+        "code" : "c_3b05",
+        "value" : 15,
+        "active" : false
+      }
+    } ]
+  },
+  "contextSize" : 168944
+}

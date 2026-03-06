@@ -22,8 +22,8 @@
 -- ============================================================================
 SELECT 
     process_id,
-    process_id,
-    var_value
+    process_name,
+    var_caseId
 FROM process_main
-WHERE var_value IS NOT NULL
+WHERE var_caseId IS NOT NULL
 LIMIT 50

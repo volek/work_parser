@@ -26,7 +26,7 @@ SELECT
     var_path,
     COUNT(DISTINCT process_id) as in_processes,
     COUNT(*) as total_occurrences
-FROM process_main
+FROM process_variables
 GROUP BY var_path
 HAVING COUNT(DISTINCT process_id) > 1
 ORDER BY in_processes DESC

@@ -23,7 +23,7 @@
 SELECT 
     var_value as status_code,
     COUNT(*) as cnt
-FROM process_main
+FROM process_variables_indexed
 WHERE var_path LIKE '%statusCode%'
 GROUP BY var_value
 ORDER BY cnt DESC

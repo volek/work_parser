@@ -25,11 +25,11 @@
 -- ============================================================================
 SELECT 
     pe.process_id,
-    pe.process_id,
-    pe.var_value,
+    pe.process_name,
+    pe.state,
     COUNT(pv.var_path) as var_count
-FROM process_main pe
-LEFT JOIN process_main pv ON pe.process_id = pv.process_id
-GROUP BY pe.process_id, pe.process_id, pe.var_value
+FROM process_events pe
+LEFT JOIN process_variables pv ON pe.process_id = pv.process_id
+GROUP BY pe.process_id, pe.process_name, pe.state
 ORDER BY var_count DESC
 LIMIT 50

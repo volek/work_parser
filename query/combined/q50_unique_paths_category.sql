@@ -22,6 +22,6 @@
 SELECT 
     var_category,
     COUNT(DISTINCT var_path) as unique_paths
-FROM process_main
+FROM process_variables_indexed
 GROUP BY var_category
 ORDER BY unique_paths DESC

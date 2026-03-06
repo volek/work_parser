@@ -22,6 +22,6 @@
 SELECT 
     LENGTH(var_path) - LENGTH(REPLACE(var_path, '.', '')) + 1 as depth,
     COUNT(*) as cnt_total
-FROM process_main
+FROM process_variables
 GROUP BY 1
 ORDER BY depth

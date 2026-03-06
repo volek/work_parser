@@ -23,7 +23,7 @@
 SELECT 
     DATE_TRUNC('hour', __time) as hour_ts,
     COUNT(*) as processes_started
-FROM process_main
+FROM process_events
 WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '24' HOUR
 GROUP BY 1
 ORDER BY hour_ts DESC

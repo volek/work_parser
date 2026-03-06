@@ -23,11 +23,10 @@
 --   - process_count: числовой показатель (INTEGER/NUMERIC).
 -- ============================================================================
 SELECT 
-    var_value,
-    var_value,
+    var_fio,
     COUNT(*) as process_count
 FROM process_main
-WHERE var_value IS NOT NULL
-GROUP BY var_value, var_value
+WHERE var_fio IS NOT NULL
+GROUP BY var_fio
 ORDER BY process_count DESC
 LIMIT 50

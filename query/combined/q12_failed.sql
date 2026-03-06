@@ -21,9 +21,10 @@
 --   - var_value: текст/структура (STRING/JSON/ARRAY).
 -- ============================================================================
 SELECT 
-    process_id,
-    process_id,
-    var_value,
-    var_value
-FROM process_main
-WHERE var_path = 'statusCode' AND var_value = '\1'
+    pvi.process_id,
+    pm.process_name,
+    pm.state,
+    pvi.var_value as statusCode
+FROM process_variables_indexed pvi
+JOIN process_main pm ON pvi.process_id = pm.process_id
+WHERE pvi.var_path = 'statusCode' AND pvi.var_value = '1'

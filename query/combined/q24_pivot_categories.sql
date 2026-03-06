@@ -25,11 +25,11 @@
 -- ============================================================================
 SELECT 
     pm.process_id,
-    pm.process_id as process_name,
+    pm.process_name,
     SUM(CASE WHEN pv.var_category = 'epkData' THEN 1 ELSE 0 END) as epk_cnt,
     SUM(CASE WHEN pv.var_category = 'staticData' THEN 1 ELSE 0 END) as static_cnt
 FROM process_main pm
-JOIN process_main pv ON pm.process_id = pv.process_id
+JOIN process_variables_indexed pv ON pm.process_id = pv.process_id
 WHERE pv.var_path = 'ucpId'
-GROUP BY pm.process_id
+GROUP BY pm.process_id, pm.process_name
 LIMIT 50

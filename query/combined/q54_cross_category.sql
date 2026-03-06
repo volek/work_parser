@@ -24,7 +24,7 @@
 SELECT 
     process_id,
     COUNT(DISTINCT var_category) as categories
-FROM process_main
+FROM process_variables_indexed
 GROUP BY process_id
 HAVING COUNT(DISTINCT var_category) > 1
 ORDER BY categories DESC

@@ -4,8 +4,9 @@
 # Запуск только приложения. Druid должен быть запущен отдельно.
 #
 # Варианты подключения к Druid:
-#   1. Внешний Druid (standalone): настройте переменные в .env файле
-#   2. Druid в отдельном docker-compose: используйте docker-compose.druid.yml
+#   1. Druid на выделенном хосте: в .env укажите DRUID_*_URL с IP/hostname хоста
+#   2. Druid на той же машине: по умолчанию host.docker.internal (Windows/macOS)
+#   3. Druid в отдельном docker-compose: docker-compose.druid.yml + общая сеть
 #
 # Запуск:
 #   docker compose up -d
@@ -29,7 +30,7 @@ services:
       # Druid Connection Settings (можно переопределить через .env файл)
       DRUID_BROKER_URL: ${DRUID_BROKER_URL:-http://host.docker.internal:8082}
       DRUID_COORDINATOR_URL: ${DRUID_COORDINATOR_URL:-http://host.docker.internal:8081}
-      DRUID_OVERLORD_URL: ${DRUID_OVERLORD_URL:-http://host.docker.internal:8090}
+      DRUID_OVERLORD_URL: ${DRUID_OVERLORD_URL:-http://host.docker.internal:8081}
       DRUID_ROUTER_URL: ${DRUID_ROUTER_URL:-http://host.docker.internal:8888}
       DRUID_CONNECT_TIMEOUT: ${DRUID_CONNECT_TIMEOUT:-30000}
       DRUID_READ_TIMEOUT: ${DRUID_READ_TIMEOUT:-60000}

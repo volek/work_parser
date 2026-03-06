@@ -25,7 +25,7 @@ SELECT
     pe.process_id,
     pe.process_id,
     pe.__time as start_date
-FROM process_main pe
-WHERE pe.var_value = 1
+FROM process_events pe
+WHERE pe.state = 1
 ORDER BY pe.__time DESC
 LIMIT 100

@@ -199,7 +199,7 @@ class MessageGenerator {
             "idempotencyKey" to null,
             "operation" to null,
             "nodeInstances" to generateNodeInstances(startDate, state),
-            "variables" to generateVariables(processName, caseId, epkId, ucpId, fio, startDate),
+            "variables" to generateVariables(processName, caseId, epkId, ucpId, fio, startDate, index),
             "contextSize" to random.nextLong(5000, 200000)
         )
     }
@@ -348,6 +348,10 @@ class MessageGenerator {
      * Специфичные переменные добавляются в зависимости
      * от типа процесса (Fraud, Transfer, etc.).
      * 
+     * Часть сообщений дополнительно получает переменные-массивы
+     * разной длины и с элементами разных типов (строки, числа, boolean, объекты, вложенные массивы).
+     * 
+     * @param messageIndex Порядковый номер сообщения (для вариативности массивов)
      * @return Map переменных процесса
      */
     private fun generateVariables(
@@ -356,7 +360,8 @@ class MessageGenerator {
         epkId: String,
         ucpId: String,
         fio: String,
-        startDate: OffsetDateTime
+        startDate: OffsetDateTime,
+        messageIndex: Int
     ): Map<String, Any?> {
         val variables = mutableMapOf<String, Any?>()
         
@@ -388,7 +393,84 @@ class MessageGenerator {
         
         addProcessSpecificVariables(variables, processName)
         
+        // Часть сообщений содержит дополнительные переменные-массивы разной длины и типов
+        if (messageIndex % 3 != 1) { // ~2/3 сообщений с массивами
+            addRandomArrayVariables(variables, messageIndex)
+        }
+        
         return variables
+    }
+    
+    /** Имена переменных, которые могут быть массивами с разными данными */
+    private val arrayVariableNames = listOf(
+        "documentIds", "amounts", "tags", "flags", "metadataList", "references",
+        "codes", "values", "items", "history", "recipientIds", "channelCodes",
+        "statusHistory", "approvalStages", "commentIds", "attachmentIds", "notifyList"
+    )
+    
+    /**
+     * Добавляет в variables несколько переменных-массивов разной длины и с элементами разных типов.
+     */
+    private fun addRandomArrayVariables(variables: MutableMap<String, Any?>, messageIndex: Int) {
+        val count = random.nextInt(2, 6)
+        val namesPool = arrayVariableNames.shuffled(random)
+        (0 until count).forEach { i ->
+            val name = namesPool[i]
+            val minLen = listOf(0, 0, 1, 2).random()
+            val maxLen = listOf(3, 5, 8, 12, 20).random()
+            variables[name] = generateRandomArray(minLen, maxLen)
+        }
+    }
+    
+    /**
+     * Генерирует массив случайной длины с элементами разных типов:
+     * String, Int, Long, Double, Boolean, null, Map, вложенный List.
+     * @param depth Глубина вложенности (для ограничения рекурсии при вложенных списках)
+     */
+    private fun generateRandomArray(minLen: Int, maxLen: Int, depth: Int = 0): List<Any?> {
+        val len = random.nextInt(minLen, maxLen.coerceAtLeast(minLen + 1))
+        return (0 until len).map { generateRandomValue(depth) }
+    }
+    
+    /**
+     * Генерирует одно значение случайного типа.
+     * @param depth Текущая глубина вложенности (для ограничения рекурсии)
+     */
+    private fun generateRandomValue(depth: Int): Any? {
+        if (depth > 2) {
+            return listOf(
+                random.nextInt(-1000, 1000),
+                random.nextDouble(-1000.0, 1000.0),
+                listOf("code_${generateHex(4)}", "val_${random.nextInt(100)}", "").random().takeIf { it.isNotEmpty() },
+                random.nextBoolean()
+            ).random()
+        }
+        when (random.nextInt(0, 12)) {
+            0 -> return null
+            1 -> return random.nextInt(-10000, 10000)
+            2 -> return random.nextLong(-1000000L, 1000000L)
+            3 -> return random.nextDouble(0.0, 100000.0)
+            4 -> return random.nextBoolean()
+            5, 6 -> return listOf(
+                UUID.randomUUID().toString(),
+                "code_${generateHex(6)}",
+                statusCodes.random(),
+                listOf("RUB", "USD", "EUR").random(),
+                OffsetDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+            ).random()
+            7, 8 -> return mapOf(
+                "id" to (if (random.nextBoolean()) UUID.randomUUID().toString() else random.nextLong(1, 999999)),
+                "code" to "c_${generateHex(4)}",
+                "value" to (if (random.nextBoolean()) random.nextInt(1, 100) else random.nextDouble(0.0, 100.0)),
+                "active" to random.nextBoolean()
+            )
+            9, 10 -> return generateRandomArray(0, 4, depth + 1).takeIf { it.isNotEmpty() }
+            11 -> return mapOf(
+                "key" to "k_${generateHex(3)}",
+                "nested" to generateRandomValue(depth + 1)
+            )
+            else -> return random.nextInt(0, 100)
+        }
     }
     
     /** Генерирует блок staticData — данные обращения клиента */

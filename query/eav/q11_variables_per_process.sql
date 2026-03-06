@@ -23,7 +23,7 @@
 SELECT 
     process_id,
     COUNT(*) as variable_count
-FROM process_main
+FROM process_variables
 GROUP BY process_id
 ORDER BY variable_count DESC
 LIMIT 20

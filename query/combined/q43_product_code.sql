@@ -23,7 +23,7 @@
 SELECT 
     var_value as product_code,
     COUNT(*) as cnt
-FROM process_main
+FROM process_variables_indexed
 WHERE var_path = 'productCode' AND var_value IS NOT NULL
 GROUP BY var_value
 ORDER BY cnt DESC

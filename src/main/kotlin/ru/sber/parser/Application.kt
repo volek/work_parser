@@ -45,15 +45,17 @@ fun main(args: Array<String>) = runBlocking {
         
         // ==========================================
         // КОМАНДА: generate
-        // Генерация тестовых JSON-сообщений
+        // Генерация тестовых JSON-сообщений (в т.ч. при запуске в Docker)
         // ==========================================
         "generate" -> {
-            logger.info("Generating test messages...")
+            val positionalArgs = args.filter { !it.startsWith("--") }
+            val outputDir = File(positionalArgs.getOrElse(1) { "messages" })
+            val count = positionalArgs.getOrElse(2) { "100" }.toIntOrNull()?.coerceIn(1, 10000) ?: 100
+            logger.info("Generating $count test messages...")
             val generator = MessageGenerator()
-            // Директория для сохранения сообщений (по умолчанию "messages")
-            val outputDir = File(args.getOrElse(1) { "messages" })
-            generator.generateAll(outputDir)
-            logger.info("Generated messages saved to: ${outputDir.absolutePath}")
+            outputDir.mkdirs()
+            generator.generateAll(outputDir, count)
+            logger.info("Generated $count messages saved to: ${outputDir.absolutePath}")
         }
         
         // ==========================================
@@ -87,16 +89,29 @@ fun main(args: Array<String>) = runBlocking {
             
             logger.info("Parsed ${messages.size} messages")
             
-            // Трансформируем сообщения в записи для Druid
+            // Трансформируем сообщения в записи для Druid (с замером времени парсинга)
+            val parseStartMs = System.currentTimeMillis()
             val records = messages.flatMap { strategy.transform(it) }
-            logger.info("Generated ${records.size} records for Druid")
+            val parseTimeMs = System.currentTimeMillis() - parseStartMs
+            logger.info("Generated ${records.size} records for Druid in ${parseTimeMs}ms (parse)")
             
-            // Если указан флаг --ingest, загружаем данные в Druid
+            // Если указан флаг --ingest, загружаем данные в Druid (с замером времени записи)
             if (args.contains("--ingest")) {
                 val druidClient = DruidClient(config.druid)
                 druidClient.use { client ->
-                    client.ingest(strategy.dataSourceName, records)
-                    logger.info("Ingested records to Druid datasource: ${strategy.dataSourceName}")
+                    val ingestStartMs = System.currentTimeMillis()
+                    if (strategy.additionalDataSources.isEmpty()) {
+                        client.ingest(strategy.dataSourceName, records)
+                        logger.info("Ingested records to Druid datasource: ${strategy.dataSourceName}")
+                    } else {
+                        val byDataSource = strategy.transformBatch(messages)
+                        byDataSource.forEach { (dataSource, dsRecords) ->
+                            client.ingest(dataSource, dsRecords)
+                            logger.info("Ingested ${dsRecords.size} records to Druid datasource: $dataSource")
+                        }
+                    }
+                    val ingestTimeMs = System.currentTimeMillis() - ingestStartMs
+                    logger.info("Ingest to Druid completed in ${ingestTimeMs}ms (submit tasks)")
                 }
             }
         }
@@ -112,8 +127,13 @@ fun main(args: Array<String>) = runBlocking {
                 return@runBlocking
             }
             
-            // Читаем SQL из файла и выполняем запрос
-            val sql = File(queryFile).readText()
+            // Читаем SQL из файла: убираем полнострочные комментарии (-- ...),
+            // чтобы парсер Druid не воспринимал идентификаторы из комментариев как колонки
+            val rawSql = File(queryFile).readText()
+            val sql = rawSql.lines()
+                .filter { line -> !line.trim().startsWith("--") }
+                .joinToString("\n")
+                .trim()
             val druidClient = DruidClient(config.druid)
             druidClient.use { client ->
                 val results = client.query(sql)
@@ -133,11 +153,15 @@ fun main(args: Array<String>) = runBlocking {
                 BPM Message Parser for Apache Druid
                 
                 Usage:
-                  generate [output-dir]           Generate test messages
+                  generate [output-dir] [count]   Generate test messages (default: messages, 100)
                   parse <strategy> [input-dir]    Parse messages (hybrid|eav|combined)
                   parse <strategy> --ingest       Parse and ingest to Druid
                   query <query-file.sql>          Execute SQL query on Druid
                   help                            Show this help
+                
+                Examples (Docker):
+                  docker compose run --rm bpm-parser generate
+                  docker compose run --rm bpm-parser generate messages 100
                 
                 Strategies:
                   hybrid   - Flat columns + JSON blobs (single table)

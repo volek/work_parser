@@ -22,7 +22,7 @@ class DruidClientTest {
         config = DruidConfig(
             brokerUrl = "http://localhost:8082",
             coordinatorUrl = "http://localhost:8081",
-            overlordUrl = "http://localhost:8090",
+            overlordUrl = "http://localhost:8081",
             batchSize = 100
         )
     }
@@ -34,7 +34,7 @@ class DruidClientTest {
     
     @Test
     fun `should use correct overlord URL for ingestion`() {
-        assertEquals("http://localhost:8090", config.overlordUrl)
+        assertEquals("http://localhost:8081", config.overlordUrl)
     }
     
     @Test

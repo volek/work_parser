@@ -23,11 +23,11 @@
 -- ============================================================================
 SELECT 
     pe.process_id,
-    pe.process_id,
-    pe.var_value,
+    pe.process_name,
+    pe.__time as start_date,
     pv.var_value as caseId
-FROM process_main pe
-JOIN process_main pv 
+FROM process_events pe
+JOIN process_variables pv
     ON pe.process_id = pv.process_id
 WHERE pv.var_path = 'caseId'
   AND pe.__time >= CURRENT_TIMESTAMP - INTERVAL '24' HOUR

@@ -24,7 +24,7 @@
 SELECT 
     var_path,
     COUNT(*) as cnt
-FROM process_main
+FROM process_variables_indexed
 WHERE var_category = 'epkData'
 GROUP BY var_path
 ORDER BY cnt DESC

@@ -24,7 +24,7 @@ SELECT
     var_path,
     var_value,
     var_type
-FROM process_main
+FROM process_variables
 WHERE var_path LIKE 'staticData.%'
   AND var_path NOT LIKE 'staticData.%[%'
 LIMIT 100

@@ -109,7 +109,7 @@ internal data class DruidFileConfig(
 data class DruidConfig(
     val brokerUrl: String = "http://localhost:8082",
     val coordinatorUrl: String = "http://localhost:8081",
-    val overlordUrl: String = "http://localhost:8090",
+    val overlordUrl: String = "http://localhost:8081",
     val routerUrl: String = "http://localhost:8888",
     val connectTimeout: Long = 30000,
     val readTimeout: Long = 60000,
@@ -136,7 +136,7 @@ data class DruidConfig(
                     ?: "http://localhost:8081",
                 overlordUrl = System.getenv("DRUID_OVERLORD_URL") 
                     ?: fileConfig?.overlordUrl 
-                    ?: "http://localhost:8090",
+                    ?: "http://localhost:8081",
                 routerUrl = System.getenv("DRUID_ROUTER_URL") 
                     ?: fileConfig?.routerUrl 
                     ?: "http://localhost:8888",
@@ -167,7 +167,7 @@ data class DruidConfig(
             return DruidConfig(
                 brokerUrl = "http://localhost:8082",
                 coordinatorUrl = "http://localhost:8081",
-                overlordUrl = "http://localhost:8090",
+                overlordUrl = "http://localhost:8081",
                 routerUrl = "http://localhost:$port"
             )
         }
@@ -179,7 +179,7 @@ data class DruidConfig(
             return DruidConfig(
                 brokerUrl = "http://host.docker.internal:8082",
                 coordinatorUrl = "http://host.docker.internal:8081",
-                overlordUrl = "http://host.docker.internal:8090",
+                overlordUrl = "http://host.docker.internal:8081",
                 routerUrl = "http://host.docker.internal:8888"
             )
         }

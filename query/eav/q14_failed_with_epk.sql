@@ -23,11 +23,11 @@
 -- ============================================================================
 SELECT 
     pe.process_id,
-    pe.process_id,
-    pe.var_value,
+    pe.process_name,
+    pe.state,
     pv.var_value as epkId
-FROM process_main pe
-JOIN process_main pv 
+FROM process_events pe
+JOIN process_variables pv 
     ON pe.process_id = pv.process_id
-WHERE pe.var_value = 3
+WHERE pe.state = 2
   AND pv.var_path = 'epkId'

@@ -24,6 +24,6 @@ SELECT
     var_type,
     var_category,
     COUNT(*) as cnt
-FROM process_main
+FROM process_variables_indexed
 GROUP BY var_type, var_category
 ORDER BY cnt DESC

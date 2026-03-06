@@ -23,7 +23,7 @@
 SELECT 
     var_path,
     COUNT(*) as occurrences
-FROM process_main
+FROM process_variables
 WHERE var_path NOT LIKE '%.%'
 GROUP BY var_path
 ORDER BY occurrences DESC

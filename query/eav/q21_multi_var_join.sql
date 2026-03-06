@@ -27,10 +27,10 @@ SELECT
     pe.process_id,
     epk.var_value as epkId,
     cid.var_value as caseId
-FROM process_main pe
-LEFT JOIN process_main epk 
+FROM process_events pe
+LEFT JOIN process_variables epk 
     ON pe.process_id = epk.process_id AND epk.var_path = 'epkId'
-LEFT JOIN process_main cid 
+LEFT JOIN process_variables cid 
     ON pe.process_id = cid.process_id AND cid.var_path = 'caseId'
 WHERE epk.var_value IS NOT NULL OR cid.var_value IS NOT NULL
 LIMIT 50

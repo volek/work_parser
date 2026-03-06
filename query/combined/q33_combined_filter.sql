@@ -24,12 +24,12 @@
 -- ============================================================================
 SELECT 
     process_id,
-    process_id,
-    var_value,
-    var_value,
-    var_value
+    process_name,
+    state,
+    var_caseId,
+    var_epkId
 FROM process_main
-WHERE var_value IS NOT NULL
-  AND var_value IN (1, 2)
+WHERE state IS NOT NULL
+  AND state IN (1, 2)
   AND __time >= CURRENT_TIMESTAMP - INTERVAL '30' DAY
 ORDER BY __time DESC

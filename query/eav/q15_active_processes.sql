@@ -25,7 +25,7 @@ SELECT
     process_id,
     process_id,
     __time as start_date
-FROM process_main
+FROM process_variables
 WHERE var_path = 'statusCode' AND var_value = '\1'
 ORDER BY __time DESC
 LIMIT 100

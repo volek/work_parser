@@ -25,8 +25,8 @@ SELECT
     pe.process_id,
     pv.var_path,
     pv.var_value as phone_number
-FROM process_main pe
-JOIN process_main pv 
+FROM process_events pe
+JOIN process_variables pv 
     ON pe.process_id = pv.process_id
 WHERE pv.var_path LIKE 'epkData.epkEntity.phoneNumbers[%].phoneNumber'
 LIMIT 100

@@ -24,8 +24,8 @@ SELECT
     pe.process_id,
     pe.process_id,
     pe.__time as start_date
-FROM process_main pe
-JOIN process_main pv 
+FROM process_events pe
+JOIN process_variables pv
     ON pe.process_id = pv.process_id
 WHERE pv.var_path = 'epkId'
   AND pv.var_value = '1234567890123456789'

@@ -24,11 +24,11 @@
 -- ============================================================================
 SELECT 
     pm.process_id,
-    pm.process_id,
-    pm.var_value,
+    pm.process_name,
+    pm.var_ucpId,
     pv.var_value as ucpId
 FROM process_main pm
-JOIN process_main pv ON pm.process_id = pv.process_id
+JOIN process_variables_indexed pv ON pm.process_id = pv.process_id
 WHERE pv.var_category = 'epkData'
   AND pv.var_path = 'epkEntity.ucpId'
 LIMIT 50

@@ -26,7 +26,7 @@ SELECT
     var_path,
     COUNT(*) as cnt,
     AVG(CAST(var_value AS DOUBLE)) as avg_val
-FROM process_main
+FROM process_variables
 WHERE var_type = 'number'
   AND var_value IS NOT NULL
 GROUP BY var_path

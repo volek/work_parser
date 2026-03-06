@@ -24,10 +24,10 @@
 -- ============================================================================
 SELECT 
     process_id,
-    process_id,
-    var_value,
+    process_name,
+    state,
     __time as start_date
 FROM process_main
-WHERE var_path = 'statusCode' AND var_value = '\1'
+WHERE state = 1
 ORDER BY __time DESC
 LIMIT 100

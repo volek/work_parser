@@ -27,7 +27,7 @@ SELECT
     process_id,
     var_value,
     COUNT(*) as cnt
-FROM process_main
+FROM process_variables
 GROUP BY 1, 2, 3
 ORDER BY day_ts DESC, cnt DESC
 LIMIT 100

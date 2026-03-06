@@ -26,8 +26,8 @@ SELECT
     pe.process_id,
     pe.process_id,
     COUNT(DISTINCT pv.var_path) as matched_paths
-FROM process_main pe
-JOIN process_main pv ON pe.process_id = pv.process_id
+FROM process_events pe
+JOIN process_variables pv ON pe.process_id = pv.process_id
 WHERE pv.var_path IN ('epkId', 'caseId', 'fio', 'productCode')
 GROUP BY pe.process_id, pe.process_id
 HAVING COUNT(DISTINCT pv.var_path) >= 3

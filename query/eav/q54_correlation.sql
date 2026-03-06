@@ -23,11 +23,11 @@
 --   - cnt: числовой показатель (INTEGER/NUMERIC).
 -- ============================================================================
 SELECT 
-    pe.var_value,
+    pe.state,
     pv.var_path,
     COUNT(*) as cnt
-FROM process_main pe
-JOIN process_main pv ON pe.process_id = pv.process_id
+FROM process_events pe
+JOIN process_variables pv ON pe.process_id = pv.process_id
 WHERE pv.var_path IN ('epkId', 'caseId', 'productCode')
-GROUP BY pe.var_value, pv.var_path
-ORDER BY pe.var_value, cnt DESC
+GROUP BY pe.state, pv.var_path
+ORDER BY pe.state, cnt DESC

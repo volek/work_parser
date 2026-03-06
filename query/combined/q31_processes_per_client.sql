@@ -23,11 +23,11 @@
 --   - types: категориальное значение (STRING/INTEGER).
 -- ============================================================================
 SELECT 
-    var_value,
+    var_caseId as client_id,
     COUNT(*) as process_cnt,
     COUNT(DISTINCT process_id) as types
 FROM process_main
-WHERE var_value IS NOT NULL
-GROUP BY var_value
+WHERE var_caseId IS NOT NULL
+GROUP BY var_caseId
 ORDER BY process_cnt DESC
 LIMIT 20

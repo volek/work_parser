@@ -28,14 +28,14 @@
 -- ============================================================================
 SELECT 
     process_id,
-    process_id,
-    var_value,
+    process_name,
+    state,
     __time as start_date,
-    var_value,
-    var_path,
-    var_value,
-    var_value,
-    var_value
+    var_caseId,
+    var_epkId,
+    var_fio,
+    var_ucpId,
+    module_id
 FROM process_main
 ORDER BY __time DESC
 LIMIT 100

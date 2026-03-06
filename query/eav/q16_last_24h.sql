@@ -23,9 +23,9 @@
 -- ============================================================================
 SELECT 
     process_id,
-    process_id,
+    var_path,
     var_value,
     __time as start_date
-FROM process_main
+FROM process_variables
 WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '24' HOUR
 ORDER BY __time DESC

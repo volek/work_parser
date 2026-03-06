@@ -23,15 +23,15 @@
 -- ============================================================================
 SELECT 
     pm.process_id,
-    pm.process_id as process_name,
+    pm.process_name,
     epk.var_value as epk_data,
     st.var_value as static_data
 FROM process_main pm
-LEFT JOIN process_main epk 
+LEFT JOIN process_variables_indexed epk 
     ON pm.process_id = epk.process_id 
     AND epk.var_category = 'epkData' 
     AND epk.var_path = 'epkEntity.ucpId'
-LEFT JOIN process_main st 
+LEFT JOIN process_variables_indexed st 
     ON pm.process_id = st.process_id 
     AND st.var_category = 'staticData' 
     AND st.var_path = 'clientEpkId'

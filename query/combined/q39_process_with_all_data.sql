@@ -28,14 +28,13 @@
 -- ============================================================================
 SELECT 
     pm.process_id,
-    pm.process_id,
-    pm.var_value,
-    pm.var_value,
-    pm.var_value,
-    pm.var_value,
+    pm.var_caseId,
+    pm.var_epkId,
+    pm.var_fio,
+    pm.var_ucpId,
     COUNT(DISTINCT pv.var_category) as categories,
     COUNT(pv.var_path) as var_count
 FROM process_main pm
-LEFT JOIN process_main pv ON pm.process_id = pv.process_id
-GROUP BY pm.process_id, pm.process_id, pm.var_value, pm.var_value, pm.var_value, pm.var_value
+LEFT JOIN process_variables_indexed pv ON pm.process_id = pv.process_id
+GROUP BY pm.process_id, pm.var_caseId, pm.var_epkId, pm.var_fio, pm.var_ucpId
 LIMIT 50

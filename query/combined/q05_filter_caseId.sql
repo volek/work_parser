@@ -22,8 +22,8 @@
 -- ============================================================================
 SELECT 
     process_id,
-    process_id,
-    var_value,
-    var_value
+    process_name,
+    var_caseId,
+    state
 FROM process_main
-WHERE var_value = 'ift-5g-rb_case-123'
+WHERE var_caseId = 'ift-5g-rb_case-123'

@@ -23,7 +23,7 @@
 SELECT 
     var_value as status_code,
     COUNT(*) as occurrences
-FROM process_main
+FROM process_variables
 WHERE var_path LIKE '%statusCode%'
 GROUP BY var_value
 ORDER BY occurrences DESC

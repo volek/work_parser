@@ -28,14 +28,14 @@
 -- ============================================================================
 SELECT 
     pm.process_id,
-    pm.process_id,
-    pm.var_value,
-    pm.var_value,
-    pm.var_value,
-    pm.var_value,
+    pm.process_name,
+    pm.var_caseId,
+    pm.var_epkId,
+    pm.var_fio,
+    pm.var_ucpId,
     pv.var_category,
     pv.var_path,
     pv.var_value
 FROM process_main pm
-JOIN process_main pv ON pm.process_id = pv.process_id
+JOIN process_variables_indexed pv ON pm.process_id = pv.process_id
 LIMIT 100

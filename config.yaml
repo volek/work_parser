@@ -19,8 +19,8 @@ druid:
   # Coordinator - управление сегментами
   coordinatorUrl: "http://localhost:8081"
   
-  # Overlord - управление задачами индексации
-  overlordUrl: "http://localhost:8090"
+  # Overlord - управление задачами индексации (часто 8081, в standalone по умолчанию 8090)
+  overlordUrl: "http://localhost:8081"
   
   # Router - унифицированная точка входа (Web Console)
   routerUrl: "http://localhost:8888"

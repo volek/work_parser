@@ -21,9 +21,9 @@
 --   - process_types: категориальное значение (STRING/INTEGER).
 -- ============================================================================
 SELECT 
-    var_path,
+    module_id,
     COUNT(*) as process_count,
     COUNT(DISTINCT process_id) as process_types
 FROM process_main
-GROUP BY var_path
+GROUP BY module_id
 ORDER BY process_count DESC

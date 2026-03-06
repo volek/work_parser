@@ -22,8 +22,8 @@
 -- ============================================================================
 SELECT 
     process_id,
-    var_value,
+    state,
     COUNT(*) as cnt
 FROM process_main
-GROUP BY process_id, var_value
-ORDER BY process_id, var_value
+GROUP BY process_id, state
+ORDER BY process_id, state

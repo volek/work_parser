@@ -22,8 +22,8 @@
 -- ============================================================================
 SELECT 
     process_id,
-    process_id,
-    var_value,
-    var_value
+    process_name,
+    var_epkId,
+    __time as start_date
 FROM process_main
-WHERE var_value = '1234567890123456789'
+WHERE var_epkId = '1234567890123456789'

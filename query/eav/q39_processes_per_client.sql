@@ -27,8 +27,8 @@ SELECT
     pv.var_value as epkId,
     COUNT(DISTINCT pe.process_id) as process_count,
     COUNT(DISTINCT pe.process_id) as process_types
-FROM process_main pe
-JOIN process_main pv ON pe.process_id = pv.process_id
+FROM process_events pe
+JOIN process_variables pv ON pe.process_id = pv.process_id
 WHERE pv.var_path = 'epkId'
 GROUP BY pv.var_value
 ORDER BY process_count DESC

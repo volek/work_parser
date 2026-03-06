@@ -24,6 +24,6 @@ SELECT
     var_category,
     COUNT(*) as var_count,
     COUNT(DISTINCT process_id) as processes
-FROM process_main
+FROM process_variables_indexed
 GROUP BY var_category
 ORDER BY var_count DESC

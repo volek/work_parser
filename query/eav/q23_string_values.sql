@@ -26,7 +26,7 @@ SELECT
     var_path,
     var_value,
     COUNT(*) as occurrences
-FROM process_main
+FROM process_variables
 WHERE var_type = 'string'
   AND var_value IS NOT NULL
 GROUP BY var_path, var_value

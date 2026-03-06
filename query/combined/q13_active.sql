@@ -22,8 +22,8 @@
 -- ============================================================================
 SELECT 
     process_id,
-    process_id,
+    process_name,
     __time as start_date
 FROM process_main
-WHERE var_path = 'statusCode' AND var_value = '\1'
+WHERE state = 1
 LIMIT 100

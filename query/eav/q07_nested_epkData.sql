@@ -25,8 +25,8 @@ SELECT
     pe.process_id,
     pe.process_id,
     pv.var_value as ucpId
-FROM process_main pe
-JOIN process_main pv 
+FROM process_events pe
+JOIN process_variables pv 
     ON pe.process_id = pv.process_id
 WHERE pv.var_path = 'epkData.epkEntity.ucpId'
 LIMIT 50

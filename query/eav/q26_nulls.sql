@@ -23,7 +23,7 @@
 SELECT 
     var_path,
     COUNT(*) as null_cnt
-FROM process_main
+FROM process_variables
 WHERE var_type = 'null' OR var_value IS NULL
 GROUP BY var_path
 ORDER BY null_cnt DESC

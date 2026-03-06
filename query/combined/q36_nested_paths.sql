@@ -26,7 +26,7 @@ SELECT
     var_path,
     var_category,
     COUNT(*) as cnt
-FROM process_main
+FROM process_variables_indexed
 WHERE LENGTH(var_path) - LENGTH(REPLACE(var_path, '.', '')) >= 2
 GROUP BY var_path, var_category
 ORDER BY cnt DESC

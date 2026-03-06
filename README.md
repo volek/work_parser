@@ -9,10 +9,12 @@ Kotlin-парсер BPM-сообщений для Apache Druid с поддерж
 - [Быстрый старт](#быстрый-старт)
 - [Установка и настройка](#установка-и-настройка)
 - [Использование](#использование)
+- [Пакетный запуск (все стратегии)](#пакетный-запуск-все-стратегии)
 - [Docker](#docker)
 - [Архитектура](#архитектура)
 - [Стратегии парсинга](#стратегии-парсинга)
 - [SQL-запросы](#sql-запросы)
+- [Очистка данных](#очистка-данных)
 - [Устранение неполадок](#устранение-неполадок)
 
 ---
@@ -45,6 +47,7 @@ Kotlin-парсер BPM-сообщений для Apache Druid с поддерж
 
 ---
 
+<a id="quick-start"></a>
 ## Быстрый старт
 
 ### Вариант 1: Standalone Druid на хосте
@@ -135,8 +138,10 @@ parser/
 │   │   ├── druid/                 # Druid client
 │   │   └── generator/             # Message generator
 │   └── test/               # Unit and integration tests
-├── messages/               # Generated test messages
-├── query/                  # SQL queries for each strategy
+├── messages/               # Сгенерированные тестовые сообщения
+├── logs/                   # Логи пакетных запусков (см. раздел «Пакетный запуск»)
+├── query-results/          # Результаты скрипта «все запросы» (PowerShell, см. п. 4)
+├── query/                  # SQL-запросы по стратегиям
 │   ├── hybrid/             # 50+ queries for Hybrid
 │   ├── eav/                # 50+ queries for EAV
 │   └── combined/           # 50+ queries for Combined
@@ -156,7 +161,7 @@ parser/
 |------------|----------------------|----------|
 | `DRUID_BROKER_URL` | `http://localhost:8082` | URL Druid Broker |
 | `DRUID_COORDINATOR_URL` | `http://localhost:8081` | URL Druid Coordinator |
-| `DRUID_OVERLORD_URL` | `http://localhost:8090` | URL Druid Overlord |
+| `DRUID_OVERLORD_URL` | `http://localhost:8081` | URL Druid Overlord (в кластере часто 8090) |
 | `DRUID_ROUTER_URL` | `http://localhost:8888` | URL Druid Router |
 | `DRUID_CONNECT_TIMEOUT` | `30000` | Таймаут подключения (мс) |
 | `DRUID_READ_TIMEOUT` | `60000` | Таймаут чтения (мс) |
@@ -201,8 +206,8 @@ cp .env.example .env
 # Показать справку
 java -jar app.jar help
 
-# Генерировать тестовые сообщения
-java -jar app.jar generate [output-dir]
+# Генерировать тестовые сообщения (по умолчанию 100 шт. в messages/)
+java -jar app.jar generate [output-dir] [count]
 
 # Парсинг сообщений
 java -jar app.jar parse <strategy> [input-dir]
@@ -218,8 +223,10 @@ java -jar app.jar query <query-file.sql>
 ### Примеры использования
 
 ```bash
-# Генерация 25+ тестовых сообщений
-docker compose run --rm bpm-parser generate messages
+# Генерация 100 тестовых сообщений (по умолчанию)
+docker compose run --rm bpm-parser generate
+# Или: каталог и количество
+docker compose run --rm bpm-parser generate messages 100
 
 # Парсинг с Hybrid-стратегией
 docker compose run --rm bpm-parser parse hybrid messages
@@ -229,6 +236,161 @@ docker compose run --rm bpm-parser parse eav messages --ingest
 
 # Выполнение запроса для поиска процессов по epkId
 docker compose run --rm bpm-parser query query/hybrid/filtering/q13_filter_by_epkId.sql
+```
+
+---
+
+## Пакетный запуск (все стратегии)
+
+Ниже — команды для последовательного запуска генерации, парсинга, загрузки в Druid и выполнения всех SQL-запросов по каждой стратегии. Логи и вывод каждого шага пишутся в отдельные файлы по стратегиям в каталог `logs/`.
+
+### Подготовка
+
+```bash
+# Создать каталог для логов (в корне проекта)
+mkdir -p logs
+```
+
+В Windows (PowerShell):
+
+```powershell
+New-Item -ItemType Directory -Force -Path logs
+```
+
+### 1. Пакетная генерация сообщений
+
+Генерация тестовых сообщений с сохранением лога в `logs/generate.log`:
+
+```bash
+docker compose run --rm bpm-parser generate messages 2>&1 | tee logs/generate.log
+```
+
+По умолчанию генерируется 100 сообщений в каталог `messages/`. Количество можно задать вторым аргументом: `generate messages 50`.
+
+### 2. Парсинг по всем стратегиям
+
+Парсинг одних и тех же сообщений (`messages/`) для каждой стратегии с записью логов в отдельные файлы:
+
+```bash
+# Hybrid
+docker compose run --rm bpm-parser parse hybrid messages 2>&1 | tee logs/hybrid_parse.log
+
+# EAV
+docker compose run --rm bpm-parser parse eav messages 2>&1 | tee logs/eav_parse.log
+
+# Combined
+docker compose run --rm bpm-parser parse combined messages 2>&1 | tee logs/combined_parse.log
+```
+
+### 3. Загрузка в Druid по всем стратегиям
+
+Парсинг и загрузка в Druid для каждой стратегии (парсинг + `--ingest`), логи — в отдельные файлы:
+
+```bash
+# Hybrid
+docker compose run --rm bpm-parser parse hybrid messages --ingest 2>&1 | tee logs/hybrid_ingest.log
+
+# EAV
+docker compose run --rm bpm-parser parse eav messages --ingest 2>&1 | tee logs/eav_ingest.log
+
+# Combined
+docker compose run --rm bpm-parser parse combined messages --ingest 2>&1 | tee logs/combined_ingest.log
+```
+
+Перед запуском убедитесь, что Druid запущен и доступен (см. [Быстрый старт](#quick-start)).
+
+### 4. Запуск всех SQL-запросов по стратегиям
+
+Выполнение всех `.sql`-файлов по каждой стратегии с записью вывода в отдельный лог по стратегии:
+
+```bash
+# Hybrid — все запросы из query/hybrid/
+for f in query/hybrid/*.sql; do
+  echo "=== $f ===" >> logs/hybrid_queries.log
+  docker compose run --rm bpm-parser query "$f" >> logs/hybrid_queries.log 2>&1
+done
+
+# EAV — все запросы из query/eav/
+for f in query/eav/*.sql; do
+  echo "=== $f ===" >> logs/eav_queries.log
+  docker compose run --rm bpm-parser query "$f" >> logs/eav_queries.log 2>&1
+done
+
+# Combined — все запросы из query/combined/
+for f in query/combined/*.sql; do
+  echo "=== $f ===" >> logs/combined_queries.log
+  docker compose run --rm bpm-parser query "$f" >> logs/combined_queries.log 2>&1
+done
+```
+
+В Windows (PowerShell) для одной стратегии, например Hybrid:
+
+```powershell
+Get-ChildItem -Path query/hybrid -Filter *.sql | ForEach-Object {
+  "=== $($_.FullName) ===" | Add-Content -Path logs/hybrid_queries.log
+  docker compose run --rm bpm-parser query $_.FullName >> logs/hybrid_queries.log 2>&1
+}
+```
+
+Аналогично замените `query/hybrid` на `query/eav` и `query/combined` и имена лог-файлов на `eav_queries.log` и `combined_queries.log`.
+
+#### Все стратегии одной командой (Windows PowerShell)
+
+Скрипт выполняет все `.sql` из `query/combined`, `query/eav` и `query/hybrid` (включая подкаталоги) и пишет результаты в `query-results/combined.txt`, `query-results/eav.txt`, `query-results/hybrid.txt`. Запуск из корня проекта (где лежит `docker-compose.yml`):
+
+```powershell
+$strategies = @("combined", "eav", "hybrid")
+$outDir = "query-results"
+New-Item -ItemType Directory -Path $outDir -Force | Out-Null
+
+$root = (Get-Location).Path
+
+foreach ($s in $strategies) {
+    $outFile = Join-Path $outDir "$s.txt"
+    Set-Content -Path $outFile -Value "=== Strategy: $s ===`n"
+
+    Get-ChildItem -Path ".\query\$s" -Recurse -Filter *.sql |
+        Sort-Object FullName |
+        ForEach-Object {
+            $rel = $_.FullName.Substring($root.Length).TrimStart('\','/').Replace('\','/')
+            Add-Content -Path $outFile -Value "`n----- $rel -----"
+            docker compose run --rm bpm-parser query $rel 2>&1 | Add-Content -Path $outFile
+        }
+
+    Write-Host "Готово: $outFile"
+}
+```
+
+### Структура логов после пакетного запуска
+
+| Файл | Содержимое |
+|------|-------------|
+| `logs/generate.log` | Вывод генерации тестовых сообщений |
+| `logs/hybrid_parse.log` | Парсинг стратегии Hybrid |
+| `logs/eav_parse.log` | Парсинг стратегии EAV |
+| `logs/combined_parse.log` | Парсинг стратегии Combined |
+| `logs/hybrid_ingest.log` | Загрузка в Druid (Hybrid) |
+| `logs/eav_ingest.log` | Загрузка в Druid (EAV) |
+| `logs/combined_ingest.log` | Загрузка в Druid (Combined) |
+| `logs/hybrid_queries.log` | Результаты всех SQL-запросов для Hybrid |
+| `logs/eav_queries.log` | Результаты всех SQL-запросов для EAV |
+| `logs/combined_queries.log` | Результаты всех SQL-запросов для Combined |
+| `query-results/combined.txt` | Вывод скрипта PowerShell (все запросы Combined) |
+| `query-results/eav.txt` | Вывод скрипта PowerShell (все запросы EAV) |
+| `query-results/hybrid.txt` | Вывод скрипта PowerShell (все запросы Hybrid) |
+
+Полный цикл (генерация → загрузка в Druid → запросы по всем стратегиям) одной командой в **Bash** (Linux, macOS, Git Bash или WSL на Windows):
+
+```bash
+mkdir -p logs
+docker compose run --rm bpm-parser generate messages 2>&1 | tee logs/generate.log
+for strategy in hybrid eav combined; do
+  docker compose run --rm bpm-parser parse $strategy messages --ingest 2>&1 | tee logs/${strategy}_ingest.log
+  for f in query/$strategy/*.sql; do
+    echo "=== $f ===" >> logs/${strategy}_queries.log
+    docker compose run --rm bpm-parser query "$f" >> logs/${strategy}_queries.log 2>&1
+  done
+done
 ```
 
 ---
@@ -544,6 +706,85 @@ FROM process_events pe
 JOIN process_variables pv ON pe.process_id = pv.process_id
 WHERE pv.var_path LIKE 'epkData.epkEntity.%'
 ```
+
+---
+
+## Очистка данных
+
+Удаление данных от предыдущего запуска (сгенерированные сообщения, логи, артефакты сборки, при необходимости — тома Druid):
+
+**Windows (PowerShell):**
+```powershell
+# Очистка парсера (messages, logs, build, том parser-logs)
+.\scripts\clean-run-data.ps1
+
+# Полный сброс, включая остановку Druid и удаление всех томов
+.\scripts\clean-run-data.ps1 -FullReset
+```
+
+**Linux / macOS / WSL (Bash):**
+```bash
+# Очистка парсера
+./scripts/clean-run-data.sh
+
+# Полный сброс (Druid + все тома)
+./scripts/clean-run-data.sh --full
+```
+
+Одной командой без скрипта (только парсер: контейнеры + том логов, без удаления `messages/` и `build/`):
+```bash
+docker compose down -v
+```
+
+### Очистка данных в Druid на отдельном хосте
+
+Если Druid запущен на другом сервере (не в `docker-compose` этого проекта), данные парсера хранятся в **datasource'ах** Druid. Их можно удалить через HTTP API Coordinator'а.
+
+**Имена datasource'ов, создаваемых парсером:**
+
+| Стратегия  | Datasource'ы |
+|------------|----------------|
+| Hybrid     | `process_hybrid` |
+| EAV        | `process_events`, `process_variables` |
+| Combined   | `process_main`, `process_variables_indexed` |
+
+**Требования:** нужен URL **Coordinator** (порт 8081), не Router. В `.env` это `DRUID_COORDINATOR_URL`. Пример: Coordinator на отдельном хосте `192.168.1.27` → `http://192.168.1.27:8081`.
+
+**Список всех datasource'ов в кластере:**
+```bash
+curl -s "http://192.168.1.27:8081/druid/coordinator/v1/datasources"
+```
+
+**Удаление одного datasource** (безвозвратно удаляет все данные в нём):
+```bash
+COORDINATOR_URL="http://192.168.1.27:8081"
+
+curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/process_hybrid"
+curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/process_events"
+curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/process_variables"
+curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/process_main"
+curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/process_variables_indexed"
+```
+
+Удаляйте только те datasource'ы, которые реально созданы парсером (лишние запросы вернут 404).
+
+**Скрипты** для удаления всех datasource'ов парсера на указанном Coordinator (пример: хост `192.168.1.27`, порт 8081):
+
+```bash
+# Bash (Linux / macOS / WSL)
+COORDINATOR_URL="http://192.168.1.27:8081" ./scripts/clean-druid-remote.sh
+# или
+./scripts/clean-druid-remote.sh http://192.168.1.27:8081
+```
+
+```powershell
+# PowerShell (Windows)
+$env:COORDINATOR_URL = "http://192.168.1.27:8081"; .\scripts\clean-druid-remote.ps1
+# или
+.\scripts\clean-druid-remote.ps1 -CoordinatorUrl "http://192.168.1.27:8081"
+```
+
+Скрипты удаляют только перечисленные выше имена; если datasource нет в кластере, запрос пропускается (404).
 
 ---
 

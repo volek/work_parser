@@ -22,6 +22,6 @@
 SELECT 
     process_id,
     SUM(CASE WHEN var_type = 'json' THEN 1 ELSE 0 END) > 0 as has_cold_data
-FROM process_main
+FROM process_variables_indexed
 GROUP BY process_id
 LIMIT 50

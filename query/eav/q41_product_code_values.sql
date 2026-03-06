@@ -23,7 +23,7 @@
 SELECT 
     var_value as product_code,
     COUNT(*) as occurrences
-FROM process_main
+FROM process_variables
 WHERE var_path = 'productCode'
 GROUP BY var_value
 ORDER BY occurrences DESC

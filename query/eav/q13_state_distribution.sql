@@ -21,9 +21,9 @@
 --   - percentage: числовой показатель (INTEGER/NUMERIC).
 -- ============================================================================
 SELECT 
-    var_value,
+    state,
     COUNT(*) as cnt_total,
     COUNT(*) * 100.0 / SUM(COUNT(*)) OVER() as percentage
-FROM process_main
-GROUP BY var_value
+FROM process_events
+GROUP BY state
 ORDER BY cnt_total DESC

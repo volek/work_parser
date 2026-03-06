@@ -26,7 +26,7 @@ SELECT
     var_path,
     var_value,
     COUNT(*) as cnt
-FROM process_main
+FROM process_variables
 WHERE var_path LIKE '%Date%'
    OR var_path LIKE '%date%'
 GROUP BY var_path, var_value

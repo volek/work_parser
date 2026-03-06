@@ -26,12 +26,12 @@
 -- ============================================================================
 SELECT 
     pm.process_id,
-    pm.process_id,
-    pm.var_value,
+    pm.process_name,
+    pm.var_caseId,
     pv.var_category,
     pv.var_path,
     pv.var_value
 FROM process_main pm
-JOIN process_main pv ON pm.process_id = pv.process_id
-WHERE pm.var_value IS NOT NULL
+JOIN process_variables_indexed pv ON pm.process_id = pv.process_id
+WHERE pv.var_value IS NOT NULL
 LIMIT 100

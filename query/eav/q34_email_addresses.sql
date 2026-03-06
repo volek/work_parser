@@ -24,7 +24,7 @@ SELECT
     process_id,
     var_path,
     var_value as email
-FROM process_main
+FROM process_variables
 WHERE var_path LIKE '%email%'
   OR var_value LIKE '%@%.%'
 LIMIT 100

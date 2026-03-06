@@ -21,5 +21,5 @@
 SELECT 
     var_category,
     COUNT(*) as cnt
-FROM process_main
+FROM process_variables_indexed
 GROUP BY var_category

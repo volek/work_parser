@@ -24,8 +24,8 @@ SELECT
     pe.process_id,
     pe.process_id,
     pv.var_value as fio
-FROM process_main pe
-JOIN process_main pv 
+FROM process_events pe
+JOIN process_variables pv 
     ON pe.process_id = pv.process_id
 WHERE pv.var_path = 'fio'
   AND pv.var_value LIKE '%ИВАНОВ%'

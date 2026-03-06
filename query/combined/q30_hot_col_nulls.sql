@@ -21,8 +21,8 @@
 --   - total: числовой показатель (INTEGER/NUMERIC).
 -- ============================================================================
 SELECT 
-    SUM(CASE WHEN var_value IS NULL THEN 1 ELSE 0 END) as null_epk,
-    SUM(CASE WHEN var_value IS NULL THEN 1 ELSE 0 END) as null_fio,
-    SUM(CASE WHEN var_value IS NULL THEN 1 ELSE 0 END) as null_case,
+    SUM(CASE WHEN var_epkId IS NULL THEN 1 ELSE 0 END) as null_epk,
+    SUM(CASE WHEN var_fio IS NULL THEN 1 ELSE 0 END) as null_fio,
+    SUM(CASE WHEN var_caseId IS NULL THEN 1 ELSE 0 END) as null_case,
     COUNT(*) as total
 FROM process_main

@@ -19,10 +19,10 @@
 --   - *: тип определяется выражением в SELECT.
 -- ============================================================================
 SELECT *
-FROM process_main
+FROM process_variables
 WHERE process_id IN (
     SELECT DISTINCT process_id
-    FROM process_main
+    FROM process_variables
     WHERE var_path = 'productCode'
       AND var_value = 'CREDIT_CARD'
 )

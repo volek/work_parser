@@ -22,10 +22,10 @@
 --   - cnt: числовой показатель (INTEGER/NUMERIC).
 -- ============================================================================
 SELECT 
-    pm.var_value,
+    pm.state,
     pv.var_category,
     COUNT(*) as cnt
 FROM process_main pm
-JOIN process_main pv ON pm.process_id = pv.process_id
-GROUP BY pm.var_value, pv.var_category
-ORDER BY pm.var_value, cnt DESC
+JOIN process_variables_indexed pv ON pm.process_id = pv.process_id
+GROUP BY pm.state, pv.var_category
+ORDER BY pm.state, cnt DESC

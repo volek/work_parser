@@ -22,8 +22,8 @@
 -- ============================================================================
 SELECT 
     process_id,
-    process_id,
-    var_value,
-    var_value
+    process_name,
+    var_fio,
+    __time as start_date
 FROM process_main
-WHERE var_value LIKE '%ИВАНОВ%'
+WHERE var_fio LIKE '%ИВАНОВ%'

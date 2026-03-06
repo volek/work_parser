@@ -24,6 +24,6 @@ SELECT
     process_id,
     var_path,
     var_value
-FROM process_main
+FROM process_variables
 WHERE var_value LIKE '%SEARCH_TERM%'
 LIMIT 100

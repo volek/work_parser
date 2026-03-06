@@ -24,7 +24,7 @@ SELECT
     var_path,
     var_value,
     var_type
-FROM process_main
+FROM process_variables
 WHERE var_path LIKE 'epkData.epkEntity.%'
   AND var_path NOT LIKE '%[%'
 LIMIT 100

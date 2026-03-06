@@ -23,7 +23,7 @@
 -- ============================================================================
 SELECT 
     DATE_TRUNC('day', __time) as day_ts,
-    var_value,
+    state,
     COUNT(*) as cnt
 FROM process_main
 GROUP BY 1, 2

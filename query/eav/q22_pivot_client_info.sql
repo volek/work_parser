@@ -29,7 +29,7 @@ SELECT
     SUM(CASE WHEN pv.var_path = 'epkId' THEN 1 ELSE 0 END) as epkId_cnt,
     SUM(CASE WHEN pv.var_path = 'fio' THEN 1 ELSE 0 END) as fio_cnt,
     SUM(CASE WHEN pv.var_path = 'caseId' THEN 1 ELSE 0 END) as caseId_cnt
-FROM process_main pe
-JOIN process_main pv ON pe.process_id = pv.process_id
+FROM process_events pe
+JOIN process_variables pv ON pe.process_id = pv.process_id
 WHERE pv.var_path IN ('epkId', 'fio', 'caseId')
 GROUP BY pe.process_id

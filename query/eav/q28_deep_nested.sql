@@ -24,6 +24,6 @@ SELECT
     var_path,
     var_value,
     process_id
-FROM process_main
+FROM process_variables
 WHERE LENGTH(var_path) - LENGTH(REPLACE(var_path, '.', '')) >= 3
 LIMIT 100

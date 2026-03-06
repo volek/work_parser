@@ -24,9 +24,9 @@
 -- ============================================================================
 SELECT 
     process_id,
-    process_id,
-    var_value,
-    var_value,
+    process_name,
+    var_caseId,
+    state,
     __time as start_date
 FROM process_main
 WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '24' HOUR

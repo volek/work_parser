@@ -24,6 +24,6 @@ SELECT
     process_id,
     var_path,
     var_value
-FROM process_main
+FROM process_variables
 WHERE var_path LIKE '%passport%'
 LIMIT 100

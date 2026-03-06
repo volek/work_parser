@@ -23,7 +23,7 @@
 SELECT 
     SUBSTRING(var_path, 1, POSITION('[' IN var_path) - 1) as array_base,
     COUNT(*) as elements_count
-FROM process_main
+FROM process_variables
 WHERE var_path LIKE '%[%'
 GROUP BY 1
 ORDER BY elements_count DESC

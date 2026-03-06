@@ -24,7 +24,7 @@ SELECT
     process_id,
     var_path,
     var_value
-FROM process_main
+FROM process_variables_indexed
 WHERE var_category = 'epkData'
   AND var_path LIKE '%identityDoc%'
 LIMIT 100

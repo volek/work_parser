@@ -25,7 +25,7 @@ SELECT
     var_path,
     var_value,
     COUNT(*) as cnt
-FROM process_main
+FROM process_variables
 WHERE var_type = 'boolean'
 GROUP BY var_path, var_value
 ORDER BY cnt DESC

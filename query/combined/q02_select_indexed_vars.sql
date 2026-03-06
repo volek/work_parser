@@ -28,6 +28,6 @@ SELECT
     var_path,
     var_value,
     var_type
-FROM process_main
+FROM process_variables_indexed
 ORDER BY __time DESC
 LIMIT 100
