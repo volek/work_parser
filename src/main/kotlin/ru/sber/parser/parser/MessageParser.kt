@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import org.slf4j.LoggerFactory
 import ru.sber.parser.model.BpmMessage
 
 /**
@@ -41,6 +42,9 @@ import ru.sber.parser.model.BpmMessage
  * @see VariableFlattener для работы с переменными
  */
 class MessageParser {
+    /** Логгер для временных метрик парсинга и сериализации JSON. */
+    private val logger = LoggerFactory.getLogger(MessageParser::class.java)
+
     /**
      * Jackson ObjectMapper с настройками для Kotlin и Java Time.
      * 
@@ -66,7 +70,35 @@ class MessageParser {
      * @throws com.fasterxml.jackson.databind.JsonMappingException при несоответствии схемы
      */
     fun parse(json: String): BpmMessage {
-        return objectMapper.readValue(json)
+        // Метрика: размер входного JSON в символах (быстрый прокси объёма парсинга).
+        val jsonChars = json.length
+        // Метрика: общий размер входного JSON в байтах UTF-8 (для расчёта пропускной способности парсера).
+        val jsonBytes = json.toByteArray(Charsets.UTF_8).size
+        // Метрика: старт высокоточного таймера полного цикла parse().
+        val totalStartNs = System.nanoTime()
+        // Метрика: старт таймера чистой десериализации Jackson.
+        val deserializeStartNs = System.nanoTime()
+        val result = objectMapper.readValue<BpmMessage>(json)
+        // Метрика: длительность чистой десериализации JSON -> BpmMessage.
+        val deserializeNs = System.nanoTime() - deserializeStartNs
+        // Метрика: полная длительность parse() с учётом обвязки метода.
+        val totalNs = System.nanoTime() - totalStartNs
+        // Метрика: пропускная способность парсера в МБ/с по входному payload.
+        val throughputMbPerSec = if (totalNs > 0) (jsonBytes.toDouble() * 1_000_000_000.0 / totalNs) / (1024.0 * 1024.0) else 0.0
+
+        // Структурированный TEMP_PERF-лог для последующего анализа во внешних системах.
+        logger.info(
+            "TEMP_PERF|component=parser|operation=parse_one|json_chars={}|json_bytes={}|deserialize_ns={}|deserialize_ms={}|total_ns={}|total_ms={}|throughput_mb_s={}",
+            jsonChars,
+            jsonBytes,
+            deserializeNs,
+            deserializeNs / 1_000_000.0,
+            totalNs,
+            totalNs / 1_000_000.0,
+            throughputMbPerSec
+        )
+
+        return result
     }
     
     /**
@@ -77,7 +109,41 @@ class MessageParser {
      * @throws com.fasterxml.jackson.core.JsonParseException при невалидном JSON
      */
     fun parseList(json: String): List<BpmMessage> {
-        return objectMapper.readValue(json)
+        // Метрика: размер JSON-массива в символах.
+        val jsonChars = json.length
+        // Метрика: размер JSON-массива в байтах UTF-8.
+        val jsonBytes = json.toByteArray(Charsets.UTF_8).size
+        // Метрика: старт таймера полного parseList().
+        val totalStartNs = System.nanoTime()
+        // Метрика: старт таймера десериализации массива.
+        val deserializeStartNs = System.nanoTime()
+        val result = objectMapper.readValue<List<BpmMessage>>(json)
+        // Метрика: длительность десериализации списка сообщений.
+        val deserializeNs = System.nanoTime() - deserializeStartNs
+        // Метрика: полная длительность parseList().
+        val totalNs = System.nanoTime() - totalStartNs
+        // Метрика: количество разобранных сообщений в массиве.
+        val messagesCount = result.size
+        // Метрика: средняя длительность разбора одного сообщения в массиве.
+        val avgPerMessageMs = if (messagesCount > 0) (totalNs / 1_000_000.0) / messagesCount else 0.0
+        // Метрика: пропускная способность в МБ/с.
+        val throughputMbPerSec = if (totalNs > 0) (jsonBytes.toDouble() * 1_000_000_000.0 / totalNs) / (1024.0 * 1024.0) else 0.0
+
+        // Структурированный TEMP_PERF-лог для анализа батчевого парсинга.
+        logger.info(
+            "TEMP_PERF|component=parser|operation=parse_list|json_chars={}|json_bytes={}|messages_count={}|deserialize_ns={}|deserialize_ms={}|total_ns={}|total_ms={}|avg_per_message_ms={}|throughput_mb_s={}",
+            jsonChars,
+            jsonBytes,
+            messagesCount,
+            deserializeNs,
+            deserializeNs / 1_000_000.0,
+            totalNs,
+            totalNs / 1_000_000.0,
+            avgPerMessageMs,
+            throughputMbPerSec
+        )
+
+        return result
     }
     
     /**

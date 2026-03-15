@@ -13,6 +13,7 @@ import ru.sber.parser.model.BpmMessage
  * │ HybridStrategy    │ Один datasource с wide columns + blobs│
  * │ EavStrategy       │ Два datasource: события + переменные  │
  * │ CombinedStrategy  │ Два datasource: main + indexed vars   │
+ * │ DefaultStrategy   │ Один datasource, все поля как колонки│
  * └───────────────────┴────────────────────────────────────────┘
  * 
  * Паттерн Strategy позволяет:
@@ -30,6 +31,7 @@ import ru.sber.parser.model.BpmMessage
  * @see HybridStrategy один datasource с колонками и блобами
  * @see EavStrategy EAV-схема с событиями и переменными
  * @see CombinedStrategy main record + индексная таблица
+ * @see DefaultStrategy все поля сообщения как отдельные колонки (имя с точкой)
  */
 interface ParseStrategy {
     /**
@@ -62,6 +64,7 @@ interface ParseStrategy {
      * - HybridStrategy: 1 запись на сообщение
      * - EavStrategy: 1 событие + N переменных
      * - CombinedStrategy: 1 main + N indexed vars
+     * - DefaultStrategy: 1 запись на сообщение (все поля — колонки)
      * 
      * Каждая запись — это Map, готовая для JSON-сериализации
      * и отправки в Druid ingestion API.

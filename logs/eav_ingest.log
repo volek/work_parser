@@ -1,0 +1,144 @@
+time="2026-03-06T16:30:28+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+13:30:31.369 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+13:30:32.248 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+13:30:32.283 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+13:30:32.284 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+13:30:32.286 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+13:30:32.288 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+13:30:32.293 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+13:30:32.426 [main] INFO  Application - Parsing messages with strategy: eav
+13:30:35.603 [main] INFO  Application - Parsed 100 messages
+13:30:36.843 [main] INFO  Application - Generated 16145 records for Druid in 1216ms (parse)
+13:30:37.617 [main] INFO  ru.sber.parser.druid.DruidClient - Ingesting 100 records to dataSource: process_events
+13:30:37.631 [main] DEBUG ru.sber.parser.druid.DruidClient - Processing batch 1/1 with 100 records
+13:30:37.859 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8081/druid/indexer/v1/task
+METHOD: HttpMethod(value=POST)
+13:30:38.668 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8081/druid/indexer/v1/task
+13:30:38.743 [main] INFO  ru.sber.parser.druid.DruidClient - Submitted ingestion task: index_parallel_process_events_gbpeicbj_2026-03-06T13:30:38.720Z
+13:30:38.748 [main] INFO  ru.sber.parser.druid.DruidClient - Successfully submitted 1 ingestion batches for dataSource: process_events
+13:30:38.749 [main] INFO  Application - Ingested 100 records to Druid datasource: process_events
+13:30:38.751 [main] INFO  ru.sber.parser.druid.DruidClient - Ingesting 16045 records to dataSource: process_variables
+13:30:38.756 [main] DEBUG ru.sber.parser.druid.DruidClient - Processing batch 1/17 with 1000 records
+13:30:38.843 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8081/druid/indexer/v1/task
+METHOD: HttpMethod(value=POST)
+13:30:39.231 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8081/druid/indexer/v1/task
+13:30:39.240 [main] INFO  ru.sber.parser.druid.DruidClient - Submitted ingestion task: index_parallel_process_variables_enafcfhm_2026-03-06T13:30:39.341Z
+13:30:39.241 [main] DEBUG ru.sber.parser.druid.DruidClient - Processing batch 2/17 with 1000 records
+13:30:39.272 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8081/druid/indexer/v1/task
+METHOD: HttpMethod(value=POST)
+13:30:39.528 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8081/druid/indexer/v1/task
+13:30:39.541 [main] INFO  ru.sber.parser.druid.DruidClient - Submitted ingestion task: index_parallel_process_variables_pceoedni_2026-03-06T13:30:39.633Z
+13:30:39.542 [main] DEBUG ru.sber.parser.druid.DruidClient - Processing batch 3/17 with 1000 records
+13:30:39.576 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8081/druid/indexer/v1/task
+METHOD: HttpMethod(value=POST)
+13:30:39.785 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8081/druid/indexer/v1/task
+13:30:39.802 [main] INFO  ru.sber.parser.druid.DruidClient - Submitted ingestion task: index_parallel_process_variables_cofjhmop_2026-03-06T13:30:39.897Z
+13:30:39.803 [main] DEBUG ru.sber.parser.druid.DruidClient - Processing batch 4/17 with 1000 records
+13:30:39.826 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8081/druid/indexer/v1/task
+METHOD: HttpMethod(value=POST)
+13:30:40.102 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8081/druid/indexer/v1/task
+13:30:40.118 [main] INFO  ru.sber.parser.druid.DruidClient - Submitted ingestion task: index_parallel_process_variables_dhbogkao_2026-03-06T13:30:40.153Z
+13:30:40.119 [main] DEBUG ru.sber.parser.druid.DruidClient - Processing batch 5/17 with 1000 records
+13:30:40.145 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8081/druid/indexer/v1/task
+METHOD: HttpMethod(value=POST)
+13:30:40.417 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8081/druid/indexer/v1/task
+13:30:40.430 [main] INFO  ru.sber.parser.druid.DruidClient - Submitted ingestion task: index_parallel_process_variables_nfbfcplh_2026-03-06T13:30:40.518Z
+13:30:40.432 [main] DEBUG ru.sber.parser.druid.DruidClient - Processing batch 6/17 with 1000 records
+13:30:40.454 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8081/druid/indexer/v1/task
+METHOD: HttpMethod(value=POST)
+13:30:40.752 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8081/druid/indexer/v1/task
+13:30:40.767 [main] INFO  ru.sber.parser.druid.DruidClient - Submitted ingestion task: index_parallel_process_variables_denmlkae_2026-03-06T13:30:40.851Z
+13:30:40.768 [main] DEBUG ru.sber.parser.druid.DruidClient - Processing batch 7/17 with 1000 records
+13:30:40.787 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8081/druid/indexer/v1/task
+METHOD: HttpMethod(value=POST)
+13:30:41.022 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8081/druid/indexer/v1/task
+13:30:41.032 [main] INFO  ru.sber.parser.druid.DruidClient - Submitted ingestion task: index_parallel_process_variables_cnigphcg_2026-03-06T13:30:41.133Z
+13:30:41.033 [main] DEBUG ru.sber.parser.druid.DruidClient - Processing batch 8/17 with 1000 records
+13:30:41.052 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8081/druid/indexer/v1/task
+METHOD: HttpMethod(value=POST)
+13:30:41.294 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8081/druid/indexer/v1/task
+13:30:41.306 [main] INFO  ru.sber.parser.druid.DruidClient - Submitted ingestion task: index_parallel_process_variables_ebfkaafm_2026-03-06T13:30:41.394Z
+13:30:41.308 [main] DEBUG ru.sber.parser.druid.DruidClient - Processing batch 9/17 with 1000 records
+13:30:41.328 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8081/druid/indexer/v1/task
+METHOD: HttpMethod(value=POST)
+13:30:41.606 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8081/druid/indexer/v1/task
+13:30:41.622 [main] INFO  ru.sber.parser.druid.DruidClient - Submitted ingestion task: index_parallel_process_variables_gkjaeplm_2026-03-06T13:30:41.697Z
+13:30:41.624 [main] DEBUG ru.sber.parser.druid.DruidClient - Processing batch 10/17 with 1000 records
+13:30:41.641 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8081/druid/indexer/v1/task
+METHOD: HttpMethod(value=POST)
+13:30:41.857 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8081/druid/indexer/v1/task
+13:30:41.866 [main] INFO  ru.sber.parser.druid.DruidClient - Submitted ingestion task: index_parallel_process_variables_gndbapal_2026-03-06T13:30:41.928Z
+13:30:41.867 [main] DEBUG ru.sber.parser.druid.DruidClient - Processing batch 11/17 with 1000 records
+13:30:41.888 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8081/druid/indexer/v1/task
+METHOD: HttpMethod(value=POST)
+13:30:42.157 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8081/druid/indexer/v1/task
+13:30:42.184 [main] INFO  ru.sber.parser.druid.DruidClient - Submitted ingestion task: index_parallel_process_variables_pmehfkek_2026-03-06T13:30:42.247Z
+13:30:42.188 [main] DEBUG ru.sber.parser.druid.DruidClient - Processing batch 12/17 with 1000 records
+13:30:42.209 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8081/druid/indexer/v1/task
+METHOD: HttpMethod(value=POST)
+13:30:42.478 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8081/druid/indexer/v1/task
+13:30:42.487 [main] INFO  ru.sber.parser.druid.DruidClient - Submitted ingestion task: index_parallel_process_variables_nkpeomlj_2026-03-06T13:30:42.580Z
+13:30:42.491 [main] DEBUG ru.sber.parser.druid.DruidClient - Processing batch 13/17 with 1000 records
+13:30:42.508 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8081/druid/indexer/v1/task
+METHOD: HttpMethod(value=POST)
+13:30:42.721 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8081/druid/indexer/v1/task
+13:30:42.731 [main] INFO  ru.sber.parser.druid.DruidClient - Submitted ingestion task: index_parallel_process_variables_jigmbgmf_2026-03-06T13:30:42.810Z
+13:30:42.733 [main] DEBUG ru.sber.parser.druid.DruidClient - Processing batch 14/17 with 1000 records
+13:30:42.751 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8081/druid/indexer/v1/task
+METHOD: HttpMethod(value=POST)
+13:30:43.019 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8081/druid/indexer/v1/task
+13:30:43.033 [main] INFO  ru.sber.parser.druid.DruidClient - Submitted ingestion task: index_parallel_process_variables_gfepplen_2026-03-06T13:30:43.117Z
+13:30:43.034 [main] DEBUG ru.sber.parser.druid.DruidClient - Processing batch 15/17 with 1000 records
+13:30:43.048 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8081/druid/indexer/v1/task
+METHOD: HttpMethod(value=POST)
+13:30:43.278 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8081/druid/indexer/v1/task
+13:30:43.292 [main] INFO  ru.sber.parser.druid.DruidClient - Submitted ingestion task: index_parallel_process_variables_llpjhjlp_2026-03-06T13:30:43.368Z
+13:30:43.294 [main] DEBUG ru.sber.parser.druid.DruidClient - Processing batch 16/17 with 1000 records
+13:30:43.307 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8081/druid/indexer/v1/task
+METHOD: HttpMethod(value=POST)
+13:30:43.554 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8081/druid/indexer/v1/task
+13:30:43.569 [main] INFO  ru.sber.parser.druid.DruidClient - Submitted ingestion task: index_parallel_process_variables_bpfhlabk_2026-03-06T13:30:43.614Z
+13:30:43.571 [main] DEBUG ru.sber.parser.druid.DruidClient - Processing batch 17/17 with 45 records
+13:30:43.578 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8081/druid/indexer/v1/task
+METHOD: HttpMethod(value=POST)
+13:30:43.650 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8081/druid/indexer/v1/task
+13:30:43.656 [main] INFO  ru.sber.parser.druid.DruidClient - Submitted ingestion task: index_parallel_process_variables_ifagdobc_2026-03-06T13:30:43.766Z
+13:30:43.657 [main] INFO  ru.sber.parser.druid.DruidClient - Successfully submitted 17 ingestion batches for dataSource: process_variables
+13:30:43.657 [main] INFO  Application - Ingested 16045 records to Druid datasource: process_variables
+13:30:43.670 [main] INFO  Application - Ingest to Druid completed in 6491ms (submit tasks)

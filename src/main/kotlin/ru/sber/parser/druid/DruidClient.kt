@@ -117,19 +117,76 @@ class DruidClient(private val config: DruidConfig) : Closeable {
      */
     suspend fun query(sql: String): List<Map<String, Any?>> {
         logger.debug("Executing query: {}", sql.take(200))
-        
+
+        // Метрика: размер SQL-запроса в символах (оценка сложности и нагрузки на парсер SQL в Druid).
+        val sqlChars = sql.length
+        // Метрика: старт таймера полного жизненного цикла SQL-запроса.
+        val totalStartNs = System.nanoTime()
+        // Метрика: старт таймера сетевого round-trip к Router.
+        val httpStartNs = System.nanoTime()
         val response: HttpResponse = httpClient.post("${config.routerUrl}/druid/v2/sql") {
             setBody(mapOf("query" to sql))
         }
+        // Метрика: длительность сетевого round-trip до получения HTTP-ответа.
+        val httpRoundTripNs = System.nanoTime() - httpStartNs
         
         if (!response.status.isSuccess()) {
             val errorBody = response.bodyAsText()
+            // Метрика: общее время до ошибки SQL-запроса.
+            val totalNs = System.nanoTime() - totalStartNs
+            // Структурированный TEMP_PERF-лог неуспешного SQL-запроса.
+            logger.info(
+                "TEMP_PERF|component=druid.query|operation=sql_request_failed|sql_chars={}|status={}|http_round_trip_ns={}|http_round_trip_ms={}|total_ns={}|total_ms={}|error_body_chars={}",
+                sqlChars,
+                response.status.value,
+                httpRoundTripNs,
+                httpRoundTripNs / 1_000_000.0,
+                totalNs,
+                totalNs / 1_000_000.0,
+                errorBody.length
+            )
             logger.error("Query failed with status ${response.status}: $errorBody")
             throw DruidException("Query failed: ${response.status}", errorBody)
         }
-        
+
+        // Метрика: старт таймера чтения тела HTTP-ответа.
+        val bodyReadStartNs = System.nanoTime()
         val body = response.bodyAsText()
-        return objectMapper.readValue(body)
+        // Метрика: длительность чтения тела ответа в строку.
+        val bodyReadNs = System.nanoTime() - bodyReadStartNs
+        // Метрика: размер тела ответа в символах.
+        val bodyChars = body.length
+        // Метрика: старт таймера JSON-декодирования результата запроса.
+        val decodeStartNs = System.nanoTime()
+        val rows: List<Map<String, Any?>> = objectMapper.readValue(body)
+        // Метрика: длительность декодирования JSON-результата.
+        val decodeNs = System.nanoTime() - decodeStartNs
+        // Метрика: число возвращённых строк.
+        val rowsCount = rows.size
+        // Метрика: полная длительность SQL-запроса.
+        val totalNs = System.nanoTime() - totalStartNs
+        // Метрика: средняя длительность на одну строку результата.
+        val avgPerRowMs = if (rowsCount > 0) (totalNs / 1_000_000.0) / rowsCount else 0.0
+
+        // Структурированный TEMP_PERF-лог успешного SQL-запроса.
+        logger.info(
+            "TEMP_PERF|component=druid.query|operation=sql_request|status={}|sql_chars={}|rows_count={}|http_round_trip_ns={}|http_round_trip_ms={}|body_read_ns={}|body_read_ms={}|json_decode_ns={}|json_decode_ms={}|total_ns={}|total_ms={}|avg_per_row_ms={}|response_body_chars={}",
+            response.status.value,
+            sqlChars,
+            rowsCount,
+            httpRoundTripNs,
+            httpRoundTripNs / 1_000_000.0,
+            bodyReadNs,
+            bodyReadNs / 1_000_000.0,
+            decodeNs,
+            decodeNs / 1_000_000.0,
+            totalNs,
+            totalNs / 1_000_000.0,
+            avgPerRowMs,
+            bodyChars
+        )
+
+        return rows
     }
     
     /**
@@ -155,14 +212,92 @@ class DruidClient(private val config: DruidConfig) : Closeable {
         }
         
         logger.info("Ingesting ${records.size} records to dataSource: $dataSource")
-        
+
+        // Метрика: старт таймера полного цикла ingest() по datasource.
+        val ingestStartNs = System.nanoTime()
+        // Метрика: старт таймера разбиения на батчи.
+        val splitStartNs = System.nanoTime()
         // Разбиваем на batch
         val batches = records.chunked(config.batchSize)
+        // Метрика: длительность разбиения входных данных на батчи.
+        val splitNs = System.nanoTime() - splitStartNs
+
+        // Метрика: суммарное время подготовки ingestion spec по всем батчам.
+        var sumSpecBuildNs = 0L
+        // Метрика: суммарное сетевое время POST /task по всем батчам.
+        var sumHttpRoundTripNs = 0L
+        // Метрика: суммарное время разбора ответов Overlord по всем батчам.
+        var sumResponseDecodeNs = 0L
+        // Метрика: минимальное время отправки одного батча.
+        var minBatchTotalNs = Long.MAX_VALUE
+        // Метрика: максимальное время отправки одного батча.
+        var maxBatchTotalNs = 0L
+
         batches.forEachIndexed { index, batch ->
             logger.debug("Processing batch ${index + 1}/${batches.size} with ${batch.size} records")
-            submitIngestionTask(dataSource, batch)
+            // Метрика: время отправки конкретного батча в Overlord.
+            val submissionMetrics = submitIngestionTask(dataSource, batch)
+            // Агрегируем временные метрики по всем батчам для итогового анализа.
+            sumSpecBuildNs += submissionMetrics.specBuildNs
+            sumHttpRoundTripNs += submissionMetrics.httpRoundTripNs
+            sumResponseDecodeNs += submissionMetrics.responseDecodeNs
+            minBatchTotalNs = kotlin.math.min(minBatchTotalNs, submissionMetrics.totalNs)
+            maxBatchTotalNs = kotlin.math.max(maxBatchTotalNs, submissionMetrics.totalNs)
+
+            // Структурированный TEMP_PERF-лог по каждому батчу ingestion.
+            logger.info(
+                "TEMP_PERF|component=druid.ingest|operation=batch_submit|data_source={}|batch_index={}|batch_count={}|batch_records={}|task_id={}|spec_build_ns={}|spec_build_ms={}|http_round_trip_ns={}|http_round_trip_ms={}|response_decode_ns={}|response_decode_ms={}|batch_total_ns={}|batch_total_ms={}",
+                dataSource,
+                index + 1,
+                batches.size,
+                batch.size,
+                submissionMetrics.taskId ?: "unknown",
+                submissionMetrics.specBuildNs,
+                submissionMetrics.specBuildNs / 1_000_000.0,
+                submissionMetrics.httpRoundTripNs,
+                submissionMetrics.httpRoundTripNs / 1_000_000.0,
+                submissionMetrics.responseDecodeNs,
+                submissionMetrics.responseDecodeNs / 1_000_000.0,
+                submissionMetrics.totalNs,
+                submissionMetrics.totalNs / 1_000_000.0
+            )
         }
         
+        // Метрика: полная длительность ingest() по datasource.
+        val ingestTotalNs = System.nanoTime() - ingestStartNs
+        // Метрика: средняя длительность отправки одного батча.
+        val avgBatchMs = if (batches.isNotEmpty()) (ingestTotalNs / 1_000_000.0) / batches.size else 0.0
+        // Метрика: количество записей в секунду на уровне submit ingestion tasks.
+        val recordsPerSec = if (ingestTotalNs > 0) records.size.toDouble() * 1_000_000_000.0 / ingestTotalNs else 0.0
+        // Метрика: количество батчей в секунду.
+        val batchesPerSec = if (ingestTotalNs > 0) batches.size.toDouble() * 1_000_000_000.0 / ingestTotalNs else 0.0
+
+        // Структурированный TEMP_PERF-лог агрегатов по ingest() для datasource.
+        logger.info(
+            "TEMP_PERF|component=druid.ingest|operation=ingest_summary|data_source={}|records_total={}|batch_size_config={}|batches_total={}|split_ns={}|split_ms={}|sum_spec_build_ns={}|sum_spec_build_ms={}|sum_http_round_trip_ns={}|sum_http_round_trip_ms={}|sum_response_decode_ns={}|sum_response_decode_ms={}|min_batch_total_ns={}|min_batch_total_ms={}|max_batch_total_ns={}|max_batch_total_ms={}|ingest_total_ns={}|ingest_total_ms={}|avg_batch_ms={}|records_per_sec={}|batches_per_sec={}",
+            dataSource,
+            records.size,
+            config.batchSize,
+            batches.size,
+            splitNs,
+            splitNs / 1_000_000.0,
+            sumSpecBuildNs,
+            sumSpecBuildNs / 1_000_000.0,
+            sumHttpRoundTripNs,
+            sumHttpRoundTripNs / 1_000_000.0,
+            sumResponseDecodeNs,
+            sumResponseDecodeNs / 1_000_000.0,
+            if (batches.isNotEmpty()) minBatchTotalNs else 0L,
+            if (batches.isNotEmpty()) minBatchTotalNs / 1_000_000.0 else 0.0,
+            if (batches.isNotEmpty()) maxBatchTotalNs else 0L,
+            if (batches.isNotEmpty()) maxBatchTotalNs / 1_000_000.0 else 0.0,
+            ingestTotalNs,
+            ingestTotalNs / 1_000_000.0,
+            avgBatchMs,
+            recordsPerSec,
+            batchesPerSec
+        )
+
         logger.info("Successfully submitted ${batches.size} ingestion batches for dataSource: $dataSource")
     }
     
@@ -176,22 +311,62 @@ class DruidClient(private val config: DruidConfig) : Closeable {
      * @param records Batch записей
      * @throws DruidException при ошибке
      */
-    private suspend fun submitIngestionTask(dataSource: String, records: List<Map<String, Any?>>) {
+    private suspend fun submitIngestionTask(dataSource: String, records: List<Map<String, Any?>>): IngestionTaskSubmissionMetrics {
+        // Метрика: старт таймера отправки одного ingestion batch.
+        val totalStartNs = System.nanoTime()
+        // Метрика: старт таймера генерации ingestion spec для батча.
+        val specBuildStartNs = System.nanoTime()
         val ingestionSpec = createBatchIngestionSpec(dataSource, records)
-        
+        // Метрика: длительность подготовки ingestion spec.
+        val specBuildNs = System.nanoTime() - specBuildStartNs
+
+        // Метрика: старт таймера HTTP POST на Overlord.
+        val httpStartNs = System.nanoTime()
         val response: HttpResponse = httpClient.post("${config.overlordUrl}/druid/indexer/v1/task") {
             setBody(ingestionSpec)
         }
+        // Метрика: длительность сетевого round-trip отправки task.
+        val httpRoundTripNs = System.nanoTime() - httpStartNs
         
         if (!response.status.isSuccess()) {
             val errorBody = response.bodyAsText()
+            // Метрика: полная длительность отправки батча до ошибки.
+            val totalNs = System.nanoTime() - totalStartNs
+            // Структурированный TEMP_PERF-лог ошибки отправки ingestion batch.
+            logger.info(
+                "TEMP_PERF|component=druid.ingest|operation=batch_submit_failed|data_source={}|batch_records={}|status={}|spec_build_ns={}|spec_build_ms={}|http_round_trip_ns={}|http_round_trip_ms={}|total_ns={}|total_ms={}|error_body_chars={}",
+                dataSource,
+                records.size,
+                response.status.value,
+                specBuildNs,
+                specBuildNs / 1_000_000.0,
+                httpRoundTripNs,
+                httpRoundTripNs / 1_000_000.0,
+                totalNs,
+                totalNs / 1_000_000.0,
+                errorBody.length
+            )
             logger.error("Ingestion failed with status ${response.status}: $errorBody")
             throw DruidException("Ingestion failed: ${response.status}", errorBody)
         }
-        
+
+        // Метрика: старт таймера разбора тела ответа Overlord.
+        val decodeStartNs = System.nanoTime()
         val result: Map<String, Any?> = objectMapper.readValue(response.bodyAsText())
+        // Метрика: длительность разбора ответа Overlord.
+        val responseDecodeNs = System.nanoTime() - decodeStartNs
         val taskId = result["task"] as? String
+        // Метрика: полная длительность отправки ingestion batch.
+        val totalNs = System.nanoTime() - totalStartNs
         logger.info("Submitted ingestion task: $taskId")
+
+        return IngestionTaskSubmissionMetrics(
+            taskId = taskId,
+            specBuildNs = specBuildNs,
+            httpRoundTripNs = httpRoundTripNs,
+            responseDecodeNs = responseDecodeNs,
+            totalNs = totalNs
+        )
     }
     
     /**
@@ -386,6 +561,23 @@ class DruidClient(private val config: DruidConfig) : Closeable {
     override fun close() {
         httpClient.close()
     }
+
+    /**
+     * Детализированные временные метрики отправки одного ingestion batch.
+     *
+     * @property taskId ID задачи в Overlord (если вернулся в ответе)
+     * @property specBuildNs Длительность генерации ingestion spec (ns)
+     * @property httpRoundTripNs Длительность HTTP round-trip POST /task (ns)
+     * @property responseDecodeNs Длительность разбора JSON-ответа Overlord (ns)
+     * @property totalNs Полная длительность submitIngestionTask() (ns)
+     */
+    private data class IngestionTaskSubmissionMetrics(
+        val taskId: String?,
+        val specBuildNs: Long,
+        val httpRoundTripNs: Long,
+        val responseDecodeNs: Long,
+        val totalNs: Long
+    )
 }
 
 /**

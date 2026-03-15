@@ -1,0 +1,22 @@
+time="2026-03-06T16:29:56+03:00" level=warning msg="C:\\Projects\\Sber\\parser\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+13:29:57.792 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+13:29:59.201 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+13:29:59.257 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+13:29:59.260 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+13:29:59.265 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+13:29:59.267 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+13:29:59.269 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+13:29:59.545 [main] INFO  Application - Parsing messages with strategy: hybrid
+13:30:05.919 [main] INFO  Application - Parsed 100 messages
+13:30:06.436 [main] INFO  Application - Generated 100 records for Druid in 503ms (parse)
+13:30:06.711 [main] INFO  ru.sber.parser.druid.DruidClient - Ingesting 100 records to dataSource: process_hybrid
+13:30:06.733 [main] DEBUG ru.sber.parser.druid.DruidClient - Processing batch 1/1 with 100 records
+13:30:07.135 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8081/druid/indexer/v1/task
+METHOD: HttpMethod(value=POST)
+13:30:09.531 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8081/druid/indexer/v1/task
+13:30:09.598 [main] INFO  ru.sber.parser.druid.DruidClient - Submitted ingestion task: index_parallel_process_hybrid_dpbbonlh_2026-03-06T13:30:09.369Z
+13:30:09.601 [main] INFO  ru.sber.parser.druid.DruidClient - Successfully submitted 1 ingestion batches for dataSource: process_hybrid
+13:30:09.602 [main] INFO  Application - Ingested records to Druid datasource: process_hybrid
+13:30:09.610 [main] INFO  Application - Ingest to Druid completed in 2906ms (submit tasks)

@@ -1,6 +1,6 @@
 # BPM Message Parser для Apache Druid
 
-Kotlin-парсер BPM-сообщений для Apache Druid с поддержкой трёх стратегий хранения данных.
+Kotlin-парсер BPM-сообщений для Apache Druid с поддержкой четырёх стратегий хранения данных.
 
 ## 📋 Содержание
 
@@ -21,13 +21,14 @@ Kotlin-парсер BPM-сообщений для Apache Druid с поддерж
 
 ## Обзор
 
-Проект предоставляет три стратегии хранения BPM-сообщений в Apache Druid:
+Проект предоставляет четыре стратегии хранения BPM-сообщений в Apache Druid:
 
 | Стратегия | Описание | Таблицы |
 |-----------|----------|---------|
 | **Hybrid** | Flat columns + JSON blobs | 1 таблица |
 | **EAV** | Entity-Attribute-Value | 2 таблицы |
 | **Combined** | Tiered (Hot/Warm/Cold) | 2 таблицы |
+| **Default** | Все поля сообщения как отдельные колонки (имена с точкой) | 1 таблица |
 
 ---
 
@@ -144,7 +145,8 @@ parser/
 ├── query/                  # SQL-запросы по стратегиям
 │   ├── hybrid/             # 50+ queries for Hybrid
 │   ├── eav/                # 50+ queries for EAV
-│   └── combined/           # 50+ queries for Combined
+│   ├── combined/           # 50+ queries for Combined
+│   └── default/            # запросы для Default (все поля как колонки)
 └── samples/                # Sample BPM messages
 ```
 
@@ -211,7 +213,7 @@ java -jar app.jar generate [output-dir] [count]
 
 # Парсинг сообщений
 java -jar app.jar parse <strategy> [input-dir]
-# strategy: hybrid | eav | combined
+# strategy: hybrid | eav | combined | default
 
 # Парсинг и загрузка в Druid
 java -jar app.jar parse <strategy> --ingest
@@ -280,6 +282,9 @@ docker compose run --rm bpm-parser parse eav messages 2>&1 | tee logs/eav_parse.
 
 # Combined
 docker compose run --rm bpm-parser parse combined messages 2>&1 | tee logs/combined_parse.log
+
+# Default
+docker compose run --rm bpm-parser parse default messages 2>&1 | tee logs/default_parse.log
 ```
 
 ### 3. Загрузка в Druid по всем стратегиям
@@ -295,6 +300,9 @@ docker compose run --rm bpm-parser parse eav messages --ingest 2>&1 | tee logs/e
 
 # Combined
 docker compose run --rm bpm-parser parse combined messages --ingest 2>&1 | tee logs/combined_ingest.log
+
+# Default
+docker compose run --rm bpm-parser parse default messages --ingest 2>&1 | tee logs/default_ingest.log
 ```
 
 Перед запуском убедитесь, что Druid запущен и доступен (см. [Быстрый старт](#quick-start)).
@@ -321,6 +329,12 @@ for f in query/combined/*.sql; do
   echo "=== $f ===" >> logs/combined_queries.log
   docker compose run --rm bpm-parser query "$f" >> logs/combined_queries.log 2>&1
 done
+
+# Default — все запросы из query/default/
+for f in query/default/*.sql; do
+  echo "=== $f ===" >> logs/default_queries.log
+  docker compose run --rm bpm-parser query "$f" >> logs/default_queries.log 2>&1
+done
 ```
 
 В Windows (PowerShell) для одной стратегии, например Hybrid:
@@ -332,14 +346,14 @@ Get-ChildItem -Path query/hybrid -Filter *.sql | ForEach-Object {
 }
 ```
 
-Аналогично замените `query/hybrid` на `query/eav` и `query/combined` и имена лог-файлов на `eav_queries.log` и `combined_queries.log`.
+Аналогично замените `query/hybrid` на `query/eav`, `query/combined` или `query/default` и имена лог-файлов на `eav_queries.log`, `combined_queries.log` или `default_queries.log`.
 
 #### Все стратегии одной командой (Windows PowerShell)
 
-Скрипт выполняет все `.sql` из `query/combined`, `query/eav` и `query/hybrid` (включая подкаталоги) и пишет результаты в `query-results/combined.txt`, `query-results/eav.txt`, `query-results/hybrid.txt`. Запуск из корня проекта (где лежит `docker-compose.yml`):
+Скрипт выполняет все `.sql` из `query/combined`, `query/eav`, `query/hybrid` и `query/default` (включая подкаталоги) и пишет результаты в `query-results/combined.txt`, `query-results/eav.txt`, `query-results/hybrid.txt`, `query-results/default.txt`. Запуск из корня проекта (где лежит `docker-compose.yml`):
 
 ```powershell
-$strategies = @("combined", "eav", "hybrid")
+$strategies = @("combined", "eav", "hybrid", "default")
 $outDir = "query-results"
 New-Item -ItemType Directory -Path $outDir -Force | Out-Null
 
@@ -375,16 +389,20 @@ foreach ($s in $strategies) {
 | `logs/hybrid_queries.log` | Результаты всех SQL-запросов для Hybrid |
 | `logs/eav_queries.log` | Результаты всех SQL-запросов для EAV |
 | `logs/combined_queries.log` | Результаты всех SQL-запросов для Combined |
+| `logs/default_parse.log` | Парсинг стратегии Default |
+| `logs/default_ingest.log` | Загрузка в Druid (Default) |
+| `logs/default_queries.log` | Результаты всех SQL-запросов для Default |
 | `query-results/combined.txt` | Вывод скрипта PowerShell (все запросы Combined) |
 | `query-results/eav.txt` | Вывод скрипта PowerShell (все запросы EAV) |
 | `query-results/hybrid.txt` | Вывод скрипта PowerShell (все запросы Hybrid) |
+| `query-results/default.txt` | Вывод скрипта PowerShell (все запросы Default) |
 
 Полный цикл (генерация → загрузка в Druid → запросы по всем стратегиям) одной командой в **Bash** (Linux, macOS, Git Bash или WSL на Windows):
 
 ```bash
 mkdir -p logs
 docker compose run --rm bpm-parser generate messages 2>&1 | tee logs/generate.log
-for strategy in hybrid eav combined; do
+for strategy in hybrid eav combined default; do
   docker compose run --rm bpm-parser parse $strategy messages --ingest 2>&1 | tee logs/${strategy}_ingest.log
   for f in query/$strategy/*.sql; do
     echo "=== $f ===" >> logs/${strategy}_queries.log
@@ -587,7 +605,8 @@ ru.sber.parser/
 │   └── druid/
 │       ├── HybridRecord.kt
 │       ├── EavRecord.kt
-│       └── CombinedRecord.kt
+│       ├── CombinedRecord.kt
+│       └── DefaultRecord.kt
 ├── parser/
 │   ├── MessageParser.kt    # JSON parsing
 │   ├── VariableFlattener.kt  # Path extraction
@@ -595,7 +614,8 @@ ru.sber.parser/
 │       ├── ParseStrategy.kt   # Strategy interface
 │       ├── HybridStrategy.kt
 │       ├── EavStrategy.kt
-│       └── CombinedStrategy.kt
+│       ├── CombinedStrategy.kt
+│       └── DefaultStrategy.kt
 ├── druid/
 │   ├── DruidClient.kt      # HTTP client
 │   ├── IngestionSpec.kt    # Ingestion specs
@@ -663,6 +683,26 @@ SELECT JSON_VALUE(var_answerGFL_json, '$.results')
 FROM process_main
 ```
 
+### 4. Default Strategy (все поля как колонки)
+
+**Таблица:** `process_default`
+
+Парсит все поля входящего сообщения и сохраняет их в Druid в виде отдельных колонок. Имена колонок для переменных формируются из путей с разделителем «точка» (например, `variables.caseId`, `variables.staticData.clientEpkId`). В SQL идентификаторы с точкой указываются в двойных кавычках.
+
+Оптимальна для:
+- Полного отображения сырых данных без предзаданной схемы
+- Аналитики по произвольным полям без переиндексации
+
+```sql
+-- Все колонки
+SELECT * FROM process_default ORDER BY __time DESC LIMIT 100
+
+-- Колонки с точкой в имени — в кавычках
+SELECT id, process_name, "variables.caseId", "variables.staticData.caseId"
+FROM process_default
+WHERE state = 2
+```
+
 ---
 
 ## SQL-запросы
@@ -681,9 +721,10 @@ query/
 │   ├── basic/
 │   ├── joins/          # JOIN таблиц
 │   └── aggregations/
-└── combined/
-    ├── tier_queries/   # По уровням
-    └── mixed/          # Комбинированные
+├── combined/
+│   ├── tier_queries/   # По уровням
+│   └── mixed/          # Комбинированные
+└── default/            # Default: все поля как колонки
 ```
 
 ### Примеры запросов
@@ -747,6 +788,7 @@ docker compose down -v
 | Hybrid     | `process_hybrid` |
 | EAV        | `process_events`, `process_variables` |
 | Combined   | `process_main`, `process_variables_indexed` |
+| Default    | `process_default` |
 
 **Требования:** нужен URL **Coordinator** (порт 8081), не Router. В `.env` это `DRUID_COORDINATOR_URL`. Пример: Coordinator на отдельном хосте `192.168.1.27` → `http://192.168.1.27:8081`.
 
@@ -764,6 +806,7 @@ curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/process_events
 curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/process_variables"
 curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/process_main"
 curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/process_variables_indexed"
+curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/process_default"
 ```
 
 Удаляйте только те datasource'ы, которые реально созданы парсером (лишние запросы вернут 404).

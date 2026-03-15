@@ -9,6 +9,7 @@
 #   Hybrid:   process_hybrid
 #   EAV:      process_events, process_variables
 #   Combined: process_main, process_variables_indexed
+#   Default:  process_default
 #
 # Требуется URL Coordinator (порт 8081), не Router (8888).
 # =============================================================================
@@ -34,7 +35,8 @@ $datasources = @(
     "process_events",
     "process_variables",
     "process_main",
-    "process_variables_indexed"
+    "process_variables_indexed",
+    "process_default"
 )
 
 Write-Host "Druid Coordinator: $CoordinatorUrl" -ForegroundColor Cyan
