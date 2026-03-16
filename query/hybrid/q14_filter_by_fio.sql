@@ -29,7 +29,7 @@ SELECT
     var_fio,
     var_epkId,
     __time as start_date
-FROM process_hybrid
+FROM process_main
 WHERE var_fio LIKE '%ИВАНОВ%'
 ORDER BY __time DESC
 LIMIT 50

@@ -37,7 +37,7 @@ SELECT
         )
         ELSE NULL
     END as hours_to_close
-FROM process_hybrid
+FROM process_main
 WHERE var_staticData_closedTime IS NOT NULL
 ORDER BY __time DESC
 LIMIT 50

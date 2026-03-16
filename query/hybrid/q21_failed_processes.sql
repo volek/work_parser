@@ -29,7 +29,7 @@ SELECT
     error,
     __time as start_date,
     end_date
-FROM process_hybrid
+FROM process_main
 WHERE state = 3 
    OR error IS NOT NULL
 ORDER BY __time DESC

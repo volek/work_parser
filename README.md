@@ -208,7 +208,7 @@ cp .env.example .env
 # Показать справку
 java -jar app.jar help
 
-# Генерировать тестовые сообщения (по умолчанию 100 шт. в messages/)
+# Генерировать тестовые сообщения (по умолчанию 500 шт. в messages/)
 java -jar app.jar generate [output-dir] [count]
 
 # Парсинг сообщений
@@ -225,7 +225,7 @@ java -jar app.jar query <query-file.sql>
 ### Примеры использования
 
 ```bash
-# Генерация 100 тестовых сообщений (по умолчанию)
+# Генерация 500 тестовых сообщений (по умолчанию)
 docker compose run --rm bpm-parser generate
 # Или: каталог и количество
 docker compose run --rm bpm-parser generate messages 100
@@ -267,7 +267,7 @@ New-Item -ItemType Directory -Force -Path logs
 docker compose run --rm bpm-parser generate messages 2>&1 | tee logs/generate.log
 ```
 
-По умолчанию генерируется 100 сообщений в каталог `messages/`. Количество можно задать вторым аргументом: `generate messages 50`.
+По умолчанию генерируется 500 сообщений в каталог `messages/`. Количество можно задать вторым аргументом: `generate messages 50`.
 
 ### 2. Парсинг по всем стратегиям
 
@@ -348,29 +348,45 @@ Get-ChildItem -Path query/hybrid -Filter *.sql | ForEach-Object {
 
 Аналогично замените `query/hybrid` на `query/eav`, `query/combined` или `query/default` и имена лог-файлов на `eav_queries.log`, `combined_queries.log` или `default_queries.log`.
 
-#### Все стратегии одной командой (Windows PowerShell)
+#### Полный цикл в PowerShell (генерация → загрузка в Druid → запросы)
 
-Скрипт выполняет все `.sql` из `query/combined`, `query/eav`, `query/hybrid` и `query/default` (включая подкаталоги) и пишет результаты в `query-results/combined.txt`, `query-results/eav.txt`, `query-results/hybrid.txt`, `query-results/default.txt`. Запуск из корня проекта (где лежит `docker-compose.yml`):
+Скрипт `scripts/run-all-strategies.ps1` выполняет по очереди: генерацию сообщений, парсинг и загрузку в Druid по каждой стратегии, затем все SQL-запросы. Запуск из корня проекта:
+
+```powershell
+.\scripts\run-all-strategies.ps1
+```
+
+Количество сообщений (по умолчанию 500):
+
+```powershell
+.\scripts\run-all-strategies.ps1 -MessageCount 100
+```
+
+Перед запуском убедитесь, что Druid запущен и доступен (см. [Быстрый старт](#quick-start)).
+
+#### Только запросы по всем стратегиям (Windows PowerShell)
+
+Если сообщения уже сгенерированы и загружены в Druid, можно выполнить только SQL-запросы. Скрипт пишет результаты в `query-results/<strategy>.txt`. Запуск из корня проекта:
 
 ```powershell
 $strategies = @("combined", "eav", "hybrid", "default")
 $outDir = "query-results"
-New-Item -ItemType Directory -Path $outDir -Force | Out-Null
-
 $root = (Get-Location).Path
 
+New-Item -ItemType Directory -Path $outDir -Force | Out-Null
+
 foreach ($s in $strategies) {
+    $queryPath = Join-Path $root "query" $s
+    if (-not (Test-Path $queryPath)) { Write-Host "Пропуск $s: нет каталога $queryPath"; continue }
+
     $outFile = Join-Path $outDir "$s.txt"
     Set-Content -Path $outFile -Value "=== Strategy: $s ===`n"
 
-    Get-ChildItem -Path ".\query\$s" -Recurse -Filter *.sql |
-        Sort-Object FullName |
-        ForEach-Object {
-            $rel = $_.FullName.Substring($root.Length).TrimStart('\','/').Replace('\','/')
-            Add-Content -Path $outFile -Value "`n----- $rel -----"
-            docker compose run --rm bpm-parser query $rel 2>&1 | Add-Content -Path $outFile
-        }
-
+    Get-ChildItem -Path $queryPath -Recurse -Filter *.sql | Sort-Object FullName | ForEach-Object {
+        $rel = $_.FullName.Substring($root.Length).TrimStart('\','/').Replace('\','/')
+        Add-Content -Path $outFile -Value "`n----- $rel -----"
+        docker compose run --rm bpm-parser query $rel 2>&1 | Add-Content -Path $outFile
+    }
     Write-Host "Готово: $outFile"
 }
 ```

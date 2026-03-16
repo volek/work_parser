@@ -28,7 +28,7 @@ SELECT
     var_fio,
     COUNT(*) as process_count,
     COUNT(DISTINCT process_name) as distinct_processes
-FROM process_hybrid
+FROM process_main
 WHERE var_epkId IS NOT NULL
 GROUP BY var_epkId, var_fio
 ORDER BY process_count DESC

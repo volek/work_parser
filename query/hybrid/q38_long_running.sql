@@ -28,7 +28,7 @@ SELECT
     __time as start_date,
     TIMESTAMPDIFF(HOUR, __time, CURRENT_TIMESTAMP) as hours_running,
     var_caseId
-FROM process_hybrid
+FROM process_main
 WHERE state = 1
   AND __time < CURRENT_TIMESTAMP - INTERVAL '1' HOUR
 ORDER BY __time

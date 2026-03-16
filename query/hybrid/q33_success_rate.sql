@@ -29,7 +29,7 @@ SELECT
     SUM(CASE WHEN state = 2 THEN 1 ELSE 0 END) as completed,
     SUM(CASE WHEN state = 3 THEN 1 ELSE 0 END) as failed,
     ROUND(SUM(CASE WHEN state = 2 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) as success_rate
-FROM process_hybrid
+FROM process_main
 GROUP BY process_name
 HAVING COUNT(*) > 10
 ORDER BY success_rate

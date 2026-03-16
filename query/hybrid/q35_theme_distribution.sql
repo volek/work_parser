@@ -25,7 +25,7 @@ SELECT
     var_theme,
     COUNT(*) as cnt_total,
     COUNT(DISTINCT var_epkId) as unique_clients
-FROM process_hybrid
+FROM process_main
 WHERE var_theme IS NOT NULL
 GROUP BY var_theme
 ORDER BY cnt_total DESC

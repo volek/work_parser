@@ -29,7 +29,7 @@ SELECT
     state,
     var_caseId,
     __time
-FROM process_hybrid
+FROM process_main
 WHERE parent_instance_id IS NULL
 ORDER BY __time DESC
 LIMIT 100

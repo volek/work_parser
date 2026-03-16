@@ -25,7 +25,7 @@ SELECT
     TIME_FLOOR(__time, 'P1D') as day_ts,
     process_name,
     COUNT(*) as cnt_total
-FROM process_hybrid
+FROM process_main
 WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '7' DAY
 GROUP BY 1, 2
 ORDER BY day_ts, cnt_total DESC

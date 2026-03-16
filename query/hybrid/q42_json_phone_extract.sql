@@ -24,6 +24,6 @@ SELECT
     process_id,
     var_fio,
     JSON_VALUE(var_epkData_json, '$.epkEntity.phoneNumbers[0].phoneNumber') as phone
-FROM process_hybrid
+FROM process_main
 WHERE var_epkData_json IS NOT NULL
 LIMIT 50

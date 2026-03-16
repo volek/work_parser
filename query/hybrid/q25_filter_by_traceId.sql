@@ -28,6 +28,6 @@ SELECT
     var_tracingHeaders_traceId,
     var_tracingHeaders_requestId,
     __time
-FROM process_hybrid
+FROM process_main
 WHERE var_tracingHeaders_traceId IS NOT NULL
 LIMIT 50

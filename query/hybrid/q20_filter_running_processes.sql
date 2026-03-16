@@ -32,6 +32,6 @@ SELECT
     var_fio,
     __time as start_date,
     TIMESTAMPDIFF(MINUTE, __time, CURRENT_TIMESTAMP) as running_minutes
-FROM process_hybrid
+FROM process_main
 WHERE state = 1
 ORDER BY __time

@@ -25,7 +25,7 @@ SELECT
     process_id,
     process_name,
     CASE WHEN node_instances_json IS NOT NULL THEN 1 ELSE 0 END as has_nodes
-FROM process_hybrid
+FROM process_main
 WHERE node_instances_json IS NOT NULL
 ORDER BY __time DESC
 LIMIT 50

@@ -28,7 +28,7 @@ SELECT
     var_caseId,
     var_staticData_casePublicId,
     var_status
-FROM process_hybrid
+FROM process_main
 WHERE var_caseId IS NOT NULL
   AND var_caseId LIKE 'test-%'
 ORDER BY __time DESC

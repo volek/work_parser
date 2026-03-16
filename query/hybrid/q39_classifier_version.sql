@@ -23,7 +23,7 @@
 SELECT 
     var_staticData_classifierVersion as classifier_version,
     COUNT(*) as cnt_total
-FROM process_hybrid
+FROM process_main
 WHERE var_staticData_classifierVersion IS NOT NULL
 GROUP BY var_staticData_classifierVersion
 ORDER BY classifier_version DESC

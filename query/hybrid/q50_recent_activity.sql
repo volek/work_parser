@@ -27,7 +27,7 @@ SELECT
     process_name,
     COUNT(*) as started,
     SUM(CASE WHEN state = 2 THEN 1 ELSE 0 END) as completed
-FROM process_hybrid
+FROM process_main
 WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '1' HOUR
 GROUP BY 1, 2
 ORDER BY time_bucket DESC, started DESC

@@ -28,6 +28,6 @@ SELECT
     var_status,
     var_staticData_statusCode,
     __time
-FROM process_hybrid
+FROM process_main
 WHERE var_status = 'IN_PROGRESS'
 ORDER BY __time DESC

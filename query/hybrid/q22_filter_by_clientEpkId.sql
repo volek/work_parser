@@ -27,5 +27,5 @@ SELECT
     var_staticData_clientEpkId,
     var_staticData_casePublicId,
     var_fio
-FROM process_hybrid
+FROM process_main
 WHERE var_staticData_clientEpkId = 1234567890123456789

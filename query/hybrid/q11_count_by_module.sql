@@ -23,7 +23,7 @@
 SELECT 
     module_id,
     COUNT(*) as cnt_total
-FROM process_hybrid
+FROM process_main
 WHERE module_id IS NOT NULL
 GROUP BY module_id
 ORDER BY cnt_total DESC

@@ -30,6 +30,6 @@ SELECT
         WHEN 3 THEN 'FAILED'
         ELSE 'UNKNOWN'
     END as state_name
-FROM process_hybrid
+FROM process_main
 GROUP BY state
 ORDER BY state

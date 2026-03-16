@@ -28,6 +28,6 @@ SELECT
     var_staticData_casePublicId,
     var_staticData_statusCode,
     __time
-FROM process_hybrid
+FROM process_main
 WHERE var_staticData_casePublicId LIKE '2407%'
 ORDER BY __time DESC

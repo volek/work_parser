@@ -25,7 +25,7 @@ SELECT
     var_epkData_clientStatus,
     var_epkData_gender,
     COUNT(*) as cnt_total
-FROM process_hybrid
+FROM process_main
 WHERE var_epkData_clientStatus IS NOT NULL
 GROUP BY var_epkData_clientStatus, var_epkData_gender
 ORDER BY cnt_total DESC

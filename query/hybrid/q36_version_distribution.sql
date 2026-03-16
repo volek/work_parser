@@ -24,6 +24,6 @@ SELECT
     process_name,
     version,
     COUNT(*) as cnt_total
-FROM process_hybrid
+FROM process_main
 GROUP BY process_name, version
 ORDER BY process_name, version DESC

@@ -28,6 +28,6 @@ SELECT
     state,
     JSON_VALUE(node_instances_json, '$[-1].nodeName') as last_node_name,
     JSON_VALUE(node_instances_json, '$[-1].state') as last_node_state
-FROM process_hybrid
+FROM process_main
 WHERE state = 1
 LIMIT 50

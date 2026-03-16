@@ -31,7 +31,7 @@ SELECT
     SUM(CASE WHEN state = 3 THEN 1 ELSE 0 END) as failed,
     MIN(__time) as first_seen,
     MAX(__time) as last_seen
-FROM process_hybrid
+FROM process_main
 WHERE module_id IS NOT NULL
 GROUP BY module_id
 ORDER BY total DESC

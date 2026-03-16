@@ -26,6 +26,6 @@ SELECT
     process_name,
     JSON_VALUE(node_instances_json, '$[0].nodeName') as first_node_name,
     JSON_VALUE(node_instances_json, '$[0].nodeType') as first_node_type
-FROM process_hybrid
+FROM process_main
 WHERE JSON_VALUE(node_instances_json, '$[0].nodeType') = 'startEvent'
 LIMIT 50

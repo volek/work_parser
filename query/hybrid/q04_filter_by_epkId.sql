@@ -29,5 +29,5 @@ SELECT
     var_fio,
     var_ucpId,
     __time as start_date
-FROM process_hybrid
+FROM process_main
 WHERE var_epkId = '1234567890123456789'

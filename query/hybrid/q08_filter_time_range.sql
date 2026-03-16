@@ -26,7 +26,7 @@ SELECT
     process_name,
     __time as start_date,
     end_date
-FROM process_hybrid
+FROM process_main
 WHERE __time >= TIMESTAMP '2024-07-01 00:00:00'
   AND __time < TIMESTAMP '2024-08-01 00:00:00'
 ORDER BY __time

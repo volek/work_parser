@@ -29,7 +29,7 @@ SELECT
     root_instance_id,
     process_name,
     state
-FROM process_hybrid
+FROM process_main
 WHERE parent_instance_id IS NOT NULL
 ORDER BY __time DESC
 LIMIT 100

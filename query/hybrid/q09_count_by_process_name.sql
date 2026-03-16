@@ -22,6 +22,6 @@
 SELECT 
     process_name,
     COUNT(*) as process_count
-FROM process_hybrid
+FROM process_main
 GROUP BY process_name
 ORDER BY process_count DESC

@@ -1,6 +1,8 @@
 package ru.sber.parser.model
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonSetter
+import com.fasterxml.jackson.annotation.Nulls
 import java.time.OffsetDateTime
 
 /**
@@ -79,6 +81,7 @@ data class BpmMessage(
     val ownerRole: String?,
     val idempotencyKey: String?,
     val operation: String?,
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
     val nodeInstances: List<NodeInstance> = emptyList(),
     val variables: Map<String, Any?> = emptyMap(),
     val contextSize: Long?

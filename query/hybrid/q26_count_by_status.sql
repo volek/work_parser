@@ -23,7 +23,7 @@
 SELECT 
     var_status,
     COUNT(*) as cnt_total
-FROM process_hybrid
+FROM process_main
 WHERE var_status IS NOT NULL
 GROUP BY var_status
 ORDER BY cnt_total DESC

@@ -29,7 +29,7 @@ SELECT
     state,
     var_status,
     end_date
-FROM process_hybrid
+FROM process_main
 WHERE state = 2
 ORDER BY __time DESC
 LIMIT 50

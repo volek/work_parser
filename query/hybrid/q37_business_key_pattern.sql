@@ -24,7 +24,7 @@
 SELECT 
     SUBSTRING(business_key, 1, 6) as date_prefix,
     COUNT(*) as cnt_total
-FROM process_hybrid
+FROM process_main
 WHERE business_key IS NOT NULL
 GROUP BY 1
 ORDER BY date_prefix DESC

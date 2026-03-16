@@ -30,6 +30,6 @@ SELECT
         ELSE 'UNKNOWN'
     END as gender_name,
     var_fio
-FROM process_hybrid
+FROM process_main
 WHERE var_epkData_gender IS NOT NULL
 LIMIT 50

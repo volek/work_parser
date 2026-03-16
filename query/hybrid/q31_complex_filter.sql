@@ -28,7 +28,7 @@ SELECT
     var_epkId,
     var_status,
     state
-FROM process_hybrid
+FROM process_main
 WHERE process_name IN ('uvskRemainderReturnCR-Service', 'uvskFraudFin_front')
   AND state = 1
   AND __time >= CURRENT_TIMESTAMP - INTERVAL '24' HOUR

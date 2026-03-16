@@ -27,6 +27,6 @@ SELECT
     var_ucpId,
     var_epkData_ucpId,
     var_fio
-FROM process_hybrid
+FROM process_main
 WHERE var_ucpId = '1713880429303593444'
    OR var_epkData_ucpId = '1713880429303593444'

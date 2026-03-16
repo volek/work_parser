@@ -28,6 +28,6 @@ SELECT
     var_caseId,
     var_epkId,
     __time as start_date
-FROM process_hybrid
+FROM process_main
 WHERE process_name = 'uvskRemainderReturnCR-Service'
 ORDER BY __time DESC

@@ -1,5 +1,7 @@
 package ru.sber.parser
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import kotlinx.coroutines.runBlocking
 import ru.sber.parser.config.AppConfig
 import ru.sber.parser.druid.DruidClient
@@ -17,6 +19,11 @@ import java.io.File
  * Логгер для главного модуля приложения.
  */
 private val logger = LoggerFactory.getLogger("Application")
+
+/**
+ * ObjectMapper для вспомогательного анализа (размеры структур и т.п.).
+ */
+private val analysisObjectMapper: ObjectMapper = jacksonObjectMapper()
 
 /**
  * Точка входа в приложение BPM Message Parser.
@@ -51,7 +58,7 @@ fun main(args: Array<String>) = runBlocking {
         "generate" -> {
             val positionalArgs = args.filter { !it.startsWith("--") }
             val outputDir = File(positionalArgs.getOrElse(1) { "messages" })
-            val count = positionalArgs.getOrElse(2) { "100" }.toIntOrNull()?.coerceIn(1, 10000) ?: 100
+            val count = positionalArgs.getOrElse(2) { "500" }.toIntOrNull()?.coerceIn(1, 10000) ?: 500
             logger.info("Generating $count test messages...")
             val generator = MessageGenerator()
             outputDir.mkdirs()
@@ -73,9 +80,9 @@ fun main(args: Array<String>) = runBlocking {
             // Выбор стратегии трансформации данных
             val strategy: ParseStrategy = when (strategyName.lowercase()) {
                 "hybrid" -> HybridStrategy(config.fieldClassification)   // Одна таблица с JSON-блобами
-                "eav" -> EavStrategy()                                    // Две таблицы: события + переменные
+                "eav" -> EavStrategy()                                   // Две таблицы: события + переменные
                 "combined" -> CombinedStrategy(config.fieldClassification) // Горячие колонки + индекс
-                "default" -> DefaultStrategy()                            // Все поля как отдельные колонки (точка в именах)
+                "default" -> DefaultStrategy()                           // Все поля как отдельные колонки (точка в именах)
                 else -> {
                     logger.error("Unknown strategy: $strategyName. Use: hybrid, eav, combined, default")
                     return@runBlocking
@@ -83,6 +90,72 @@ fun main(args: Array<String>) = runBlocking {
             }
             
             logger.info("Parsing messages with strategy: $strategyName")
+
+            // Аналитическое логирование схемы данных и SQL-запросов для выбранной стратегии.
+            // Это статический анализ: какие datasources, какие колонки и какие SQL-файлы привязаны к стратегии.
+            try {
+                // Определяем основную и дополнительные схемы колонок Druid.
+                val primarySchema: Map<String, String>?
+                val secondarySchemas: Map<String, Map<String, String>>
+                when (strategy) {
+                    is HybridStrategy -> {
+                        primarySchema = ru.sber.parser.parser.strategy.HybridStrategy.SCHEMA
+                        secondarySchemas = emptyMap()
+                    }
+                    is EavStrategy -> {
+                        primarySchema = ru.sber.parser.parser.strategy.EavStrategy.EVENT_SCHEMA
+                        secondarySchemas = mapOf(
+                            "variables" to ru.sber.parser.parser.strategy.EavStrategy.VARIABLE_SCHEMA
+                        )
+                    }
+                    is CombinedStrategy -> {
+                        primarySchema = ru.sber.parser.parser.strategy.CombinedStrategy.MAIN_SCHEMA
+                        secondarySchemas = mapOf(
+                            "variables_indexed" to ru.sber.parser.parser.strategy.CombinedStrategy.VARIABLE_INDEXED_SCHEMA
+                        )
+                    }
+                    is DefaultStrategy -> {
+                        // Для DefaultStrategy схема динамическая, но у модели есть базовый набор полей.
+                        primarySchema = null
+                        secondarySchemas = emptyMap()
+                    }
+                    else -> {
+                        primarySchema = null
+                        secondarySchemas = emptyMap()
+                    }
+                }
+
+                val schemaJson = primarySchema?.let { analysisObjectMapper.writeValueAsString(it) }
+                val secondarySchemasJson = if (secondarySchemas.isNotEmpty()) {
+                    analysisObjectMapper.writeValueAsString(secondarySchemas)
+                } else {
+                    null
+                }
+
+                // Анализ SQL‑запросов по текущей стратегии: файлы, суммарный размер и количество.
+                val queryDir = File("query/${strategyName.lowercase()}")
+                val sqlFiles = if (queryDir.exists()) {
+                    queryDir.walkTopDown().filter { it.isFile && it.extension == "sql" }.toList()
+                } else {
+                    emptyList()
+                }
+                val totalQueryFiles = sqlFiles.size
+                val totalQueryBytes = sqlFiles.sumOf { it.length() }
+
+                logger.info(
+                    "ANALYSIS|component=app.strategy|strategy={}|stage=metadata|primary_datasource={}|additional_datasources={}|primary_schema_json={}|secondary_schemas_json={}|query_dir={}|query_files_count={}|query_files_bytes_total={}",
+                    strategyName,
+                    strategy.dataSourceName,
+                    strategy.additionalDataSources.joinToString(","),
+                    schemaJson,
+                    secondarySchemasJson,
+                    queryDir.absolutePath,
+                    totalQueryFiles,
+                    totalQueryBytes
+                )
+            } catch (ex: Exception) {
+                logger.warn("ANALYSIS|component=app.strategy|strategy=$strategyName|stage=metadata|status=failed|reason=${ex.message}")
+            }
 
             // Метрика: старт полного цикла команды parse.
             val parseCommandStartNs = System.nanoTime()
@@ -142,6 +215,36 @@ fun main(args: Array<String>) = runBlocking {
             }
 
             logger.info("Parsed ${messages.size} messages")
+
+            // Дополнительный анализ первой пары «сырое сообщение → распаршенное сообщение → записи стратегии».
+            // Логируем размеры и примерную «плотность» данных по выбранной стратегии.
+            try {
+                val sampleFile = jsonFiles.firstOrNull()
+                val sampleMessage = messages.firstOrNull()
+                if (sampleFile != null && sampleMessage != null) {
+                    val rawBytes = sampleFile.length()
+                    val sampleRecords = strategy.transform(sampleMessage)
+                    val recordsJsonBytes = analysisObjectMapper.writeValueAsBytes(sampleRecords).size.toLong()
+
+                    logger.info(
+                        "ANALYSIS|component=app.strategy|strategy={}|stage=message_sample|sample_file={}|source_bytes={}|variables_count={}|node_instances_count={}|records_count={}|records_bytes={}",
+                        strategyName,
+                        sampleFile.name,
+                        rawBytes,
+                        sampleMessage.variables.size,
+                        sampleMessage.nodeInstances.size,
+                        sampleRecords.size,
+                        recordsJsonBytes
+                    )
+                } else {
+                    logger.info(
+                        "ANALYSIS|component=app.strategy|strategy={}|stage=message_sample|status=skipped|reason=no_sample",
+                        strategyName
+                    )
+                }
+            } catch (ex: Exception) {
+                logger.warn("ANALYSIS|component=app.strategy|strategy=$strategyName|stage=message_sample|status=failed|reason=${ex.message}")
+            }
 
             // Метрика: старт трансформации сообщений в записи Druid.
             val transformStartNs = System.nanoTime()
@@ -355,7 +458,7 @@ fun main(args: Array<String>) = runBlocking {
                 BPM Message Parser for Apache Druid
                 
                 Usage:
-                  generate [output-dir] [count]   Generate test messages (default: messages, 100)
+                  generate [output-dir] [count]   Generate test messages (default: messages, 500)
                   parse <strategy> [input-dir]    Parse messages (hybrid|eav|combined|default)
                   parse <strategy> --ingest       Parse and ingest to Druid
                   query <query-file.sql>          Execute SQL query on Druid
@@ -363,7 +466,7 @@ fun main(args: Array<String>) = runBlocking {
                 
                 Examples (Docker):
                   docker compose run --rm bpm-parser generate
-                  docker compose run --rm bpm-parser generate messages 100
+                  docker compose run --rm bpm-parser generate messages 500
                 
                 Strategies:
                   hybrid   - Flat columns + JSON blobs (single table)

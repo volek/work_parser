@@ -198,8 +198,9 @@ class MessageGenerator {
             "ownerRole" to if (random.nextBoolean()) "admin" else null,
             "idempotencyKey" to null,
             "operation" to null,
-            "nodeInstances" to generateNodeInstances(startDate, state),
-            "variables" to generateVariables(processName, caseId, epkId, ucpId, fio, startDate, index),
+            // В корне сообщения больше нет массивов: nodeInstances переносим в ветку variables.
+            "nodeInstances" to null,
+            "variables" to generateVariables(processName, caseId, epkId, ucpId, fio, startDate, index, state),
             "contextSize" to random.nextLong(5000, 200000)
         )
     }
@@ -361,7 +362,8 @@ class MessageGenerator {
         ucpId: String,
         fio: String,
         startDate: OffsetDateTime,
-        messageIndex: Int
+        messageIndex: Int,
+        processState: Int
     ): Map<String, Any?> {
         val variables = mutableMapOf<String, Any?>()
         
@@ -380,6 +382,8 @@ class MessageGenerator {
         variables["epkData"] = generateEpkData(ucpId, fio)
         variables["tracingHeaders"] = generateTracingHeaders()
         variables["startAttributes"] = generateStartAttributes(caseId)
+        // Переносим nodeInstances в ветку variables, чтобы массивов не было в корне сообщения.
+        variables["nodeInstances"] = generateNodeInstances(startDate, processState)
         
         if (processName.contains("Fraud") || random.nextInt(3) == 0) {
             variables["answerGFL"] = generateAnswerGFL()
@@ -392,6 +396,7 @@ class MessageGenerator {
         }
         
         addProcessSpecificVariables(variables, processName)
+        addAdditionalArrayVariables(variables, startDate)
         
         // Часть сообщений содержит дополнительные переменные-массивы разной длины и типов
         if (messageIndex % 3 != 1) { // ~2/3 сообщений с массивами
@@ -501,7 +506,24 @@ class MessageGenerator {
             "expirationTime" to startDate.plusDays(1).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
             "initialExpirationTime" to startDate.plusDays(1).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
             "initialInteractionId" to UUID.randomUUID().toString(),
-            "answers" to emptyList<Any>()
+            // answers теперь содержит массив сложных структур с дополнительной вложенностью
+            "answers" to listOf(
+                mapOf(
+                    "channel" to listOf("WEB", "MOBILE", "BRANCH").random(),
+                    "codes" to listOf(resultCode, "INFO_${generateHex(3)}"),
+                    "details" to mapOf(
+                        "operator" to "OP_${generateHex(4)}",
+                        "tags" to listOf("test", "synthetic", "case_$caseId"),
+                        "history" to (0..random.nextInt(0, 3)).map {
+                            mapOf(
+                                "ts" to startDate.plusMinutes(random.nextLong(1, 120))
+                                    .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+                                "status" to statusCodes.random()
+                            )
+                        }
+                    )
+                )
+            )
         )
     }
     
@@ -526,7 +548,30 @@ class MessageGenerator {
                 "electronicAddresses" to emptyList<Any>(),
                 "deathDate" to null,
                 "birthDate" to generateBirthDate(),
-                "identifications" to listOf(generateIdentification())
+                "identifications" to listOf(generateIdentification()),
+                // Дополнительный массив адресов с вложенными массивами и объектами
+                "addresses" to (1..random.nextInt(1, 3)).map { idx ->
+                    mapOf(
+                        "type" to listOf("REGISTRATION", "RESIDENCE", "WORK").random(),
+                        "region" to random.nextInt(1, 80),
+                        "city" to "City_$idx",
+                        "street" to "Street_${generateHex(3)}",
+                        "house" to "${random.nextInt(1, 200)}",
+                        "flat" to if (random.nextBoolean()) random.nextInt(1, 300) else null,
+                        "geo" to mapOf(
+                            "lat" to random.nextDouble(54.0, 56.0),
+                            "lon" to random.nextDouble(36.0, 39.0),
+                            "history" to (0..random.nextInt(0, 2)).map {
+                                mapOf(
+                                    "source" to listOf("ECP", "MANUAL", "SYNC").random(),
+                                    "updatedAt" to OffsetDateTime.now()
+                                        .minusDays(random.nextLong(1, 365))
+                                        .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+                                )
+                            }
+                        )
+                    )
+                }
             ),
             "customerKnowledge" to (0..random.nextInt(0, 3)).map {
                 mapOf(
@@ -535,6 +580,83 @@ class MessageGenerator {
                 )
             }
         )
+    }
+
+    /**
+     * Добавляет дополнительные массивы с глубокой вложенностью в переменные процесса.
+     * Эти структуры предназначены для тестирования парсера на сложных JSON-ветках.
+     */
+    private fun addAdditionalArrayVariables(
+        variables: MutableMap<String, Any?>,
+        startDate: OffsetDateTime
+    ) {
+        // Массив операций по процессу с вложенными массивами шагов и атрибутов.
+        variables["operations"] = (1..random.nextInt(1, 4)).map { opIndex ->
+            mapOf(
+                "operationId" to "OP_${opIndex}_${generateHex(4)}",
+                "type" to listOf("CREATE", "UPDATE", "CLOSE").random(),
+                "createdAt" to startDate
+                    .plusMinutes(random.nextLong(0, 240))
+                    .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+                "steps" to (1..random.nextInt(1, 5)).map { stepIndex ->
+                    mapOf(
+                        "stepId" to "STEP_${opIndex}_$stepIndex",
+                        "status" to statusCodes.random(),
+                        "attempts" to (0..random.nextInt(0, 2)).map {
+                            mapOf(
+                                "attempt" to it,
+                                "result" to listOf("OK", "WARN", "ERROR").random(),
+                                "ts" to startDate.plusMinutes(random.nextLong(0, 480))
+                                    .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+                            )
+                        }
+                    )
+                }
+            )
+        }
+
+        // Массив лимитов с вложенными массивами правил и значений.
+        variables["limits"] = listOf("DAILY", "MONTHLY").map { period ->
+            mapOf(
+                "period" to period,
+                "currency" to "RUB",
+                "rules" to (1..random.nextInt(1, 3)).map { ruleIndex ->
+                    mapOf(
+                        "ruleId" to "LIM_${period}_$ruleIndex",
+                        "thresholds" to listOf(
+                            mapOf("type" to "WARN", "value" to random.nextInt(10_000, 50_000)),
+                            mapOf("type" to "BLOCK", "value" to random.nextInt(50_001, 200_000))
+                        ),
+                        "channels" to listOf("WEB", "MOBILE", "ATM").shuffled().take(random.nextInt(1, 3))
+                    )
+                }
+            )
+        }
+
+        // Массив событий аудита с глубоко вложенными деталями.
+        variables["auditTrail"] = (1..random.nextInt(1, 5)).map { idx ->
+            mapOf(
+                "eventId" to "EVT_${generateHex(6)}",
+                "eventType" to listOf("CREATE", "STATE_CHANGE", "NOTIFY", "ROUTE").random(),
+                "timestamp" to startDate.plusMinutes(random.nextLong(0, 720))
+                    .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+                "actor" to mapOf(
+                    "id" to "USR_${generateHex(5)}",
+                    "roles" to listOf("OPERATOR", "SUPPORT", "SYSTEM").shuffled()
+                        .take(random.nextInt(1, 3))
+                ),
+                "details" to mapOf(
+                    "oldState" to statusCodes.random(),
+                    "newState" to statusCodes.random(),
+                    "attributes" to (0..random.nextInt(0, 4)).map {
+                        mapOf(
+                            "key" to "attr_${generateHex(3)}",
+                            "values" to (0..random.nextInt(1, 3)).map { "v_${generateHex(2)}" }
+                        )
+                    }
+                )
+            )
+        }
     }
     
     /** Генерирует структуру телефонного номера с метаданными */

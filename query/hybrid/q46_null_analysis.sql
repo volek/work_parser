@@ -27,4 +27,4 @@ SELECT
     SUM(CASE WHEN var_epkId IS NULL THEN 1 ELSE 0 END) as null_epkId,
     SUM(CASE WHEN var_fio IS NULL THEN 1 ELSE 0 END) as null_fio,
     SUM(CASE WHEN var_staticData_clientEpkId IS NULL THEN 1 ELSE 0 END) as null_clientEpkId
-FROM process_hybrid
+FROM process_main

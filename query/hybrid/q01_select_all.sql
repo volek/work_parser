@@ -28,6 +28,6 @@ SELECT
     state,
     __time as start_date,
     module_id
-FROM process_hybrid
+FROM process_main
 ORDER BY __time DESC
 LIMIT 100

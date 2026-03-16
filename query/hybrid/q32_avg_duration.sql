@@ -26,6 +26,6 @@ SELECT
     COUNT(*) as total,
     MIN(__time) as first_seen,
     MAX(__time) as last_seen
-FROM process_hybrid
+FROM process_main
 GROUP BY process_name
 ORDER BY total DESC

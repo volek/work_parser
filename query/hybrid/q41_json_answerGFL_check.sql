@@ -26,6 +26,6 @@ SELECT
     process_name,
     var_answerGFL_json IS NOT NULL as has_gfl_answer,
     JSON_VALUE(var_answerGFL_json, '$.Status.StatusCode') as gfl_status_code
-FROM process_hybrid
+FROM process_main
 WHERE var_answerGFL_json IS NOT NULL
 LIMIT 50

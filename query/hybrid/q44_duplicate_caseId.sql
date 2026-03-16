@@ -25,7 +25,7 @@
 SELECT 
     var_caseId,
     COUNT(*) as process_count
-FROM process_hybrid
+FROM process_main
 WHERE var_caseId IS NOT NULL
 GROUP BY var_caseId
 HAVING COUNT(*) > 1

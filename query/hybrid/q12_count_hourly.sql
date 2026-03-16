@@ -23,7 +23,7 @@
 SELECT 
     TIME_FLOOR(__time, 'PT1H') as hour_ts,
     COUNT(*) as cnt_total
-FROM process_hybrid
+FROM process_main
 WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '24' HOUR
 GROUP BY 1
 ORDER BY hour_ts

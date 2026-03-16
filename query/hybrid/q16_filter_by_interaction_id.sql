@@ -27,5 +27,5 @@ SELECT
     var_interactionId,
     var_interactionDate,
     var_caseId
-FROM process_hybrid
+FROM process_main
 WHERE var_interactionId LIKE '240725-%'

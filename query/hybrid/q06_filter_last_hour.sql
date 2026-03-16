@@ -26,6 +26,6 @@ SELECT
     process_name,
     state,
     __time as start_date
-FROM process_hybrid
+FROM process_main
 WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '1' HOUR
 ORDER BY __time DESC

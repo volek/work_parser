@@ -197,6 +197,48 @@ Datasource: `process_hybrid`.
 
 ---
 
+## 4) `default` стратегия
+
+## Идея модели
+
+`Default` = «плоская» wide‑таблица: **один datasource, все поля сообщения как отдельные колонки**.
+
+- Datasource: `process_default`.
+- Поля верхнего уровня (`id`, `process_id`, `process_name`, `state`, `start_date` и т.п.) хранятся в `snake_case`.
+- Все переменные процесса пишутся как колонки c префиксом `variables.` и путём через точку:
+  - `variables.caseId`
+  - `variables.staticData.clientEpkId`
+  - `variables.epkData.epkEntity.ucpId`
+- `node_instances` хранится в одной колонке как JSON‑строка.
+
+Плюс: самая простая модель, **нет JOIN и нет EAV‑слоя**, любые переменные сразу доступны как колонки.  
+Минус: очень wide‑таблица, число колонок растёт с разнообразием переменных; схема менее контролируема по сравнению с `hybrid`/`combined`.
+
+## Как работает парсинг
+
+`DefaultStrategy.transform(message)`:
+
+- ставит `__time` = `startDate` в millis;
+- заполняет все поля верхнего уровня в `snake_case`;
+- сериализует `node_instances` в JSON‑строку колонку `node_instances`;
+- сплющивает `variables` через `VariableFlattener` и для каждого leaf‑значения создаёт колонку `variables.<path>`.
+
+На выходе всегда **одна запись на сообщение**.
+
+## Как выбирать данные из Druid (default)
+
+Типовые паттерны:
+
+- Фильтрация по метаданным процесса:
+  - `WHERE process_name = '...' AND state = 1`
+- Поиск по переменным:
+  - `WHERE variables.caseId = '...'`
+  - `WHERE variables.epkData.epkEntity.ucpId = '...'`
+- Вытаскивание вложенных структур из `node_instances`:
+  - `JSON_VALUE(node_instances, '$[0].nodeId')` (если нужна работа с JSON‑массивом нод).
+
+---
+
 ## Важный нюанс текущей реализации CLI ingestion
 
 В `Application.kt` при `parse <strategy> --ingest` выполняется:
@@ -219,5 +261,6 @@ Datasource: `process_hybrid`.
 | `hybrid`   | `process_hybrid`                            | 1                    | Простые и быстрые запросы без JOIN | Частично wide/NULL-heavy         |
 | `eav`      | `process_events`, `process_variables`       | 1 + N                | Максимальная гибкость схемы        | Сложные JOIN/self-JOIN           |
 | `combined` | `process_main`, `process_variables_indexed` | 1 + N(warm)          | Баланс скорости и гибкости         | 2 datasource и сложнее ingestion |
+| `default`  | `process_default`                           | 1                    | Максимально простой мэппинг полей  | Очень wide‑таблица, динамическая |
 
 

@@ -27,7 +27,7 @@ SELECT
     COUNT(*) as cnt_total,
     MIN(__time) as first_occurrence,
     MAX(__time) as last_occurrence
-FROM process_hybrid
+FROM process_main
 WHERE var_staticData_statusCode IS NOT NULL
 GROUP BY var_staticData_statusCode
 ORDER BY cnt_total DESC

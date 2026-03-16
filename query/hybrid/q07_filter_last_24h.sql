@@ -28,6 +28,6 @@ SELECT
     state,
     module_id,
     __time as start_date
-FROM process_hybrid
+FROM process_main
 WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '24' HOUR
 ORDER BY __time DESC

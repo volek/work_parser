@@ -23,5 +23,5 @@ SELECT
     process_id,
     COALESCE(var_caseId, var_staticData_caseId, 'NO_CASE_ID') as effective_caseId,
     COALESCE(var_ucpId, var_epkData_ucpId, 'NO_UCP_ID') as effective_ucpId
-FROM process_hybrid
+FROM process_main
 LIMIT 100

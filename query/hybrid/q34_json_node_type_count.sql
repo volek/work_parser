@@ -22,6 +22,6 @@
 SELECT 
     JSON_VALUE(node_instances_json, '$[0].nodeType') as first_node_type,
     COUNT(*) as cnt_total
-FROM process_hybrid
+FROM process_main
 GROUP BY 1
 ORDER BY cnt_total DESC
