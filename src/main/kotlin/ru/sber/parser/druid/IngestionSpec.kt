@@ -266,6 +266,49 @@ data class IngestionSpec(
                 DimensionSpec("var_type", "string")
             )
         )
+
+        /**
+         * Спецификация для Compcom-main (compact combined).
+         * Основная таблица без cold-блоба: нет колонки var_blob_json.
+         */
+        fun forProcessMainCompact(): IngestionSpec = IngestionSpec(
+            dataSource = "process_main_compact",
+            dimensions = listOf(
+                DimensionSpec("process_id", "string"),
+                DimensionSpec("process_name", "string"),
+                DimensionSpec("state", "long"),
+                DimensionSpec("module_id", "string"),
+                DimensionSpec("business_key", "string"),
+                DimensionSpec("root_instance_id", "string"),
+                DimensionSpec("parent_instance_id", "string"),
+                DimensionSpec("version", "long"),
+                DimensionSpec("end_date", "long"),
+                DimensionSpec("error", "string"),
+                DimensionSpec("var_caseId", "string"),
+                DimensionSpec("var_epkId", "string"),
+                DimensionSpec("var_fio", "string"),
+                DimensionSpec("var_ucpId", "string"),
+                DimensionSpec("var_status", "string"),
+                DimensionSpec("var_globalInstanceId", "string"),
+                DimensionSpec("var_interactionId", "string"),
+                DimensionSpec("var_interactionDate", "string"),
+                DimensionSpec("var_theme", "string"),
+                DimensionSpec("var_result", "string"),
+                DimensionSpec("var_staticData_caseId", "string"),
+                DimensionSpec("var_staticData_clientEpkId", "long"),
+                DimensionSpec("var_staticData_casePublicId", "string"),
+                DimensionSpec("var_staticData_statusCode", "string"),
+                DimensionSpec("var_staticData_registrationTime", "long"),
+                DimensionSpec("var_staticData_closedTime", "long"),
+                DimensionSpec("var_staticData_classifierVersion", "long"),
+                DimensionSpec("var_epkData_ucpId", "string"),
+                DimensionSpec("var_epkData_clientStatus", "long"),
+                DimensionSpec("var_epkData_gender", "long"),
+                DimensionSpec("var_tracingHeaders_requestId", "string"),
+                DimensionSpec("var_tracingHeaders_traceId", "string"),
+                DimensionSpec("node_instances_json", "string")
+            )
+        )
     }
 }
 

@@ -1,179 +1,204 @@
 {
-  "id" : "psi-fl-5g_637b20cf-29d7-4365-baa8-f7ebe9549338",
-  "parentInstanceId" : null,
-  "rootInstanceId" : "psi-fl-5g_637b20cf-29d7-4365-baa8-f7ebe9549338",
-  "processId" : "Process_e87bf20",
-  "processDefinitionId" : "Process_5c9a2eb:47:27a50022-53cd-47c0-81cb-fa53fa3948de",
+  "id" : "ift-5g-fl-cc_7780cc86-f5cd-4730-ba61-aa4502398c22",
+  "parentInstanceId" : "psi-fl-5g_b3db6b9e-87eb-4a51-9d68-6a9d4d67d6a3",
+  "rootInstanceId" : "psi-fl-5g_b3db6b9e-87eb-4a51-9d68-6a9d4d67d6a3",
+  "processId" : "Process_31ac820",
+  "processDefinitionId" : "Process_bf0b61c:76:d9845bae-4555-476d-b227-17ff923650af",
   "resourceName" : null,
-  "rootProcessId" : null,
+  "rootProcessId" : "Process_bf3f21c",
   "processName" : "uvskRemainderReturnCR-Service",
-  "startDate" : "2026-03-16T05:38:31.272452818+03:00",
+  "startDate" : "2026-03-16T17:30:50.264542507+03:00",
   "endDate" : null,
-  "state" : 0,
-  "businessKey" : "2603165205018",
-  "version" : 81,
-  "bamProjectId" : "150689bd-5364-48c9-9ac3-13fbcf0230cc",
+  "state" : 1,
+  "businessKey" : "2603179084963",
+  "version" : 73,
+  "bamProjectId" : "bdf8ac72-6a9c-4cf1-af2c-0f5384613943",
   "extIds" : null,
   "error" : null,
-  "moduleId" : "psi-5g-fl-mpz1",
-  "engineVersion" : "D-5.5.0-3101",
-  "enginePodName" : "bpmx-engine-ift-5g-fl-cc-e36dfe950d",
-  "retryCount" : 2,
-  "ownerRole" : null,
+  "moduleId" : "ift-5g-fl-cc",
+  "engineVersion" : "D-5.5.0-3427",
+  "enginePodName" : "bpmx-engine-psi-fl-5g-5ad7d473b5",
+  "retryCount" : 3,
+  "ownerRole" : "admin",
   "idempotencyKey" : null,
   "operation" : null,
   "nodeInstances" : null,
   "variables" : {
-    "caseId" : "82eb00ec-62be-4832-a447-f4c2c5bcc92d",
-    "epkId" : "1917189994165798176",
-    "ucpId" : "1295076294980369039",
-    "fio" : "ФЕДОРОВ КОНСТАНТИН НИКОЛАЕВИЧ",
-    "globalInstanceId" : "00514c65-0346-4848-b9e1-60943a4113b9",
-    "INTERACTION_ID" : "260316-7000-439007",
+    "caseId" : "b1294737-eaf4-40ad-8d87-117e17f61806",
+    "epkId" : "1113164964585326322",
+    "ucpId" : "1758243354230773761",
+    "fio" : "СОКОЛОВ АРТЕМ АЛЕКСАНДРОВИЧ",
+    "globalInstanceId" : "79705b7b-2610-4678-b4bd-0fb9975a1c73",
+    "INTERACTION_ID" : "260316-7000-416227",
     "INTERACTION_DATE" : "16.03.2026",
-    "theme" : "fraudAlert",
+    "theme" : "incorrectCommunication",
     "result" : "",
-    "status" : "REJECTED",
+    "status" : "CANCELLED",
     "staticData" : {
-      "classifierVersion" : 38,
-      "caseId" : "82eb00ec-62be-4832-a447-f4c2c5bcc92d",
-      "classifierMasterId" : "82e3fb79-311c-42f1-85c0-d324cf4bc9d0",
-      "classifierParentMasterId" : "d1a8f9c6-a586-432e-9093-9d5c06c5a165",
-      "casePublicId" : "2603167000962365",
-      "clientEpkId" : 1917189994165798176,
-      "statusCode" : "PENDING",
+      "classifierVersion" : 22,
+      "caseId" : "b1294737-eaf4-40ad-8d87-117e17f61806",
+      "classifierMasterId" : "563d6947-4b2c-4148-8825-2c7f1f45f8ba",
+      "classifierParentMasterId" : "9840047e-e698-4858-ac1f-df0a16d70f04",
+      "casePublicId" : "2603167000125434",
+      "clientEpkId" : 1113164964585326322,
+      "statusCode" : "IN_PROGRESS",
       "statusName" : null,
       "crmAppealNum" : null,
-      "considerationResultCode" : "IN_REVIEW",
-      "considerationResultName" : "На рассмотрении",
+      "considerationResultCode" : "ESCALATED",
+      "considerationResultName" : "Эскалировано",
       "crmRequestId" : null,
-      "lastUpdateTime" : "2026-03-16T05:40:31.272452818+03:00",
+      "lastUpdateTime" : "2026-03-16T17:42:50.264542507+03:00",
       "closedTime" : null,
-      "registrationTime" : "2026-03-16T05:38:31.272452818+03:00",
-      "publicDescription" : "Тестовое обращение #8288",
+      "registrationTime" : "2026-03-16T17:30:50.264542507+03:00",
+      "publicDescription" : "Тестовое обращение #9135",
       "caseEcmFolder" : null,
-      "pprbCase" : false,
+      "pprbCase" : true,
       "contactSettingsStart" : "09:00",
       "contactSettingsFinish" : "20:00",
       "contactSettingsTimeZone" : "+03:00",
-      "expirationTime" : "2026-03-17T05:38:31.272452818+03:00",
-      "initialExpirationTime" : "2026-03-17T05:38:31.272452818+03:00",
-      "initialInteractionId" : "33c007fa-ad01-4df2-b2ba-a610ca40b3c8",
+      "expirationTime" : "2026-03-17T17:30:50.264542507+03:00",
+      "initialExpirationTime" : "2026-03-17T17:30:50.264542507+03:00",
+      "initialInteractionId" : "bb178183-b461-4d30-b2fe-011eec26d666",
       "answers" : [ {
-        "channel" : "WEB",
-        "codes" : [ "IN_REVIEW", "INFO_750" ],
+        "channel" : "BRANCH",
+        "codes" : [ "ESCALATED", "INFO_e14" ],
         "details" : {
-          "operator" : "OP_75d4",
-          "tags" : [ "test", "synthetic", "case_82eb00ec-62be-4832-a447-f4c2c5bcc92d" ],
+          "operator" : "OP_82ad",
+          "tags" : [ "test", "synthetic", "case_b1294737-eaf4-40ad-8d87-117e17f61806" ],
           "history" : [ {
-            "ts" : "2026-03-16T06:36:31.272452818+03:00",
-            "status" : "IN_PROGRESS"
-          }, {
-            "ts" : "2026-03-16T05:53:31.272452818+03:00",
-            "status" : "IN_PROGRESS"
+            "ts" : "2026-03-16T18:48:50.264542507+03:00",
+            "status" : "PENDING"
           } ]
         }
       } ]
     },
     "epkData" : {
       "epkEntity" : {
-        "ucpId" : "1295076294980369039",
-        "version" : 81,
+        "ucpId" : "1758243354230773761",
+        "version" : 37,
         "names" : [ {
-          "surname" : "ФЕДОРОВ",
-          "name" : "КОНСТАНТИН",
-          "patronymic" : "НИКОЛАЕВИЧ"
+          "surname" : "СОКОЛОВ",
+          "name" : "АРТЕМ",
+          "patronymic" : "АЛЕКСАНДРОВИЧ"
         } ],
         "clientStatus" : 1,
-        "gender" : 2,
-        "clientGroups" : [ 654, 1635, 2007 ],
+        "gender" : 1,
+        "clientGroups" : [ 1181, 405, 1405, 562 ],
         "phoneNumbers" : [ {
-          "phoneNumber" : "+7 (987) 1093353",
-          "startDate" : "2022-03-16T13:06:31.274376013Z",
+          "phoneNumber" : "+7 (926) 8405317",
+          "startDate" : "2023-03-17T11:46:50.266569231Z",
           "endDate" : null,
-          "updateDateTime" : "2026-01-19T13:06:31.274406544Z",
+          "updateDateTime" : "2025-09-08T11:46:50.266615626Z",
           "contactStatus" : 1,
           "timeAvailabilityFrom" : null,
           "timeAvailabilityTo" : null,
           "usageType" : 14,
-          "flags" : [ 18, 75, 13, 42, 65 ],
+          "flags" : [ 75, 86, 30 ],
           "flagList" : [ ],
           "phoneQualityCode" : 511,
-          "region" : 55
+          "region" : 56
+        }, {
+          "phoneNumber" : "+7 (906) 7028104",
+          "startDate" : "2024-03-17T11:46:50.266748929Z",
+          "endDate" : null,
+          "updateDateTime" : "2025-05-04T11:46:50.26678655Z",
+          "contactStatus" : 1,
+          "timeAvailabilityFrom" : null,
+          "timeAvailabilityTo" : null,
+          "usageType" : 14,
+          "flags" : [ 80, 10 ],
+          "flagList" : [ ],
+          "phoneQualityCode" : 511,
+          "region" : 69
         } ],
         "electronicAddresses" : [ ],
         "deathDate" : null,
-        "birthDate" : "1989-03-16T13:06:31.274464411Z",
+        "birthDate" : "2002-03-17T11:46:50.2668233Z",
         "identifications" : [ {
-          "documentSeries" : "64 37",
-          "documentNumber" : "141936",
-          "documentTypeCode" : 177,
-          "issuedDate" : "2009-03-16T13:06:31.27449057Z",
-          "issuerCode" : "374-813",
-          "issuedByOrganization" : "ОВД района Центральный"
+          "documentSeries" : "26 35",
+          "documentNumber" : "948521",
+          "documentTypeCode" : 17,
+          "issuedDate" : "2014-03-17T11:46:50.266873043Z",
+          "issuerCode" : "416-243",
+          "issuedByOrganization" : "ОВД района Западный"
         } ],
         "addresses" : [ {
-          "type" : "WORK",
-          "region" : 64,
+          "type" : "REGISTRATION",
+          "region" : 26,
           "city" : "City_1",
-          "street" : "Street_601",
-          "house" : "123",
-          "flat" : 212,
+          "street" : "Street_5c3",
+          "house" : "151",
+          "flat" : null,
           "geo" : {
-            "lat" : 55.09501438057512,
-            "lon" : 37.32547664282673,
+            "lat" : 55.810949985074096,
+            "lon" : 36.86139663008262,
             "history" : [ {
               "source" : "SYNC",
-              "updatedAt" : "2025-05-04T13:06:31.274566483Z"
+              "updatedAt" : "2026-02-14T11:46:50.266960416Z"
             }, {
-              "source" : "SYNC",
-              "updatedAt" : "2025-05-12T13:06:31.274590536Z"
+              "source" : "MANUAL",
+              "updatedAt" : "2025-06-29T11:46:50.266997426Z"
+            } ]
+          }
+        }, {
+          "type" : "RESIDENCE",
+          "region" : 61,
+          "city" : "City_2",
+          "street" : "Street_12f",
+          "house" : "137",
+          "flat" : null,
+          "geo" : {
+            "lat" : 54.90163020693368,
+            "lon" : 38.13637343974072,
+            "history" : [ {
+              "source" : "ECP",
+              "updatedAt" : "2025-12-24T11:46:50.267057859Z"
+            }, {
+              "source" : "MANUAL",
+              "updatedAt" : "2025-10-07T11:46:50.267077908Z"
             } ]
           }
         } ]
       },
       "customerKnowledge" : [ {
-        "value" : "47011",
-        "id" : 1767299034780589324
+        "value" : "31013",
+        "id" : 1270305507884879035
       }, {
-        "value" : "31309",
-        "id" : 1719821241802862383
-      }, {
-        "value" : "40823",
-        "id" : 1410135439354024536
+        "value" : "33503",
+        "id" : 1201303544411431588
       } ]
     },
     "tracingHeaders" : {
-      "x-request-id" : "f969a11d-2606-4fcb-b3b4-737dfc84e50c",
-      "x-b3-parentspanid" : "2c8fa4cf5b6b4318",
-      "x-b3-spanid" : "ed93b639a831138b",
-      "x-b3-traceid" : "b12631e789081f4d51e301e6f8e2c4f4",
+      "x-request-id" : "f6e1245a-a271-4c79-9311-49dc4eb2bd88",
+      "x-b3-parentspanid" : "87b07e56c6ae9d52",
+      "x-b3-spanid" : "3fe7ca5fd38559a9",
+      "x-b3-traceid" : "bc6f627735c174947f07d6b86b3bdd94",
       "x-b3-sampled" : "1"
     },
     "startAttributes" : {
-      "caseId" : "82eb00ec-62be-4832-a447-f4c2c5bcc92d",
+      "caseId" : "b1294737-eaf4-40ad-8d87-117e17f61806",
       "attributes" : [ {
-        "inputSumm" : "211"
+        "inputSumm" : "3611"
       }, {
         "inputCC" : {
-          "DPAN" : "2895261079562788",
-          "endDate" : "2030-03-16",
-          "accountNum" : "59610660334470222",
+          "DPAN" : "1961038965942513",
+          "endDate" : "2028-03-17",
+          "accountNum" : "50643013851256377",
           "processing" : "urn:sbrfsystems:99-way"
         }
       }, {
         "inputDC" : {
-          "DPAN" : "9725651311348417",
-          "endDate" : "2027-03-16",
-          "accountNum" : "41908593858641228",
+          "DPAN" : "1722243717418304",
+          "endDate" : "2029-03-17",
+          "accountNum" : "50227432186673684",
           "processing" : "urn:sbrfsystems:99-pci:tw"
         }
       } ]
     },
     "nodeInstances" : [ {
-      "id" : "af77dc04-ad8c-458d-9dbe-2bb66c2eb2fc",
-      "nodeId" : "Activity_8a667ce",
-      "nodeDefinitionId" : "Activity_8a667ce",
+      "id" : "b85cfdda-16cb-448f-a543-996e4f8a8d87",
+      "nodeId" : "Activity_e07b52e",
+      "nodeDefinitionId" : "Activity_e07b52e",
       "nodeName" : "Start",
       "nodeType" : "startEvent",
       "error" : null,
@@ -181,108 +206,71 @@
       "calledProcessInstanceIds" : null,
       "retries" : [ ],
       "htmTaskId" : null,
-      "triggerTime" : "2026-03-16T05:38:31.272452818+03:00",
-      "leaveTime" : "2026-03-16T05:38:31.272452818+03:00",
+      "triggerTime" : "2026-03-16T17:30:50.264542507+03:00",
+      "leaveTime" : "2026-03-16T17:30:50.264542507+03:00",
       "triggerNodeInstanceId" : null,
       "creationOrder" : 1
     }, {
-      "id" : "d976bc70-33e1-47f5-a0dc-a7166e37c78f",
-      "nodeId" : "Activity_80ff4d7",
-      "nodeDefinitionId" : "Activity_80ff4d7",
-      "nodeName" : "Gateway_2",
-      "nodeType" : "exclusiveGateway",
+      "id" : "a6dda9f4-7ef1-495c-a5fc-3b23ab46fe4a",
+      "nodeId" : "Activity_3c2ac92",
+      "nodeDefinitionId" : "Activity_3c2ac92",
+      "nodeName" : "parseResponse",
+      "nodeType" : "scriptTask",
       "error" : null,
       "state" : 4,
       "calledProcessInstanceIds" : null,
       "retries" : [ ],
       "htmTaskId" : null,
-      "triggerTime" : "2026-03-16T05:38:37.272452818+03:00",
-      "leaveTime" : "2026-03-16T05:38:41.272452818+03:00",
+      "triggerTime" : "2026-03-16T17:30:56.264542507+03:00",
+      "leaveTime" : "2026-03-16T17:31:00.264542507+03:00",
       "triggerNodeInstanceId" : null,
       "creationOrder" : 2
+    }, {
+      "id" : "13f74580-c0ee-4f77-b1c1-6f4f996a1507",
+      "nodeId" : "Activity_45eca61",
+      "nodeDefinitionId" : "Activity_45eca61",
+      "nodeName" : "ValidationSubProcess",
+      "nodeType" : "subProcess",
+      "error" : null,
+      "state" : 4,
+      "calledProcessInstanceIds" : null,
+      "retries" : [ ],
+      "htmTaskId" : null,
+      "triggerTime" : "2026-03-16T17:31:00.264542507+03:00",
+      "leaveTime" : "2026-03-16T17:31:11.264542507+03:00",
+      "triggerNodeInstanceId" : null,
+      "creationOrder" : 3
+    }, {
+      "id" : "cb9bfde6-2b3e-45ae-8ee1-d72375e39b09",
+      "nodeId" : "Activity_255ea69",
+      "nodeDefinitionId" : "Activity_255ea69",
+      "nodeName" : "Gateway_4",
+      "nodeType" : "exclusiveGateway",
+      "error" : null,
+      "state" : 0,
+      "calledProcessInstanceIds" : null,
+      "retries" : [ ],
+      "htmTaskId" : null,
+      "triggerTime" : "2026-03-16T17:31:11.264542507+03:00",
+      "leaveTime" : null,
+      "triggerNodeInstanceId" : null,
+      "creationOrder" : 4
+    }, {
+      "id" : "964b0502-d2b5-4175-9d98-afc1a932f287",
+      "nodeId" : "Activity_a5ecf10",
+      "nodeDefinitionId" : "Activity_a5ecf10",
+      "nodeName" : "Gateway_5",
+      "nodeType" : "exclusiveGateway",
+      "error" : null,
+      "state" : 0,
+      "calledProcessInstanceIds" : null,
+      "retries" : [ ],
+      "htmTaskId" : null,
+      "triggerTime" : "2026-03-16T17:31:11.264542507+03:00",
+      "leaveTime" : null,
+      "triggerNodeInstanceId" : null,
+      "creationOrder" : 5
     } ],
-    "answerGFL" : {
-      "RqTm" : "2026-03-16T13:06:31.27540793",
-      "RqUID" : "533e278002fdb5d56b5f2d561378db04",
-      "Status" : {
-        "StatusCode" : 0,
-        "StatusDesc" : "SUCCESS",
-        "AdditionalStatus" : [ ]
-      },
-      "OperUID" : "d5f7060071aa34e8c6aade271af56428",
-      "AcctType" : [ ],
-      "PankAcctRec" : [ {
-        "Mord" : {
-          "SPName" : "urn:sbrfsystems:99-way",
-          "AcctBal" : [ {
-            "CurAmt" : 91556.82889538119,
-            "AcctCur" : "RUB",
-            "BalType" : "Avail"
-          }, {
-            "CurAmt" : 55513.98700634733,
-            "AcctCur" : "RUB",
-            "BalType" : "CR_LIMIT"
-          }, {
-            "CurAmt" : 293466.4137396808,
-            "AcctCur" : "RUB",
-            "BalType" : "OWN_BALANCE"
-          }, {
-            "CurAmt" : 0.0,
-            "AcctCur" : "RUB",
-            "BalType" : "Debt"
-          } ],
-          "MordAcctId" : {
-            "EndDt" : "2029-03-16",
-            "AcctId" : "40817831460839327250",
-            "AcctCur" : "RUB",
-            "MordNum" : "31D68156A0448B0B",
-            "MordType" : "DC",
-            "SystemId" : "urn:sbrfsystems:99-way",
-            "MordLevel" : "VG"
-          },
-          "PankAcctStatus" : {
-            "StatusDesc" : "+ - КАРТОЧКА ОТКРЫТА",
-            "StatusClass" : "Valid",
-            "PankAcctStatusCode" : "+"
-          }
-        }
-      }, {
-        "Mord" : {
-          "SPName" : "urn:sbrfsystems:99-way",
-          "AcctBal" : [ {
-            "CurAmt" : 328922.63112969726,
-            "AcctCur" : "RUB",
-            "BalType" : "Avail"
-          }, {
-            "CurAmt" : 64187.32819757069,
-            "AcctCur" : "RUB",
-            "BalType" : "CR_LIMIT"
-          }, {
-            "CurAmt" : 58635.79445881534,
-            "AcctCur" : "RUB",
-            "BalType" : "OWN_BALANCE"
-          }, {
-            "CurAmt" : 0.0,
-            "AcctCur" : "RUB",
-            "BalType" : "Debt"
-          } ],
-          "MordAcctId" : {
-            "EndDt" : "2029-03-16",
-            "AcctId" : "40817821925593378114",
-            "AcctCur" : "RUB",
-            "MordNum" : "CB07ECAB41349FB7",
-            "MordType" : "CC",
-            "SystemId" : "urn:sbrfsystems:99-way",
-            "MordLevel" : "ST"
-          },
-          "PankAcctStatus" : {
-            "StatusDesc" : "+ - КАРТОЧКА ОТКРЫТА",
-            "StatusClass" : "Valid",
-            "PankAcctStatusCode" : "+"
-          }
-        }
-      } ]
-    },
     "uvsk_restTaskTimer" : "PT30S",
     "uvskCLTV_taskTimer" : "PT30S",
     "uvskVis_armStageDurationTimer" : "P3D",
@@ -293,74 +281,69 @@
     "urlGFL" : "http://gfl-service:8080",
     "urlEpk" : "http://bpm-gateway:8080",
     "operations" : [ {
-      "operationId" : "OP_1_af76",
-      "type" : "UPDATE",
-      "createdAt" : "2026-03-16T07:29:31.272452818+03:00",
+      "operationId" : "OP_1_893f",
+      "type" : "CREATE",
+      "createdAt" : "2026-03-16T18:43:50.264542507+03:00",
       "steps" : [ {
         "stepId" : "STEP_1_1",
-        "status" : "IN_PROGRESS",
+        "status" : "CANCELLED",
         "attempts" : [ {
           "attempt" : 0,
           "result" : "ERROR",
-          "ts" : "2026-03-16T11:04:31.272452818+03:00"
+          "ts" : "2026-03-16T18:32:50.264542507+03:00"
+        } ]
+      }, {
+        "stepId" : "STEP_1_2",
+        "status" : "CANCELLED",
+        "attempts" : [ {
+          "attempt" : 0,
+          "result" : "ERROR",
+          "ts" : "2026-03-17T01:09:50.264542507+03:00"
+        } ]
+      }, {
+        "stepId" : "STEP_1_3",
+        "status" : "IN_PROGRESS",
+        "attempts" : [ {
+          "attempt" : 0,
+          "result" : "OK",
+          "ts" : "2026-03-16T21:33:50.264542507+03:00"
+        } ]
+      }, {
+        "stepId" : "STEP_1_4",
+        "status" : "COMPLETED",
+        "attempts" : [ {
+          "attempt" : 0,
+          "result" : "OK",
+          "ts" : "2026-03-16T23:13:50.264542507+03:00"
         }, {
           "attempt" : 1,
-          "result" : "OK",
-          "ts" : "2026-03-16T10:35:31.272452818+03:00"
+          "result" : "ERROR",
+          "ts" : "2026-03-16T19:32:50.264542507+03:00"
         } ]
       } ]
     }, {
-      "operationId" : "OP_2_abbd",
-      "type" : "CREATE",
-      "createdAt" : "2026-03-16T06:26:31.272452818+03:00",
+      "operationId" : "OP_2_012e",
+      "type" : "UPDATE",
+      "createdAt" : "2026-03-16T18:50:50.264542507+03:00",
       "steps" : [ {
         "stepId" : "STEP_2_1",
         "status" : "PENDING",
         "attempts" : [ {
           "attempt" : 0,
-          "result" : "WARN",
-          "ts" : "2026-03-16T11:04:31.272452818+03:00"
+          "result" : "OK",
+          "ts" : "2026-03-16T21:54:50.264542507+03:00"
         }, {
           "attempt" : 1,
           "result" : "ERROR",
-          "ts" : "2026-03-16T06:32:31.272452818+03:00"
+          "ts" : "2026-03-16T18:52:50.264542507+03:00"
         } ]
       }, {
         "stepId" : "STEP_2_2",
         "status" : "COMPLETED",
         "attempts" : [ {
           "attempt" : 0,
-          "result" : "WARN",
-          "ts" : "2026-03-16T05:59:31.272452818+03:00"
-        } ]
-      }, {
-        "stepId" : "STEP_2_3",
-        "status" : "IN_PROGRESS",
-        "attempts" : [ {
-          "attempt" : 0,
-          "result" : "WARN",
-          "ts" : "2026-03-16T10:29:31.272452818+03:00"
-        }, {
-          "attempt" : 1,
-          "result" : "OK",
-          "ts" : "2026-03-16T06:26:31.272452818+03:00"
-        } ]
-      } ]
-    }, {
-      "operationId" : "OP_3_ae0a",
-      "type" : "UPDATE",
-      "createdAt" : "2026-03-16T09:33:31.272452818+03:00",
-      "steps" : [ {
-        "stepId" : "STEP_3_1",
-        "status" : "IN_PROGRESS",
-        "attempts" : [ {
-          "attempt" : 0,
           "result" : "ERROR",
-          "ts" : "2026-03-16T12:32:31.272452818+03:00"
-        }, {
-          "attempt" : 1,
-          "result" : "OK",
-          "ts" : "2026-03-16T07:37:31.272452818+03:00"
+          "ts" : "2026-03-17T00:50:50.264542507+03:00"
         } ]
       } ]
     } ],
@@ -371,22 +354,22 @@
         "ruleId" : "LIM_DAILY_1",
         "thresholds" : [ {
           "type" : "WARN",
-          "value" : 39604
+          "value" : 41985
         }, {
           "type" : "BLOCK",
-          "value" : 179422
+          "value" : 89986
         } ],
-        "channels" : [ "ATM", "MOBILE" ]
+        "channels" : [ "WEB", "ATM" ]
       }, {
         "ruleId" : "LIM_DAILY_2",
         "thresholds" : [ {
           "type" : "WARN",
-          "value" : 29508
+          "value" : 48922
         }, {
           "type" : "BLOCK",
-          "value" : 110207
+          "value" : 51990
         } ],
-        "channels" : [ "WEB" ]
+        "channels" : [ "WEB", "MOBILE" ]
       } ]
     }, {
       "period" : "MONTHLY",
@@ -395,82 +378,136 @@
         "ruleId" : "LIM_MONTHLY_1",
         "thresholds" : [ {
           "type" : "WARN",
-          "value" : 25560
+          "value" : 22623
         }, {
           "type" : "BLOCK",
-          "value" : 68988
+          "value" : 80478
         } ],
-        "channels" : [ "WEB" ]
-      }, {
-        "ruleId" : "LIM_MONTHLY_2",
-        "thresholds" : [ {
-          "type" : "WARN",
-          "value" : 35487
-        }, {
-          "type" : "BLOCK",
-          "value" : 136536
-        } ],
-        "channels" : [ "ATM" ]
+        "channels" : [ "WEB", "MOBILE" ]
       } ]
     } ],
     "auditTrail" : [ {
-      "eventId" : "EVT_a0889e",
-      "eventType" : "STATE_CHANGE",
-      "timestamp" : "2026-03-16T10:57:31.272452818+03:00",
+      "eventId" : "EVT_e74b6e",
+      "eventType" : "ROUTE",
+      "timestamp" : "2026-03-17T03:05:50.264542507+03:00",
       "actor" : {
-        "id" : "USR_9aaa8",
-        "roles" : [ "SUPPORT" ]
+        "id" : "USR_39237",
+        "roles" : [ "SYSTEM", "OPERATOR" ]
       },
       "details" : {
-        "oldState" : "REJECTED",
-        "newState" : "COMPLETED",
+        "oldState" : "COMPLETED",
+        "newState" : "REJECTED",
         "attributes" : [ {
-          "key" : "attr_d8e",
-          "values" : [ "v_92", "v_e1" ]
+          "key" : "attr_916",
+          "values" : [ "v_7e", "v_6f", "v_91" ]
         }, {
-          "key" : "attr_fad",
-          "values" : [ "v_89", "v_12", "v_b1" ]
+          "key" : "attr_937",
+          "values" : [ "v_b5", "v_32" ]
+        }, {
+          "key" : "attr_702",
+          "values" : [ "v_d9", "v_3c", "v_3a" ]
+        }, {
+          "key" : "attr_e2b",
+          "values" : [ "v_b8", "v_38", "v_f1" ]
         } ]
       }
     }, {
-      "eventId" : "EVT_a49f0e",
-      "eventType" : "ROUTE",
-      "timestamp" : "2026-03-16T06:00:31.272452818+03:00",
+      "eventId" : "EVT_f45e26",
+      "eventType" : "CREATE",
+      "timestamp" : "2026-03-17T04:40:50.264542507+03:00",
       "actor" : {
-        "id" : "USR_4197c",
+        "id" : "USR_e3326",
         "roles" : [ "OPERATOR" ]
       },
       "details" : {
-        "oldState" : "IN_PROGRESS",
+        "oldState" : "COMPLETED",
         "newState" : "CANCELLED",
         "attributes" : [ {
-          "key" : "attr_090",
-          "values" : [ "v_b3", "v_d6" ]
+          "key" : "attr_e78",
+          "values" : [ "v_ee", "v_f4", "v_82" ]
         }, {
-          "key" : "attr_39e",
-          "values" : [ "v_26", "v_82", "v_27" ]
+          "key" : "attr_5c7",
+          "values" : [ "v_af", "v_b6" ]
+        } ]
+      }
+    }, {
+      "eventId" : "EVT_be2df3",
+      "eventType" : "NOTIFY",
+      "timestamp" : "2026-03-16T23:37:50.264542507+03:00",
+      "actor" : {
+        "id" : "USR_88181",
+        "roles" : [ "SUPPORT", "SYSTEM" ]
+      },
+      "details" : {
+        "oldState" : "IN_PROGRESS",
+        "newState" : "IN_PROGRESS",
+        "attributes" : [ {
+          "key" : "attr_112",
+          "values" : [ "v_ef", "v_08" ]
         }, {
-          "key" : "attr_dd4",
-          "values" : [ "v_94", "v_65", "v_eb" ]
+          "key" : "attr_833",
+          "values" : [ "v_ce", "v_cb" ]
         }, {
-          "key" : "attr_9a1",
-          "values" : [ "v_1b", "v_3e", "v_db" ]
+          "key" : "attr_f54",
+          "values" : [ "v_88", "v_2c" ]
+        }, {
+          "key" : "attr_f84",
+          "values" : [ "v_b0", "v_d4", "v_7e" ]
+        } ]
+      }
+    }, {
+      "eventId" : "EVT_d635e7",
+      "eventType" : "CREATE",
+      "timestamp" : "2026-03-17T02:43:50.264542507+03:00",
+      "actor" : {
+        "id" : "USR_be2e8",
+        "roles" : [ "OPERATOR" ]
+      },
+      "details" : {
+        "oldState" : "CANCELLED",
+        "newState" : "REJECTED",
+        "attributes" : [ {
+          "key" : "attr_2ad",
+          "values" : [ "v_3c", "v_28", "v_8a" ]
+        }, {
+          "key" : "attr_41a",
+          "values" : [ "v_2b", "v_a8" ]
+        }, {
+          "key" : "attr_a47",
+          "values" : [ "v_95", "v_e5" ]
         } ]
       }
     } ],
-    "flags" : [ -2862, {
-      "key" : "k_2f7",
-      "nested" : {
-        "key" : "k_028",
-        "nested" : null
-      }
-    } ],
-    "references" : [ {
-      "id" : 861621,
-      "code" : "c_4f20",
-      "value" : 61,
+    "items" : [ {
+      "id" : "721f6368-db9e-4f0a-b27f-b663e6762380",
+      "code" : "c_0c87",
+      "value" : 10.765226485793955,
       "active" : true
-    } ]
+    }, {
+      "id" : 511723,
+      "code" : "c_f206",
+      "value" : 95.18703501196283,
+      "active" : true
+    }, 48534.659583894565 ],
+    "attachmentIds" : [ [ "2026-03-17T11:46:50.269094258Z", {
+      "id" : 248100,
+      "code" : "c_3258",
+      "value" : 9.802225441883705,
+      "active" : false
+    }, null ], [ {
+      "id" : 308244,
+      "code" : "c_3482",
+      "value" : 80,
+      "active" : false
+    }, "RUB", [ -645729 ] ], -9602, 10211.31766235125 ],
+    "metadataList" : [ ],
+    "notifyList" : [ "REJECTED", null, "code_7f3bce" ],
+    "tags" : [ 95733.66902796311, "REJECTED", [ 58509.00789101407 ], [ [ 16317.641851251163, "COMPLETED" ], true, true ], "RUB", null, [ null, {
+      "id" : 810992,
+      "code" : "c_3b95",
+      "value" : 39,
+      "active" : true
+    } ] ]
   },
-  "contextSize" : 7248
+  "contextSize" : 184222
 }

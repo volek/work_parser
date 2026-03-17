@@ -8,6 +8,7 @@ import ru.sber.parser.druid.DruidClient
 import ru.sber.parser.generator.MessageGenerator
 import ru.sber.parser.parser.MessageParser
 import ru.sber.parser.parser.strategy.CombinedStrategy
+import ru.sber.parser.parser.strategy.CompcomStrategy
 import ru.sber.parser.parser.strategy.DefaultStrategy
 import ru.sber.parser.parser.strategy.EavStrategy
 import ru.sber.parser.parser.strategy.HybridStrategy
@@ -71,20 +72,22 @@ fun main(args: Array<String>) = runBlocking {
         // Парсинг сообщений с выбранной стратегией
         // ==========================================
         "parse" -> {
-            // Название стратегии: hybrid, eav, combined или default
+            // Название стратегии: hybrid, eav, combined, compcom или default
             val strategyName: String = args.getOrElse(1) { "hybrid" }
             // Директория с входными JSON-файлами (пропускаем флаги, начинающиеся с --)
             val positionalArgs = args.filter { !it.startsWith("--") }
             val inputDir = File(positionalArgs.getOrElse(2) { "messages" })
             
+            val warmLimit = config.parserConfig?.effectiveWarmVariablesLimit()
             // Выбор стратегии трансформации данных
             val strategy: ParseStrategy = when (strategyName.lowercase()) {
-                "hybrid" -> HybridStrategy(config.fieldClassification)   // Одна таблица с JSON-блобами
-                "eav" -> EavStrategy()                                   // Две таблицы: события + переменные
-                "combined" -> CombinedStrategy(config.fieldClassification) // Горячие колонки + индекс
-                "default" -> DefaultStrategy()                           // Все поля как отдельные колонки (точка в именах)
+                "hybrid" -> HybridStrategy(config.fieldClassification)
+                "eav" -> EavStrategy()
+                "combined" -> CombinedStrategy(config.fieldClassification, warmLimit)
+                "compcom" -> CompcomStrategy(config.fieldClassification, warmLimit)
+                "default" -> DefaultStrategy()
                 else -> {
-                    logger.error("Unknown strategy: $strategyName. Use: hybrid, eav, combined, default")
+                    logger.error("Unknown strategy: $strategyName. Use: hybrid, eav, combined, compcom, default")
                     return@runBlocking
                 }
             }
@@ -112,6 +115,12 @@ fun main(args: Array<String>) = runBlocking {
                         primarySchema = ru.sber.parser.parser.strategy.CombinedStrategy.MAIN_SCHEMA
                         secondarySchemas = mapOf(
                             "variables_indexed" to ru.sber.parser.parser.strategy.CombinedStrategy.VARIABLE_INDEXED_SCHEMA
+                        )
+                    }
+                    is CompcomStrategy -> {
+                        primarySchema = ru.sber.parser.parser.strategy.CompcomStrategy.MAIN_SCHEMA
+                        secondarySchemas = mapOf(
+                            "variables_indexed" to ru.sber.parser.parser.strategy.CompcomStrategy.VARIABLE_INDEXED_SCHEMA
                         )
                     }
                     is DefaultStrategy -> {
@@ -459,7 +468,7 @@ fun main(args: Array<String>) = runBlocking {
                 
                 Usage:
                   generate [output-dir] [count]   Generate test messages (default: messages, 500)
-                  parse <strategy> [input-dir]    Parse messages (hybrid|eav|combined|default)
+                  parse <strategy> [input-dir]    Parse messages (hybrid|eav|combined|compcom|default)
                   parse <strategy> --ingest       Parse and ingest to Druid
                   query <query-file.sql>          Execute SQL query on Druid
                   help                            Show this help
@@ -471,7 +480,8 @@ fun main(args: Array<String>) = runBlocking {
                 Strategies:
                   hybrid   - Flat columns + JSON blobs (single table)
                   eav      - Entity-Attribute-Value (two tables)
-                  combined - Tiered approach (hot/warm/cold)
+                  combined - Tiered approach (hot/warm/cold, with var_blob_json)
+                  compcom  - Compact combined (hot/warm, no cold blob in Druid)
                   default  - All message fields as columns (dot-separated names)
             """.trimIndent())
         }

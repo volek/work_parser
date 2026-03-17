@@ -2,7 +2,7 @@
 
 ## Обзор проекта
 
-Реализация Kotlin-парсера BPM-сообщений для Apache Druid с поддержкой трёх стратегий хранения: гибридной (Flat+JSON), вертикальной (EAV) и комбинированной. Включает генератор тестовых сообщений, парсеры, клиент Druid и 150+ тестовых запросов.
+Реализация Kotlin-парсера BPM-сообщений для Apache Druid с поддержкой пяти стратегий хранения: гибридной (Flat+JSON), вертикальной (EAV), комбинированной (Combined), компактной комбинированной (Compcom, без cold blob) и Default (все поля как колонки). Включает генератор тестовых сообщений, парсеры, клиент Druid и 250+ тестовых запросов.
 
 ## Статус задач
 
@@ -44,7 +44,8 @@ c:\Projects\Sber\parser\
 │   │           │   └── druid/
 │   │           │       ├── HybridRecord.kt      # Вариант 1: Flat+JSON
 │   │           │       ├── EavRecord.kt         # Вариант 2: EAV
-│   │           │       └── CombinedRecord.kt    # Вариант 3: Combined
+│   │           │       ├── CombinedRecord.kt    # Вариант 3: Combined
+│   │           │       └── DefaultRecord.kt     # Default: все поля как колонки
 │   │           ├── parser/
 │   │           │   ├── MessageParser.kt         # JSON parsing interface
 │   │           │   ├── VariableFlattener.kt     # Path extraction
@@ -52,7 +53,9 @@ c:\Projects\Sber\parser\
 │   │           │       ├── ParseStrategy.kt     # Strategy interface
 │   │           │       ├── HybridStrategy.kt    # Вариант 1
 │   │           │       ├── EavStrategy.kt       # Вариант 2
-│   │           │       └── CombinedStrategy.kt  # Вариант 3
+│   │           │       ├── CombinedStrategy.kt  # Вариант 3 (warmVariablesLimit 10..1010)
+│   │           │       ├── CompcomStrategy.kt   # Compact combined: без cold blob
+│   │           │       └── DefaultStrategy.kt   # Default
 │   │           ├── druid/
 │   │           │   ├── DruidClient.kt           # HTTP client for Druid
 │   │           │   ├── DruidIngester.kt         # Batch ingestion
@@ -65,9 +68,11 @@ c:\Projects\Sber\parser\
 │       └── kotlin/...
 ├── messages/                         # Generated test messages (20+)
 ├── query/
-│   ├── hybrid/                       # 50+ queries for strategy 1
-│   ├── eav/                          # 50+ queries for strategy 2
-│   └── combined/                     # 50+ queries for strategy 3
+│   ├── hybrid/                       # 50+ queries for Hybrid
+│   ├── eav/                          # 50+ queries for EAV
+│   ├── combined/                     # 68 queries for Combined (process_main + process_variables_indexed)
+│   ├── compcom/                      # 70 queries for Compcom (process_main_compact + process_variables_indexed)
+│   └── default/                      # queries for Default
 └── samples/                          # Existing sample files
 ```
 

@@ -3,9 +3,15 @@
 #   .\scripts\run-all-strategies.ps1
 # Optional message count (default 500):
 #   .\scripts\run-all-strategies.ps1 -MessageCount 100
+# Optional warm limit for combined/compcom (10..1010, step 100); can pass multiple variants:
+#   .\scripts\run-all-strategies.ps1 -WarmLimitVariants 10, 110, 210
 
 param(
-    [int] $MessageCount = 500
+    [int] $MessageCount = 500,
+    # Для стратегий combined и compcom: варианты лимита warm-колонок (10..1010, шаг 100).
+    # Если не задано — один прогон без лимита (config по умолчанию).
+    # Пример: -WarmLimitVariants 10, 110, 210 — три прогона с PARSER_WARM_VARIABLES_LIMIT=10, 110, 210.
+    [int[]] $WarmLimitVariants = @()
 )
 
 $ErrorActionPreference = "Stop"
@@ -14,7 +20,8 @@ if (-not (Test-Path (Join-Path $root "docker-compose.yml"))) {
     Write-Error "Run script from project root (where docker-compose.yml is). Current dir: $root"
 }
 
-$strategies = @("combined", "eav", "hybrid", "default")
+$strategies = @("combined", "compcom", "eav", "hybrid", "default")
+$strategiesWithWarm = @("combined", "compcom")
 $logsDir = Join-Path $root "logs"
 $outDir = Join-Path $root "query-results"
 $messagesDir = Join-Path $root "messages"
@@ -56,14 +63,26 @@ $ErrorActionPreference = "Stop"
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 # 2. Parse and ingest to Druid per strategy
+# Для combined и compcom при заданных WarmLimitVariants — по одному прогону на каждый вариант (логи *_ingest_warm{N}.log).
 $ErrorActionPreference = "Continue"
 foreach ($s in $strategies) {
-    Write-Host "=== Parse and ingest to Druid: $s ===" -ForegroundColor Cyan
-    $ingestLog = Join-Path $logsDir "${s}_ingest.log"
-    # Inside container, input directory is 'messages' (volume ./messages:/app/messages)
-    docker compose run --rm bpm-parser parse $s messages --ingest 2>&1 | Tee-Object -FilePath $ingestLog
-    if ($LASTEXITCODE -ne 0) {
-        Write-Warning "Ingest failed for strategy $s (exit code $LASTEXITCODE). Log: $ingestLog"
+    $variants = @($null)
+    if ($s -in $strategiesWithWarm -and $WarmLimitVariants.Count -gt 0) {
+        $variants = $WarmLimitVariants.ForEach({ $_ })
+    }
+    foreach ($warm in $variants) {
+        $suffix = if ($null -eq $warm) { "" } else { "_warm$warm" }
+        $ingestLog = Join-Path $logsDir "${s}_ingest${suffix}.log"
+        Write-Host "=== Parse and ingest to Druid: $s$(if ($null -ne $warm) { " (warm limit $warm)" }) ===" -ForegroundColor Cyan
+        $envArgs = @()
+        if ($null -ne $warm) {
+            $envArgs = @("-e", "PARSER_WARM_VARIABLES_LIMIT=$warm")
+        }
+        $dockerArgs = @("compose", "run", "--rm") + $envArgs + @("bpm-parser", "parse", $s, "messages", "--ingest")
+        & docker @dockerArgs 2>&1 | Tee-Object -FilePath $ingestLog
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "Ingest failed for strategy $s$(if ($null -ne $warm) { " warm=$warm" }) (exit code $LASTEXITCODE). Log: $ingestLog"
+        }
     }
 }
 $ErrorActionPreference = "Stop"

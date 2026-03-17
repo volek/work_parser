@@ -24,10 +24,12 @@ import java.io.File
  * 
  * @property druid Настройки подключения к Apache Druid
  * @property fieldClassification Классификация полей по уровням (hot/warm/cold)
+ * @property parserConfig Опции парсера (лимит warm-переменных для combined/compcom)
  */
 data class AppConfig(
     val druid: DruidConfig = DruidConfig.fromEnvironment(),
-    val fieldClassification: FieldClassification = FieldClassification.default()
+    val fieldClassification: FieldClassification = FieldClassification.default(),
+    val parserConfig: ParserConfig? = null
 ) {
     companion object {
         private val logger = LoggerFactory.getLogger(AppConfig::class.java)
@@ -69,10 +71,16 @@ data class AppConfig(
                 null
             }
             
-            // Собираем итоговую конфигурацию с учётом приоритетов
+            // Собираем итоговую конфигурацию с учётом приоритетов (ENV > file)
+            val warmFromEnv = System.getenv("PARSER_WARM_VARIABLES_LIMIT")?.toIntOrNull()
+            val parserConfig = when {
+                warmFromEnv != null -> ParserConfig(warmVariablesLimit = warmFromEnv)
+                else -> fileConfig?.parserConfig
+            }
             return AppConfig(
                 druid = DruidConfig.fromEnvironmentWithFallback(fileConfig?.druid),
-                fieldClassification = fileConfig?.fieldClassification ?: FieldClassification.default()
+                fieldClassification = fileConfig?.fieldClassification ?: FieldClassification.default(),
+                parserConfig = parserConfig
             )
         }
     }
@@ -83,8 +91,40 @@ data class AppConfig(
  */
 private data class FileConfig(
     val druid: DruidFileConfig? = null,
-    val fieldClassification: FieldClassification? = null
+    val fieldClassification: FieldClassification? = null,
+    val parser: ParserFileConfig? = null
+) {
+    val parserConfig: ParserConfig?
+        get() = parser?.let { ParserConfig(warmVariablesLimit = it.warmVariablesLimit) }
+}
+
+/**
+ * Настройки парсера (YAML-секция parser).
+ */
+private data class ParserFileConfig(
+    val warmVariablesLimit: Int? = null
 )
+
+/**
+ * Конфигурация парсера для стратегий combined/compcom.
+ *
+ * @property warmVariablesLimit Максимум записей process_variables_indexed на одно сообщение.
+ *                              Допустимый диапазон: 10..1010 с шагом 100 (10, 110, 210, ..., 1010).
+ *                              null = без ограничения.
+ */
+data class ParserConfig(
+    val warmVariablesLimit: Int? = null
+) {
+    /**
+     * Возвращает лимит, приведённый к допустимому диапазону, или null.
+     */
+    fun effectiveWarmVariablesLimit(): Int? {
+        val v = warmVariablesLimit ?: return null
+        if (v < 10) return null
+        if (v > 1010) return 1010
+        return v
+    }
+}
 
 internal data class DruidFileConfig(
     val brokerUrl: String? = null,

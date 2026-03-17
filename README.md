@@ -1,6 +1,6 @@
 # BPM Message Parser для Apache Druid
 
-Kotlin-парсер BPM-сообщений для Apache Druid с поддержкой четырёх стратегий хранения данных.
+Kotlin-парсер BPM-сообщений для Apache Druid с поддержкой пяти стратегий хранения данных.
 
 ## 📋 Содержание
 
@@ -21,14 +21,17 @@ Kotlin-парсер BPM-сообщений для Apache Druid с поддерж
 
 ## Обзор
 
-Проект предоставляет четыре стратегии хранения BPM-сообщений в Apache Druid:
+Проект предоставляет пять стратегий хранения BPM-сообщений в Apache Druid:
 
 | Стратегия | Описание | Таблицы |
 |-----------|----------|---------|
 | **Hybrid** | Flat columns + JSON blobs | 1 таблица |
 | **EAV** | Entity-Attribute-Value | 2 таблицы |
-| **Combined** | Tiered (Hot/Warm/Cold) | 2 таблицы |
+| **Combined** | Tiered (Hot/Warm/Cold), с cold blob в Druid | 2 таблицы |
+| **Compcom** | Compact combined: как Combined, но без cold blob в Druid | 2 таблицы |
 | **Default** | Все поля сообщения как отдельные колонки (имена с точкой) | 1 таблица |
+
+Для стратегий **Combined** и **Compcom** в `config.yaml` можно задать лимит warm-переменных на сообщение: `parser.warmVariablesLimit` (10..1010, шаг 100). Подробнее см. [strategies.md](strategies.md).
 
 ---
 
@@ -145,7 +148,8 @@ parser/
 ├── query/                  # SQL-запросы по стратегиям
 │   ├── hybrid/             # 50+ queries for Hybrid
 │   ├── eav/                # 50+ queries for EAV
-│   ├── combined/           # 50+ queries for Combined
+│   ├── combined/           # 68 queries for Combined (process_main + process_variables_indexed)
+│   ├── compcom/            # 70 queries for Compcom (process_main_compact + process_variables_indexed)
 │   └── default/            # запросы для Default (все поля как колонки)
 └── samples/                # Sample BPM messages
 ```
@@ -187,6 +191,10 @@ fieldClassification:
     - "processId"
     - "processName"
     - "status"
+
+# Опционально: лимит warm-переменных для combined/compcom (10..1010, шаг 100)
+# parser:
+#   warmVariablesLimit: 110
 ```
 
 #### Файл .env
@@ -213,7 +221,7 @@ java -jar app.jar generate [output-dir] [count]
 
 # Парсинг сообщений
 java -jar app.jar parse <strategy> [input-dir]
-# strategy: hybrid | eav | combined | default
+# strategy: hybrid | eav | combined | compcom | default
 
 # Парсинг и загрузка в Druid
 java -jar app.jar parse <strategy> --ingest
@@ -283,6 +291,9 @@ docker compose run --rm bpm-parser parse eav messages 2>&1 | tee logs/eav_parse.
 # Combined
 docker compose run --rm bpm-parser parse combined messages 2>&1 | tee logs/combined_parse.log
 
+# Compcom (compact combined, без cold blob в Druid)
+docker compose run --rm bpm-parser parse compcom messages 2>&1 | tee logs/compcom_parse.log
+
 # Default
 docker compose run --rm bpm-parser parse default messages 2>&1 | tee logs/default_parse.log
 ```
@@ -300,6 +311,9 @@ docker compose run --rm bpm-parser parse eav messages --ingest 2>&1 | tee logs/e
 
 # Combined
 docker compose run --rm bpm-parser parse combined messages --ingest 2>&1 | tee logs/combined_ingest.log
+
+# Compcom
+docker compose run --rm bpm-parser parse compcom messages --ingest 2>&1 | tee logs/compcom_ingest.log
 
 # Default
 docker compose run --rm bpm-parser parse default messages --ingest 2>&1 | tee logs/default_ingest.log
@@ -330,6 +344,12 @@ for f in query/combined/*.sql; do
   docker compose run --rm bpm-parser query "$f" >> logs/combined_queries.log 2>&1
 done
 
+# Compcom — все запросы из query/compcom/
+for f in query/compcom/*.sql; do
+  echo "=== $f ===" >> logs/compcom_queries.log
+  docker compose run --rm bpm-parser query "$f" >> logs/compcom_queries.log 2>&1
+done
+
 # Default — все запросы из query/default/
 for f in query/default/*.sql; do
   echo "=== $f ===" >> logs/default_queries.log
@@ -346,7 +366,7 @@ Get-ChildItem -Path query/hybrid -Filter *.sql | ForEach-Object {
 }
 ```
 
-Аналогично замените `query/hybrid` на `query/eav`, `query/combined` или `query/default` и имена лог-файлов на `eav_queries.log`, `combined_queries.log` или `default_queries.log`.
+Аналогично замените `query/hybrid` на `query/eav`, `query/combined`, `query/compcom` или `query/default` и имена лог-файлов на `eav_queries.log`, `combined_queries.log`, `compcom_queries.log` или `default_queries.log`.
 
 #### Полный цикл в PowerShell (генерация → загрузка в Druid → запросы)
 
@@ -362,6 +382,12 @@ Get-ChildItem -Path query/hybrid -Filter *.sql | ForEach-Object {
 .\scripts\run-all-strategies.ps1 -MessageCount 100
 ```
 
+Варианты лимита warm-колонок для стратегий **combined** и **compcom** (10..1010, шаг 100): несколько прогонов с разными `PARSER_WARM_VARIABLES_LIMIT`, логи `*_ingest_warm{N}.log`:
+
+```powershell
+.\scripts\run-all-strategies.ps1 -WarmLimitVariants 10, 110, 210
+```
+
 Перед запуском убедитесь, что Druid запущен и доступен (см. [Быстрый старт](#quick-start)).
 
 #### Только запросы по всем стратегиям (Windows PowerShell)
@@ -369,7 +395,7 @@ Get-ChildItem -Path query/hybrid -Filter *.sql | ForEach-Object {
 Если сообщения уже сгенерированы и загружены в Druid, можно выполнить только SQL-запросы. Скрипт пишет результаты в `query-results/<strategy>.txt`. Запуск из корня проекта:
 
 ```powershell
-$strategies = @("combined", "eav", "hybrid", "default")
+$strategies = @("combined", "compcom", "eav", "hybrid", "default")
 $outDir = "query-results"
 $root = (Get-Location).Path
 
@@ -399,16 +425,20 @@ foreach ($s in $strategies) {
 | `logs/hybrid_parse.log` | Парсинг стратегии Hybrid |
 | `logs/eav_parse.log` | Парсинг стратегии EAV |
 | `logs/combined_parse.log` | Парсинг стратегии Combined |
+| `logs/compcom_parse.log` | Парсинг стратегии Compcom |
 | `logs/hybrid_ingest.log` | Загрузка в Druid (Hybrid) |
 | `logs/eav_ingest.log` | Загрузка в Druid (EAV) |
 | `logs/combined_ingest.log` | Загрузка в Druid (Combined) |
+| `logs/compcom_ingest.log` | Загрузка в Druid (Compcom) |
 | `logs/hybrid_queries.log` | Результаты всех SQL-запросов для Hybrid |
 | `logs/eav_queries.log` | Результаты всех SQL-запросов для EAV |
 | `logs/combined_queries.log` | Результаты всех SQL-запросов для Combined |
+| `logs/compcom_queries.log` | Результаты всех SQL-запросов для Compcom |
 | `logs/default_parse.log` | Парсинг стратегии Default |
 | `logs/default_ingest.log` | Загрузка в Druid (Default) |
 | `logs/default_queries.log` | Результаты всех SQL-запросов для Default |
 | `query-results/combined.txt` | Вывод скрипта PowerShell (все запросы Combined) |
+| `query-results/compcom.txt` | Вывод скрипта PowerShell (все запросы Compcom) |
 | `query-results/eav.txt` | Вывод скрипта PowerShell (все запросы EAV) |
 | `query-results/hybrid.txt` | Вывод скрипта PowerShell (все запросы Hybrid) |
 | `query-results/default.txt` | Вывод скрипта PowerShell (все запросы Default) |
@@ -418,7 +448,7 @@ foreach ($s in $strategies) {
 ```bash
 mkdir -p logs
 docker compose run --rm bpm-parser generate messages 2>&1 | tee logs/generate.log
-for strategy in hybrid eav combined default; do
+for strategy in hybrid eav combined compcom default; do
   docker compose run --rm bpm-parser parse $strategy messages --ingest 2>&1 | tee logs/${strategy}_ingest.log
   for f in query/$strategy/*.sql; do
     echo "=== $f ===" >> logs/${strategy}_queries.log
@@ -631,6 +661,7 @@ ru.sber.parser/
 │       ├── HybridStrategy.kt
 │       ├── EavStrategy.kt
 │       ├── CombinedStrategy.kt
+│       ├── CompcomStrategy.kt # Compact combined (no cold blob)
 │       └── DefaultStrategy.kt
 ├── druid/
 │   ├── DruidClient.kt      # HTTP client
@@ -694,12 +725,31 @@ JOIN process_variables_indexed pvi
   ON pm.process_id = pvi.process_id
 WHERE pvi.var_category = 'epkData'
 
--- Tier 3: Cold blobs (JSON extraction)
-SELECT JSON_VALUE(var_answerGFL_json, '$.results')
+-- Tier 3: Cold blobs (JSON extraction) — только в combined, в compcom колонки var_blob_json нет
+SELECT JSON_VALUE(var_blob_json, '$.answerGFL')
 FROM process_main
 ```
 
-### 4. Default Strategy (все поля как колонки)
+При задании в `config.yaml` секции `parser.warmVariablesLimit` (10..1010, шаг 100) число записей в `process_variables_indexed` на одно сообщение ограничивается (для тестов и вариативности объёма warm-переменных). Подробнее: [strategies.md](strategies.md).
+
+### 4. Compcom Strategy (compact combined, без cold blob)
+
+**Таблицы:** `process_main_compact`, `process_variables_indexed`
+
+Как Combined, но **без сохранения cold blob в Druid**: в основной таблице нет колонки `var_blob_json`. Поддерживается тот же лимит warm-переменных (`parser.warmVariablesLimit`).
+
+Оптимальна для:
+- Сценариев, где холодные переменные в Druid не нужны (экономия места)
+- Тестов и сравнения с combined при одинаковом наборе warm-переменных
+
+```sql
+SELECT process_id, process_name, var_epkId, var_caseId
+FROM process_main_compact
+WHERE state = 1
+LIMIT 100
+```
+
+### 5. Default Strategy (все поля как колонки)
 
 **Таблица:** `process_default`
 
@@ -737,9 +787,8 @@ query/
 │   ├── basic/
 │   ├── joins/          # JOIN таблиц
 │   └── aggregations/
-├── combined/
-│   ├── tier_queries/   # По уровням
-│   └── mixed/          # Комбинированные
+├── combined/           # 68 запросов (process_main + process_variables_indexed)
+├── compcom/            # 70 запросов (process_main_compact + process_variables_indexed)
 └── default/            # Default: все поля как колонки
 ```
 
@@ -804,6 +853,7 @@ docker compose down -v
 | Hybrid     | `process_hybrid` |
 | EAV        | `process_events`, `process_variables` |
 | Combined   | `process_main`, `process_variables_indexed` |
+| Compcom    | `process_main_compact`, `process_variables_indexed` |
 | Default    | `process_default` |
 
 **Требования:** нужен URL **Coordinator** (порт 8081), не Router. В `.env` это `DRUID_COORDINATOR_URL`. Пример: Coordinator на отдельном хосте `192.168.1.27` → `http://192.168.1.27:8081`.
@@ -821,6 +871,7 @@ curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/process_hybrid
 curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/process_events"
 curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/process_variables"
 curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/process_main"
+curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/process_main_compact"
 curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/process_variables_indexed"
 curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/process_default"
 ```

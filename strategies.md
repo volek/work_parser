@@ -1,4 +1,4 @@
-# Стратегии хранения и выборок в Druid: `combined`, `eav`, `hybrid`
+# Стратегии хранения и выборок в Druid: `combined`, `compcom`, `eav`, `hybrid`
 
 Документ описывает **фактическую реализованную логику** в коде проекта: как сообщения парсятся, как сериализуются в записи для Apache Druid, и как по ним выполняются выборки.
 
@@ -6,7 +6,7 @@
 
 1. Команда `parse <strategy> [input-dir]` читает все JSON-файлы из директории (`Application.kt`).
 2. `MessageParser` десериализует каждый JSON в `BpmMessage`.
-3. Выбранная стратегия (`HybridStrategy` / `EavStrategy` / `CombinedStrategy`) делает `transform(message)`.
+3. Выбранная стратегия (`HybridStrategy` / `EavStrategy` / `CombinedStrategy` / `CompcomStrategy`) делает `transform(message)`.
 4. На выходе стратегия возвращает `List<Map<String, Any?>>` в формате, пригодном для Druid ingestion.
 5. При `--ingest` `DruidClient.ingest(...)` отправляет inline `index_parallel` task на Overlord:
   - `__time` используется как timestamp-колонка (формат `millis`)
@@ -161,7 +161,8 @@ Datasource: `process_hybrid`.
   - для каждой категории из `tier2WarmCategories` (`epkData`, `staticData`, `tracingHeaders`, `startAttributes`, `inputCC`, `inputDC`) извлекает объект;
   - сплющивает через `VariableFlattener`;
   - фильтрует пути по конфигурации категории, включая wildcard `[*]`;
-  - создает запись в `process_variables_indexed`.
+  - создает запись в `process_variables_indexed`;
+  - **ограничение по количеству**: при заданном `maxWarmVariables` (конфиг `parser.warmVariablesLimit`) сохраняется не более N записей warm-переменных на сообщение. Вариативность: от 10 до 1010 с шагом 100 (10, 110, 210, …, 1010) для тестов объёма индексированных переменных.
 
 ## Формат хранения в Druid
 
@@ -197,7 +198,41 @@ Datasource: `process_hybrid`.
 
 ---
 
-## 4) `default` стратегия
+## 4) `compcom` стратегия (compact combined)
+
+## Идея модели
+
+`Compcom` = тот же tier-подход, что и `combined`, но **без сохранения cold blob в Druid**:
+
+- `process_main_compact` — основная wide-строка на процесс (hot + structured), **без колонки `var_blob_json`**;
+- `process_variables_indexed` — те же индексированные warm-переменные, что и у `combined`.
+
+Используется, когда холодные переменные не нужны в Druid (экономия места и упрощение схемы).
+
+## Как работает парсинг
+
+`CompcomStrategy.transform(message)` делает:
+
+1. `createMainRecord(...)` — как в combined, но cold-данные не собираются; в запись не попадает `var_blob_json` (в Druid этот столбец отсутствует).
+2. `createWarmVariableRecords(...)` — так же, как в combined, с поддержкой лимита `maxWarmVariables` (конфиг `parser.warmVariablesLimit`, 10..1010 шаг 100).
+
+## Формат хранения в Druid
+
+### `process_main_compact`
+
+- Метаданные процесса + hot/structured колонки + `node_instances_json`.
+- **Нет** колонки `var_blob_json`.
+
+### `process_variables_indexed`
+
+- Совпадает со стратегией combined: `process_id`, `__time`, `var_category`, `var_path`, `var_value`, `var_type`.
+
+Плюс: меньше объём в Druid, нет cold-блоба.  
+Минус: доступ к холодным переменным через Druid невозможен.
+
+---
+
+## 5) `default` стратегия
 
 ## Идея модели
 
@@ -247,20 +282,20 @@ Datasource: `process_hybrid`.
 - затем **один вызов** `client.ingest(strategy.dataSourceName, records)`.
 
 Для `hybrid` это корректно (один datasource).  
-Для `eav` и `combined` это означает, что записи обоих типов формируются, но отправляются одним потоком в `dataSourceName` стратегии, если не использовать отдельную группировку и отдельные ingestion-вызовы по каждому datasource.
+Для `eav`, `combined` и `compcom` записи обоих типов формируются и отправляются через `transformBatch(...)` с раздельным `ingest` по каждому datasource (в коде это уже реализовано).
 
-Для корректной двухтабличной загрузки нужно использовать логику `transformBatch(...)` + раздельный `ingest` для каждого ключа `Map<dataSource, records>`.
+Лимит warm-переменных для `combined` и `compcom` задаётся в конфиге: `parser.warmVariablesLimit` (10..1010, шаг 100). Без значения — сохраняются все сформированные warm-записи.
 
 ---
 
 ## Быстрое сравнение
 
-
-| Стратегия  | Datasource                                  | Записей на 1 процесс | Сильная сторона                    | Ограничение                      |
-| ---------- | ------------------------------------------- | -------------------- | ---------------------------------- | -------------------------------- |
-| `hybrid`   | `process_hybrid`                            | 1                    | Простые и быстрые запросы без JOIN | Частично wide/NULL-heavy         |
-| `eav`      | `process_events`, `process_variables`       | 1 + N                | Максимальная гибкость схемы        | Сложные JOIN/self-JOIN           |
-| `combined` | `process_main`, `process_variables_indexed` | 1 + N(warm)          | Баланс скорости и гибкости         | 2 datasource и сложнее ingestion |
-| `default`  | `process_default`                           | 1                    | Максимально простой мэппинг полей  | Очень wide‑таблица, динамическая |
+| Стратегия  | Datasource                                           | Записей на 1 процесс | Сильная сторона                    | Ограничение                      |
+| ---------- | ---------------------------------------------------- | -------------------- | ---------------------------------- | -------------------------------- |
+| `hybrid`   | `process_hybrid`                                     | 1                    | Простые и быстрые запросы без JOIN | Частично wide/NULL-heavy         |
+| `eav`      | `process_events`, `process_variables`                | 1 + N                | Максимальная гибкость схемы        | Сложные JOIN/self-JOIN           |
+| `combined` | `process_main`, `process_variables_indexed`          | 1 + N(warm)          | Баланс скорости и гибкости + cold | 2 datasource, cold blob в Druid  |
+| `compcom`  | `process_main_compact`, `process_variables_indexed`  | 1 + N(warm)          | Как combined без cold blob         | 2 datasource, нет cold в Druid   |
+| `default`  | `process_default`                                    | 1                    | Максимально простой мэппинг полей  | Очень wide‑таблица, динамическая |
 
 

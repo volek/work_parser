@@ -60,8 +60,13 @@ import java.time.OffsetDateTime
  * @see ProcessVariableIndexedRecord модель индексной записи
  * @see FieldClassification настройка hot/warm/cold полей
  */
+/**
+ * @param maxWarmVariables Максимум записей в process_variables_indexed на одно сообщение (null = без ограничения).
+ *                         Вариативность: от 10 до 1010 с шагом 100 для тестов объёма warm-переменных.
+ */
 class CombinedStrategy(
-    private val fieldClassification: FieldClassification
+    private val fieldClassification: FieldClassification,
+    private val maxWarmVariables: Int? = null
 ) : ParseStrategy {
     
     /** Основной datasource — main record с hot-колонками */
@@ -244,8 +249,8 @@ class CombinedStrategy(
                 }
             }
         }
-        
-        return records
+        val limit = maxWarmVariables ?: Int.MAX_VALUE
+        return records.take(limit)
     }
     
     /**
