@@ -24,6 +24,6 @@ SELECT
     process_id,
     process_name,
     var_answerGFL_json IS NOT NULL as has_gfl_answer
-FROM process_main
+FROM process_hybrid
 WHERE var_answerGFL_json IS NOT NULL
 LIMIT 50

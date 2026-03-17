@@ -24,6 +24,6 @@ SELECT
     process_id,
     JSON_VALUE(var_epkData_json, '$.epkEntity.names[0].surname') as surname,
     JSON_VALUE(var_epkData_json, '$.epkEntity.names[0].name') as name
-FROM process_main
+FROM process_hybrid
 WHERE var_epkData_json IS NOT NULL
 LIMIT 50
