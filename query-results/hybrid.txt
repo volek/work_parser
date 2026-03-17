@@ -3650,3 +3650,180 @@ FROM: http://192.168.1.27:8888/druid/v2/sql
 13:39:32.589 [main] INFO  Application - Query returned 5 rows
 
 ----- query/hybrid/q48_top_clients_count.sql -----
+13:41:01.724 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+13:41:02.398 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+13:41:02.562 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+13:41:02.575 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+13:41:02.577 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+13:41:02.579 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+13:41:02.582 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+13:41:05.167 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: SELECT 
+    var_epkId,
+    var_fio,
+    COUNT(*) as process_count,
+    COUNT(DISTINCT process_name) as distinct_processes
+FROM process_main
+WHERE var_epkId IS NOT NULL
+GROUP BY var_epkId, var_fio
+ORDE
+13:41:11.767 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+13:41:15.090 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+13:41:16.350 [main] INFO  ru.sber.parser.druid.DruidClient - TEMP_PERF|component=druid.query|operation=sql_request|status=200|sql_chars=232|rows_count=20|http_round_trip_ns=10165774402|http_round_trip_ms=10165.774402|body_read_ns=516602559|body_read_ms=516.602559|json_decode_ns=471967836|json_decode_ms=471.967836|total_ns=11154431836|total_ms=11154.431836|avg_per_row_ms=557.7215917999999|response_body_chars=2302
+{var_epkId=1000082013130273438, var_fio=╨д╨Х╨Ф╨Ю╨а╨Ю╨Т ╨Т╨Ы╨Р╨Ф╨Ш╨Ь╨Ш╨а ╨Р╨Ы╨Х╨Ъ╨б╨Х╨Х╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+{var_epkId=1000518999060229602, var_fio=╨С╨Ю╨У╨Ф╨Р╨Э╨Ю╨Т ╨Р╨Э╨Э╨Р ╨б╨Х╨а╨У╨Х╨Х╨Т╨Э╨Р, process_count=1, distinct_processes=1}
+{var_epkId=1006985062690148789, var_fio=╨б╨Х╨Ь╨Х╨Э╨Ю╨Т ╨Ф╨Ь╨Ш╨в╨а╨Ш╨Щ ╨Т╨Ы╨Р╨Ф╨Ш╨Ь╨Ш╨а╨Ю╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+{var_epkId=1008185624532798671, var_fio=╨С╨Ю╨У╨Ф╨Р╨Э╨Ю╨Т ╨Р╨Э╨Э╨Р ╨Ф╨Ь╨Ш╨в╨а╨Ш╨Х╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+{var_epkId=1009600825191465252, var_fio=╨Т╨Ш╨Э╨Ю╨У╨а╨Р╨Ф╨Ю╨Т ╨Р╨а╨в╨Х╨Ь ╨Э╨Ш╨Ъ╨Ю╨Ы╨Р╨Х╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+{var_epkId=1013189442988528133, var_fio=╨Т╨Ш╨Э╨Ю╨У╨а╨Р╨Ф╨Ю╨Т ╨Р╨а╨в╨Х╨Ь ╨Ф╨Ь╨Ш╨в╨а╨Ш╨Х╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+{var_epkId=1021346360747679156, var_fio=╨Э╨Ю╨Т╨Ш╨Ъ╨Ю╨Т ╨Ю╨Ы╨м╨У╨Р ╨Р╨Э╨Ф╨а╨Х╨Х╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+{var_epkId=1023292707139316004, var_fio=╨Я╨Р╨Т╨Ы╨Ю╨Т ╨Ь╨Ш╨е╨Р╨Ш╨Ы ╨Т╨Ы╨Р╨Ф╨Ш╨Ь╨Ш╨а╨Ю╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+{var_epkId=1025519135058686363, var_fio=╨Т╨Ш╨Э╨Ю╨У╨а╨Р╨Ф╨Ю╨Т ╨Ь╨Ш╨е╨Р╨Ш╨Ы ╨Ь╨Р╨Ъ╨б╨Ш╨Ь╨Ю╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+{var_epkId=1026827140590666468, var_fio=╨Т╨Ю╨Ы╨Ъ╨Ю╨Т ╨Р╨Э╨Ф╨а╨Х╨Щ ╨Ш╨Т╨Р╨Э╨Ю╨Т╨Э╨Р, process_count=1, distinct_processes=1}
+{var_epkId=1027584042563857167, var_fio=╨Ъ╨Ю╨Ь╨Р╨а╨Ю╨Т ╨Х╨Ы╨Х╨Э╨Р ╨Ь╨Ш╨е╨Р╨Щ╨Ы╨Ю╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+{var_epkId=1032364082618130663, var_fio=╨д╨Х╨Ф╨Ю╨а╨Ю╨Т ╨Ш╨Т╨Р╨Э ╨Ф╨Ь╨Ш╨в╨а╨Ш╨Х╨Т╨Э╨Р, process_count=1, distinct_processes=1}
+{var_epkId=1032678938064240967, var_fio=╨б╨Ю╨Ъ╨Ю╨Ы╨Ю╨Т ╨Ю╨Ы╨м╨У╨Р ╨Э╨Ш╨Ъ╨Ю╨Ы╨Р╨Х╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+{var_epkId=1034556498952947252, var_fio=╨Ь╨Ю╨а╨Ю╨Ч╨Ю╨Т ╨Х╨Т╨У╨Х╨Э╨Ш╨Щ ╨Р╨Ы╨Х╨Ъ╨б╨Р╨Э╨Ф╨а╨Ю╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+{var_epkId=1038209285157859352, var_fio=╨С╨Ю╨У╨Ф╨Р╨Э╨Ю╨Т ╨Ф╨Ь╨Ш╨в╨а╨Ш╨Щ ╨Т╨Ы╨Р╨Ф╨Ш╨Ь╨Ш╨а╨Ю╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+{var_epkId=1039940468976341719, var_fio=╨б╨Х╨Ь╨Х╨Э╨Ю╨Т ╨Ф╨Х╨Э╨Ш╨б ╨Р╨Э╨Ф╨а╨Х╨Х╨Т╨Э╨Р, process_count=1, distinct_processes=1}
+{var_epkId=1040883745700918727, var_fio=╨Т╨Ю╨а╨Ю╨С╨м╨Х╨Т ╨Ь╨Ш╨е╨Р╨Ш╨Ы ╨Р╨Э╨Ф╨а╨Х╨Х╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+{var_epkId=1041070741205547984, var_fio=╨д╨Х╨Ф╨Ю╨а╨Ю╨Т ╨Ф╨Х╨Э╨Ш╨б ╨Р╨Ы╨Х╨Ъ╨б╨Х╨Х╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+{var_epkId=1042363768334028755, var_fio=╨С╨Х╨Ы╨Ю╨Т ╨Ю╨Ы╨м╨У╨Р ╨б╨Х╨а╨У╨Х╨Х╨Т╨Э╨Р, process_count=1, distinct_processes=1}
+{var_epkId=1049776572512508154, var_fio=╨Ъ╨Ю╨Ь╨Р╨а╨Ю╨Т ╨Ш╨Т╨Р╨Э ╨Р╨Ы╨Х╨Ъ╨б╨Х╨Х╨Т╨Ш╨з, process_count=1, distinct_processes=1}
+13:41:16.411 [main] INFO  Application - TEMP_PERF|component=app.query|operation=query_summary|query_file=query/hybrid/q48_top_clients_count.sql|raw_sql_chars=1541|prepared_sql_chars=232|raw_sql_lines=36|prepared_sql_lines=10|read_ns=251299121|read_ms=251.299121|prepare_ns=208118218|prepare_ms=208.118218|druid_exec_ns=11207713383|druid_exec_ms=11207.713383|print_ns=54758510|print_ms=54.75851|rows_count=20|query_command_total_ns=13398065969|query_command_total_ms=13398.065969|avg_per_row_ms=669.90329845
+13:41:16.463 [main] INFO  Application - Query returned 20 rows
+
+----- query/hybrid/q49_module_performance.sql -----
+13:41:31.463 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+13:41:31.894 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+13:41:31.995 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+13:41:31.999 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+13:41:32.002 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+13:41:32.004 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+13:41:32.014 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+13:41:33.492 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: SELECT 
+    module_id,
+    COUNT(*) as total,
+    SUM(CASE WHEN state = 2 THEN 1 ELSE 0 END) as completed,
+    SUM(CASE WHEN state = 3 THEN 1 ELSE 0 END) as failed,
+    MIN(__time) as first_seen,
+    
+13:41:36.653 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+13:41:38.021 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+13:41:38.822 [main] INFO  ru.sber.parser.druid.DruidClient - TEMP_PERF|component=druid.query|operation=sql_request|status=200|sql_chars=309|rows_count=5|http_round_trip_ns=4634416460|http_round_trip_ms=4634.41646|body_read_ns=382793707|body_read_ms=382.793707|json_decode_ns=297910985|json_decode_ms=297.910985|total_ns=5315202599|total_ms=5315.202599|avg_per_row_ms=1063.0405198|response_body_chars=723
+{module_id=psi-5g-fl-mpz1, total=114, completed=60, failed=0, first_seen=2026-03-15T13:23:38.226Z, last_seen=2026-03-16T12:42:42.507Z}
+{module_id=ift-5g-fl-cc, total=103, completed=53, failed=0, first_seen=2026-03-15T13:34:39.069Z, last_seen=2026-03-16T12:52:47.484Z}
+{module_id=psi-fl-cc, total=100, completed=38, failed=0, first_seen=2026-03-15T13:12:43.821Z, last_seen=2026-03-16T12:59:28.527Z}
+{module_id=psi-fl-5g, total=98, completed=48, failed=0, first_seen=2026-03-15T13:20:39.165Z, last_seen=2026-03-16T13:01:40.043Z}
+{module_id=ift-5g-rb, total=85, completed=41, failed=0, first_seen=2026-03-15T13:12:43.175Z, last_seen=2026-03-16T12:51:42.407Z}
+13:41:38.833 [main] INFO  Application - TEMP_PERF|component=app.query|operation=query_summary|query_file=query/hybrid/q49_module_performance.sql|raw_sql_chars=1680|prepared_sql_chars=309|raw_sql_lines=38|prepared_sql_lines=11|read_ns=82053995|read_ms=82.053995|prepare_ns=150400196|prepare_ms=150.400196|druid_exec_ns=5343942263|druid_exec_ms=5343.942263|print_ns=4526080|print_ms=4.52608|rows_count=5|query_command_total_ns=6520202654|query_command_total_ms=6520.202654|avg_per_row_ms=1304.0405308
+13:41:38.838 [main] INFO  Application - Query returned 5 rows
+
+----- query/hybrid/q50_recent_activity.sql -----
+13:41:48.188 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+13:41:48.584 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+13:41:48.663 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+13:41:48.668 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+13:41:48.671 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+13:41:48.674 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+13:41:48.676 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+13:41:49.633 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: SELECT 
+    TIME_FLOOR(__time, 'PT10M') as time_bucket,
+    process_name,
+    COUNT(*) as started,
+    SUM(CASE WHEN state = 2 THEN 1 ELSE 0 END) as completed
+FROM process_main
+WHERE __time >= CURRENT
+13:41:51.788 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+13:41:53.106 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+13:41:53.650 [main] INFO  ru.sber.parser.druid.DruidClient - TEMP_PERF|component=druid.query|operation=sql_request|status=200|sql_chars=284|rows_count=6|http_round_trip_ns=3566619110|http_round_trip_ms=3566.61911|body_read_ns=247413649|body_read_ms=247.413649|json_decode_ns=195017625|json_decode_ms=195.017625|total_ns=4009124738|total_ms=4009.124738|avg_per_row_ms=668.1874563333333|response_body_chars=662
+{time_bucket=2026-03-16T13:00:00.000Z, process_name=MassTransferProcessUnif, started=1, completed=1}
+{time_bucket=2026-03-16T12:50:00.000Z, process_name=tappeal_p2p_receiver, started=3, completed=1}
+{time_bucket=2026-03-16T12:50:00.000Z, process_name=MassTransferProcessUnif, started=1, completed=0}
+{time_bucket=2026-03-16T12:50:00.000Z, process_name=uvskRemainderReturnCR-Service, started=1, completed=1}
+{time_bucket=2026-03-16T12:40:00.000Z, process_name=MassTransferProcessUnif, started=2, completed=2}
+{time_bucket=2026-03-16T12:40:00.000Z, process_name=tappeal_p2p_receiver, started=1, completed=0}
+13:41:53.662 [main] INFO  Application - TEMP_PERF|component=app.query|operation=query_summary|query_file=query/hybrid/q50_recent_activity.sql|raw_sql_chars=1502|prepared_sql_chars=284|raw_sql_lines=34|prepared_sql_lines=9|read_ns=46674218|read_ms=46.674218|prepare_ns=73718185|prepare_ms=73.718185|druid_exec_ns=4028344979|druid_exec_ms=4028.344979|print_ns=6467486|print_ms=6.467486|rows_count=6|query_command_total_ns=4771576782|query_command_total_ms=4771.576782|avg_per_row_ms=795.262797
+13:41:53.668 [main] INFO  Application - Query returned 6 rows
+
+----- query/hybrid/q51_json_surname_extract.sql -----
+13:42:03.159 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+13:42:03.386 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+13:42:03.431 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+13:42:03.434 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+13:42:03.439 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+13:42:03.444 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+13:42:03.447 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+13:42:04.123 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: SELECT 
+    process_id,
+    JSON_VALUE(var_epkData_json, '$.epkEntity.names[0].surname') as surname,
+    JSON_VALUE(var_epkData_json, '$.epkEntity.names[0].name') as name
+FROM process_main
+WHERE var_e
+13:42:06.738 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+13:42:10.739 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 400 Bad Request
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+13:42:11.100 [main] INFO  ru.sber.parser.druid.DruidClient - TEMP_PERF|component=druid.query|operation=sql_request_failed|sql_chars=232|status=400|http_round_trip_ns=6732610585|http_round_trip_ms=6732.610585|total_ns=6960623254|total_ms=6960.623254|error_body_chars=272
+13:42:11.106 [main] ERROR ru.sber.parser.druid.DruidClient - Query failed with status 400 Bad Request: {"error":"druidException","errorCode":"invalidInput","persona":"USER","category":"INVALID_INPUT","errorMessage":"Column 'var_epkData_json' not found in any table (line [6], column [7])","context":{"sourceType":"sql","line":"6","column":"7","endLine":"6","endColumn":"22"}}
+Exception in thread "main" ru.sber.parser.druid.DruidException: Query failed: 400 Bad Request
+	at ru.sber.parser.druid.DruidClient.query(DruidClient.kt:149)
+	at ru.sber.parser.druid.DruidClient$query$1.invokeSuspend(DruidClient.kt)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at ru.sber.parser.ApplicationKt$main$1.invokeSuspend(Application.kt:408)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at ru.sber.parser.ApplicationKt.main(Application.kt:44)
+System.Management.Automation.RemoteException
+
+----- query/hybrid/q52_status_code_dist.sql -----
+13:42:25.726 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+13:42:25.938 [main] INFO  ru.sber.parser.config.AppConfig - Config file not found at config.yaml, using environment variables and defaults
+13:42:26.003 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+13:42:26.005 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: http://192.168.1.27:8888
+13:42:26.006 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: http://192.168.1.27:8082
+13:42:26.007 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: http://192.168.1.27:8081
+13:42:26.009 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: http://192.168.1.27:8081
+13:42:27.093 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: SELECT 
+    var_staticData_statusCode,
+    COUNT(*) as cnt_total,
+    MIN(__time) as first_occurrence,
+    MAX(__time) as last_occurrence
+FROM process_main
+WHERE var_staticData_statusCode IS NOT NULL
+
+13:42:29.101 [main] INFO  io.ktor.client.HttpClient - REQUEST: http://192.168.1.27:8888/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+13:42:30.296 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: http://192.168.1.27:8888/druid/v2/sql
+13:42:30.758 [main] INFO  ru.sber.parser.druid.DruidClient - TEMP_PERF|component=druid.query|operation=sql_request|status=200|sql_chars=258|rows_count=5|http_round_trip_ns=3313140404|http_round_trip_ms=3313.140404|body_read_ns=160239682|body_read_ms=160.239682|json_decode_ns=184675243|json_decode_ms=184.675243|total_ns=3658100547|total_ms=3658.100547|avg_per_row_ms=731.6201094|response_body_chars=744
+{var_staticData_statusCode=COMPLETED, cnt_total=110, first_occurrence=2026-03-15T13:12:43.821Z, last_occurrence=2026-03-16T13:01:40.043Z}
+{var_staticData_statusCode=IN_PROGRESS, cnt_total=106, first_occurrence=2026-03-15T13:34:42.571Z, last_occurrence=2026-03-16T11:24:38.585Z}
+{var_staticData_statusCode=PENDING, cnt_total=100, first_occurrence=2026-03-15T13:12:43.175Z, last_occurrence=2026-03-16T12:51:42.407Z}
+{var_staticData_statusCode=REJECTED, cnt_total=94, first_occurrence=2026-03-15T13:23:38.226Z, last_occurrence=2026-03-16T12:59:28.527Z}
+{var_staticData_statusCode=CANCELLED, cnt_total=90, first_occurrence=2026-03-15T13:36:50.332Z, last_occurrence=2026-03-16T12:52:47.484Z}
+13:42:30.765 [main] INFO  Application - TEMP_PERF|component=app.query|operation=query_summary|query_file=query/hybrid/q52_status_code_dist.sql|raw_sql_chars=1508|prepared_sql_chars=258|raw_sql_lines=34|prepared_sql_lines=9|read_ns=55503237|read_ms=55.503237|prepare_ns=79609411|prepare_ms=79.609411|druid_exec_ns=3676281128|druid_exec_ms=3676.281128|print_ns=1572395|print_ms=1.572395|rows_count=5|query_command_total_ns=4559320395|query_command_total_ms=4559.320395|avg_per_row_ms=911.864079
+13:42:30.773 [main] INFO  Application - Query returned 5 rows
