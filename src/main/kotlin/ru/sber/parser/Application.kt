@@ -93,6 +93,11 @@ fun main(args: Array<String>) = runBlocking {
             }
             
             logger.info("Parsing messages with strategy: $strategyName")
+            logger.info(
+                "ANALYSIS|component=app.strategy|strategy={}|stage=params|warm_variables_limit_effective={}",
+                strategyName,
+                warmLimit ?: "null"
+            )
 
             // Аналитическое логирование схемы данных и SQL-запросов для выбранной стратегии.
             // Это статический анализ: какие datasources, какие колонки и какие SQL-файлы привязаны к стратегии.
@@ -360,13 +365,30 @@ fun main(args: Array<String>) = runBlocking {
                                 )
                                 logger.info("Ingested ${dsRecords.size} records to Druid datasource: $dataSource")
                             }
+
+                            // Итоговая метрика: распределение записей по datasource (для Combined/Compcom/EAV).
+                            try {
+                                val dsCounts = byDataSource.entries
+                                    .sortedBy { it.key }
+                                    .joinToString(",") { (ds, rs) -> "$ds=${rs.size}" }
+                                logger.info(
+                                    "TEMP_PERF|component=app.parse|operation=ingest_datasource_distribution|strategy={}|datasource_counts={}|datasources_count={}|records_total={}",
+                                    strategyName,
+                                    dsCounts,
+                                    byDataSource.size,
+                                    byDataSource.values.sumOf { it.size }
+                                )
+                            } catch (ex: Exception) {
+                                logger.warn("TEMP_PERF|component=app.parse|operation=ingest_datasource_distribution|strategy=$strategyName|status=failed|reason=${ex.message}")
+                            }
                         }
                         // Метрика: полная длительность ingest-этапа команды parse.
                         val ingestNs = System.nanoTime() - ingestStartNs
                         // Структурированный TEMP_PERF-лог итогов ingest-этапа.
                         logger.info(
-                            "TEMP_PERF|component=app.parse|operation=ingest_stage_summary|strategy={}|ingest_ns={}|ingest_ms={}",
+                            "TEMP_PERF|component=app.parse|operation=ingest_stage_summary|strategy={}|warm_variables_limit_effective={}|ingest_ns={}|ingest_ms={}",
                             strategyName,
+                            warmLimit ?: "null",
                             ingestNs,
                             ingestNs / 1_000_000.0
                         )
@@ -457,6 +479,169 @@ fun main(args: Array<String>) = runBlocking {
                 }
             }
         }
+
+        // ==========================================
+        // КОМАНДА: query-suite
+        // Прогон всех SQL-файлов для стратегии + метрики (median/p95)
+        // ==========================================
+        "query-suite" -> {
+            val strategyName: String = args.getOrElse(1) { "" }
+            if (strategyName.isBlank()) {
+                logger.error("Usage: query-suite <strategy> [--repeat N] [--out query-results/<strategy>.txt] [--segment-sizes]")
+                return@runBlocking
+            }
+            val warmLimit = config.parserConfig?.effectiveWarmVariablesLimit()
+            val repeat = extractIntFlag(args, "--repeat")?.coerceIn(1, 100) ?: 1
+            val outPath = extractStringFlag(args, "--out") ?: "query-results/${strategyName.lowercase()}.txt"
+            val includeSegmentSizes = args.contains("--segment-sizes")
+
+            val strategy: ParseStrategy = when (strategyName.lowercase()) {
+                "hybrid" -> HybridStrategy(config.fieldClassification)
+                "eav" -> EavStrategy()
+                "combined" -> CombinedStrategy(config.fieldClassification, warmLimit)
+                "compcom" -> CompcomStrategy(config.fieldClassification, warmLimit)
+                "default" -> DefaultStrategy()
+                else -> {
+                    logger.error("Unknown strategy: $strategyName. Use: hybrid, eav, combined, compcom, default")
+                    return@runBlocking
+                }
+            }
+
+            val queryDir = File("query/${strategyName.lowercase()}")
+            if (!queryDir.exists()) {
+                logger.error("Query directory not found: ${queryDir.absolutePath}")
+                return@runBlocking
+            }
+            val sqlFiles = queryDir.walkTopDown()
+                .filter { it.isFile && it.extension.lowercase() == "sql" }
+                .sortedBy { it.name }
+                .toList()
+            if (sqlFiles.isEmpty()) {
+                logger.warn("No .sql files found in: ${queryDir.absolutePath}")
+                return@runBlocking
+            }
+
+            File(outPath).parentFile?.mkdirs()
+            val reportFile = File(outPath)
+            reportFile.writeText("") // reset
+
+            logger.info(
+                "ANALYSIS|component=app.query_suite|strategy={}|query_dir={}|files_count={}|repeat={}|out_path={}|warm_variables_limit_effective={}|segment_sizes_requested={}",
+                strategyName,
+                queryDir.absolutePath,
+                sqlFiles.size,
+                repeat,
+                reportFile.absolutePath,
+                warmLimit ?: "null",
+                includeSegmentSizes
+            )
+
+            val client = DruidClient(config.druid)
+            client.use { druid ->
+                val allSuccessLatenciesMs = mutableListOf<Double>()
+                var totalAttempts = 0
+                var okAttempts = 0
+
+                sqlFiles.forEach { file ->
+                    val prepared = readAndPrepareSql(file)
+                    val fileLatenciesOkMs = mutableListOf<Double>()
+                    var fileOk = 0
+                    var fileFail = 0
+
+                    repeat(repeat) { attemptIdx ->
+                        totalAttempts++
+                        val attempt = druid.tryQuery(prepared.sql)
+                        val totalMs = attempt.metrics.totalMs
+                        val status = attempt.metrics.status
+                        val rowsCount = attempt.metrics.rowsCount
+                        val success = attempt.success
+
+                        if (success) {
+                            okAttempts++
+                            fileOk++
+                            fileLatenciesOkMs.add(totalMs)
+                            allSuccessLatenciesMs.add(totalMs)
+                        } else {
+                            fileFail++
+                        }
+
+                        logger.info(
+                            "TEMP_PERF|component=app.query_suite|operation=query_file_attempt|strategy={}|file_name={}|attempt_index={}|repeat={}|status={}|success={}|rows_count={}|total_ms={}|sql_chars={}|raw_sql_chars={}|prepared_sql_chars={}|raw_sql_lines={}|prepared_sql_lines={}",
+                            strategyName,
+                            file.name,
+                            attemptIdx + 1,
+                            repeat,
+                            status,
+                            success,
+                            rowsCount,
+                            totalMs,
+                            attempt.metrics.sqlChars,
+                            prepared.rawChars,
+                            prepared.preparedChars,
+                            prepared.rawLines,
+                            prepared.preparedLines
+                        )
+
+                        // Строка отчёта: один запуск одного файла.
+                        reportFile.appendText(
+                            listOf(
+                                strategyName.lowercase(),
+                                file.name,
+                                (attemptIdx + 1).toString(),
+                                status.toString(),
+                                success.toString(),
+                                rowsCount.toString(),
+                                "%.3f".format(totalMs),
+                                attempt.metrics.sqlChars.toString()
+                            ).joinToString("\t") + "\n"
+                        )
+                    }
+
+                    val fileMedian = percentile(fileLatenciesOkMs, 50.0)
+                    val fileP95 = percentile(fileLatenciesOkMs, 95.0)
+                    logger.info(
+                        "TEMP_PERF|component=app.query_suite|operation=query_file_summary|strategy={}|file_name={}|ok={}|fail={}|median_ms={}|p95_ms={}",
+                        strategyName,
+                        file.name,
+                        fileOk,
+                        fileFail,
+                        fileMedian ?: -1.0,
+                        fileP95 ?: -1.0
+                    )
+                }
+
+                val overallMedian = percentile(allSuccessLatenciesMs, 50.0)
+                val overallP95 = percentile(allSuccessLatenciesMs, 95.0)
+                val successRate = if (totalAttempts > 0) okAttempts.toDouble() / totalAttempts else 0.0
+
+                logger.info(
+                    "TEMP_PERF|component=app.query_suite|operation=query_suite_summary|strategy={}|files_count={}|repeat={}|attempts_total={}|attempts_ok={}|success_rate={}|median_ms={}|p95_ms={}|out_path={}",
+                    strategyName,
+                    sqlFiles.size,
+                    repeat,
+                    totalAttempts,
+                    okAttempts,
+                    successRate,
+                    overallMedian ?: -1.0,
+                    overallP95 ?: -1.0,
+                    reportFile.absolutePath
+                )
+
+                if (includeSegmentSizes) {
+                    val datasources = (listOf(strategy.dataSourceName) + strategy.additionalDataSources).distinct()
+                    val segRows = fetchSegmentSizesViaSysTable(druid, datasources)
+                    logger.info(
+                        "ANALYSIS|component=app.query_suite|strategy={}|stage=segment_sizes|datasources={}|rows={}",
+                        strategyName,
+                        datasources.joinToString(","),
+                        segRows.size
+                    )
+                    segRows.forEach { row ->
+                        logger.info("ANALYSIS|component=app.query_suite|strategy={}|stage=segment_size_row|row={}", strategyName, row)
+                    }
+                }
+            }
+        }
         
         // ==========================================
         // КОМАНДА: help
@@ -471,6 +656,7 @@ fun main(args: Array<String>) = runBlocking {
                   parse <strategy> [input-dir]    Parse messages (hybrid|eav|combined|compcom|default)
                   parse <strategy> --ingest       Parse and ingest to Druid
                   query <query-file.sql>          Execute SQL query on Druid
+                  query-suite <strategy>          Run all SQL files in query/<strategy> with metrics
                   help                            Show this help
                 
                 Examples (Docker):
@@ -491,4 +677,67 @@ fun main(args: Array<String>) = runBlocking {
             logger.error("Unknown command: $command. Use 'help' for usage.")
         }
     }
+}
+
+private data class PreparedSql(
+    val sql: String,
+    val rawChars: Int,
+    val preparedChars: Int,
+    val rawLines: Int,
+    val preparedLines: Int
+)
+
+private fun readAndPrepareSql(file: File): PreparedSql {
+    val rawSql = file.readText()
+    val rawLines = rawSql.lines().size
+    val rawChars = rawSql.length
+    val sql = rawSql.lines()
+        .filter { line: String -> !line.trim().startsWith("--") }
+        .joinToString("\n")
+        .trim()
+    return PreparedSql(
+        sql = sql,
+        rawChars = rawChars,
+        preparedChars = sql.length,
+        rawLines = rawLines,
+        preparedLines = if (sql.isBlank()) 0 else sql.lines().size
+    )
+}
+
+private fun extractIntFlag(args: Array<String>, flag: String): Int? {
+    val idx = args.indexOf(flag)
+    if (idx < 0) return null
+    return args.getOrNull(idx + 1)?.toIntOrNull()
+}
+
+private fun extractStringFlag(args: Array<String>, flag: String): String? {
+    val idx = args.indexOf(flag)
+    if (idx < 0) return null
+    return args.getOrNull(idx + 1)
+}
+
+private fun percentile(values: List<Double>, p: Double): Double? {
+    if (values.isEmpty()) return null
+    val sorted = values.sorted()
+    val rank = (p / 100.0) * (sorted.size - 1)
+    val lo = kotlin.math.floor(rank).toInt()
+    val hi = kotlin.math.ceil(rank).toInt()
+    if (lo == hi) return sorted[lo]
+    val w = rank - lo
+    return sorted[lo] * (1.0 - w) + sorted[hi] * w
+}
+
+private suspend fun fetchSegmentSizesViaSysTable(druid: DruidClient, datasources: List<String>): List<Map<String, Any?>> {
+    if (datasources.isEmpty()) return emptyList()
+    val inList = datasources.joinToString(",") { "'$it'" }
+    val sql = """
+        SELECT datasource, SUM(size) AS bytes, COUNT(*) AS segments
+        FROM sys.segments
+        WHERE datasource IN ($inList)
+        GROUP BY 1
+        ORDER BY bytes DESC
+    """.trimIndent()
+    // Используем tryQuery, чтобы в отчётах не падать, если sys.* не доступен в конкретной сборке Druid.
+    val attempt = druid.tryQuery(sql)
+    return if (attempt.success) attempt.rows ?: emptyList() else emptyList()
 }

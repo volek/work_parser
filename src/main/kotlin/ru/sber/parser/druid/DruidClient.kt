@@ -8,6 +8,7 @@ import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
+import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
@@ -87,6 +88,18 @@ class DruidClient(private val config: DruidConfig) : Closeable {
                 registerModule(JavaTimeModule())
             }
         }
+        install(HttpRequestRetry) {
+            maxRetries = 4
+            retryIf { _, response ->
+                // transient statuses; for ingestion submit Overlord can return 5xx under load
+                response.status.value == 429 || response.status.value in 500..599
+            }
+            retryOnExceptionIf { _, cause ->
+                // Broken pipe / connection reset, etc.
+                cause is java.io.IOException
+            }
+            exponentialDelay()
+        }
         install(Logging) {
             logger = Logger.DEFAULT
             level = LogLevel.INFO
@@ -118,75 +131,136 @@ class DruidClient(private val config: DruidConfig) : Closeable {
     suspend fun query(sql: String): List<Map<String, Any?>> {
         logger.debug("Executing query: {}", sql.take(200))
 
+        val attempt = executeSqlAttempt(sql)
+        if (!attempt.success) {
+            val msg = "Query failed: HTTP ${attempt.metrics.status}"
+            logger.error(msg + (attempt.errorBodyPreview?.let { " ($it)" } ?: ""))
+            throw DruidException(msg, attempt.errorBody)
+        }
+        return attempt.rows ?: emptyList()
+    }
+
+    /**
+     * Выполняет SQL-запрос и возвращает результат вместе с метриками.
+     *
+     * В отличие от [query], не бросает исключение на неуспешный HTTP-статус —
+     * удобно для бенчмарков/пакетного прогона запросов (раздел 7 отчёта).
+     */
+    suspend fun tryQuery(sql: String): SqlQueryAttempt = executeSqlAttempt(sql)
+
+    data class SqlQueryMetrics(
+        val status: Int,
+        val sqlChars: Int,
+        val rowsCount: Int,
+        val httpRoundTripNs: Long,
+        val bodyReadNs: Long,
+        val jsonDecodeNs: Long,
+        val totalNs: Long,
+        val responseBodyChars: Int?,
+        val errorBodyChars: Int?
+    ) {
+        val httpRoundTripMs: Double get() = httpRoundTripNs / 1_000_000.0
+        val bodyReadMs: Double get() = bodyReadNs / 1_000_000.0
+        val jsonDecodeMs: Double get() = jsonDecodeNs / 1_000_000.0
+        val totalMs: Double get() = totalNs / 1_000_000.0
+        val avgPerRowMs: Double get() = if (rowsCount > 0) totalMs / rowsCount else 0.0
+    }
+
+    data class SqlQueryAttempt(
+        val success: Boolean,
+        val rows: List<Map<String, Any?>>?,
+        val metrics: SqlQueryMetrics,
+        val errorBody: String? = null,
+        val errorBodyPreview: String? = null
+    )
+
+    private suspend fun executeSqlAttempt(sql: String): SqlQueryAttempt {
         // Метрика: размер SQL-запроса в символах (оценка сложности и нагрузки на парсер SQL в Druid).
         val sqlChars = sql.length
-        // Метрика: старт таймера полного жизненного цикла SQL-запроса.
         val totalStartNs = System.nanoTime()
-        // Метрика: старт таймера сетевого round-trip к Router.
+
         val httpStartNs = System.nanoTime()
         val response: HttpResponse = httpClient.post("${config.routerUrl}/druid/v2/sql") {
             setBody(mapOf("query" to sql))
         }
-        // Метрика: длительность сетевого round-trip до получения HTTP-ответа.
         val httpRoundTripNs = System.nanoTime() - httpStartNs
-        
+
         if (!response.status.isSuccess()) {
             val errorBody = response.bodyAsText()
-            // Метрика: общее время до ошибки SQL-запроса.
             val totalNs = System.nanoTime() - totalStartNs
-            // Структурированный TEMP_PERF-лог неуспешного SQL-запроса.
+            val metrics = SqlQueryMetrics(
+                status = response.status.value,
+                sqlChars = sqlChars,
+                rowsCount = 0,
+                httpRoundTripNs = httpRoundTripNs,
+                bodyReadNs = 0L,
+                jsonDecodeNs = 0L,
+                totalNs = totalNs,
+                responseBodyChars = null,
+                errorBodyChars = errorBody.length
+            )
             logger.info(
                 "TEMP_PERF|component=druid.query|operation=sql_request_failed|sql_chars={}|status={}|http_round_trip_ns={}|http_round_trip_ms={}|total_ns={}|total_ms={}|error_body_chars={}",
-                sqlChars,
-                response.status.value,
-                httpRoundTripNs,
-                httpRoundTripNs / 1_000_000.0,
-                totalNs,
-                totalNs / 1_000_000.0,
-                errorBody.length
+                metrics.sqlChars,
+                metrics.status,
+                metrics.httpRoundTripNs,
+                metrics.httpRoundTripMs,
+                metrics.totalNs,
+                metrics.totalMs,
+                metrics.errorBodyChars ?: 0
             )
-            logger.error("Query failed with status ${response.status}: $errorBody")
-            throw DruidException("Query failed: ${response.status}", errorBody)
+            return SqlQueryAttempt(
+                success = false,
+                rows = null,
+                metrics = metrics,
+                errorBody = errorBody,
+                errorBodyPreview = errorBody.take(300)
+            )
         }
 
-        // Метрика: старт таймера чтения тела HTTP-ответа.
         val bodyReadStartNs = System.nanoTime()
         val body = response.bodyAsText()
-        // Метрика: длительность чтения тела ответа в строку.
         val bodyReadNs = System.nanoTime() - bodyReadStartNs
-        // Метрика: размер тела ответа в символах.
         val bodyChars = body.length
-        // Метрика: старт таймера JSON-декодирования результата запроса.
+
         val decodeStartNs = System.nanoTime()
         val rows: List<Map<String, Any?>> = objectMapper.readValue(body)
-        // Метрика: длительность декодирования JSON-результата.
         val decodeNs = System.nanoTime() - decodeStartNs
-        // Метрика: число возвращённых строк.
-        val rowsCount = rows.size
-        // Метрика: полная длительность SQL-запроса.
-        val totalNs = System.nanoTime() - totalStartNs
-        // Метрика: средняя длительность на одну строку результата.
-        val avgPerRowMs = if (rowsCount > 0) (totalNs / 1_000_000.0) / rowsCount else 0.0
 
-        // Структурированный TEMP_PERF-лог успешного SQL-запроса.
+        val rowsCount = rows.size
+        val totalNs = System.nanoTime() - totalStartNs
+        val metrics = SqlQueryMetrics(
+            status = response.status.value,
+            sqlChars = sqlChars,
+            rowsCount = rowsCount,
+            httpRoundTripNs = httpRoundTripNs,
+            bodyReadNs = bodyReadNs,
+            jsonDecodeNs = decodeNs,
+            totalNs = totalNs,
+            responseBodyChars = bodyChars,
+            errorBodyChars = null
+        )
         logger.info(
             "TEMP_PERF|component=druid.query|operation=sql_request|status={}|sql_chars={}|rows_count={}|http_round_trip_ns={}|http_round_trip_ms={}|body_read_ns={}|body_read_ms={}|json_decode_ns={}|json_decode_ms={}|total_ns={}|total_ms={}|avg_per_row_ms={}|response_body_chars={}",
-            response.status.value,
-            sqlChars,
-            rowsCount,
-            httpRoundTripNs,
-            httpRoundTripNs / 1_000_000.0,
-            bodyReadNs,
-            bodyReadNs / 1_000_000.0,
-            decodeNs,
-            decodeNs / 1_000_000.0,
-            totalNs,
-            totalNs / 1_000_000.0,
-            avgPerRowMs,
-            bodyChars
+            metrics.status,
+            metrics.sqlChars,
+            metrics.rowsCount,
+            metrics.httpRoundTripNs,
+            metrics.httpRoundTripMs,
+            metrics.bodyReadNs,
+            metrics.bodyReadMs,
+            metrics.jsonDecodeNs,
+            metrics.jsonDecodeMs,
+            metrics.totalNs,
+            metrics.totalMs,
+            metrics.avgPerRowMs,
+            metrics.responseBodyChars ?: 0
         )
-
-        return rows
+        return SqlQueryAttempt(
+            success = true,
+            rows = rows,
+            metrics = metrics
+        )
     }
     
     /**
@@ -217,8 +291,8 @@ class DruidClient(private val config: DruidConfig) : Closeable {
         val ingestStartNs = System.nanoTime()
         // Метрика: старт таймера разбиения на батчи.
         val splitStartNs = System.nanoTime()
-        // Разбиваем на batch
-        val batches = records.chunked(config.batchSize)
+        // Разбиваем на batch по количеству + ограничению размера inline NDJSON.
+        val batches = splitIntoSafeBatches(records)
         // Метрика: длительность разбиения входных данных на батчи.
         val splitNs = System.nanoTime() - splitStartNs
 
@@ -322,11 +396,28 @@ class DruidClient(private val config: DruidConfig) : Closeable {
 
         // Метрика: старт таймера HTTP POST на Overlord.
         val httpStartNs = System.nanoTime()
-        val response: HttpResponse = httpClient.post("${config.overlordUrl}/druid/indexer/v1/task") {
-            setBody(ingestionSpec)
+        val response: HttpResponse
+        val httpRoundTripNs: Long
+        try {
+            response = httpClient.post("${config.overlordUrl}/druid/indexer/v1/task") {
+                setBody(ingestionSpec)
+            }
+            // Метрика: длительность сетевого round-trip отправки task.
+            httpRoundTripNs = System.nanoTime() - httpStartNs
+        } catch (e: java.io.IOException) {
+            val totalNs = System.nanoTime() - totalStartNs
+            logger.info(
+                "TEMP_PERF|component=druid.ingest|operation=batch_submit_io_failed|data_source={}|batch_records={}|spec_build_ns={}|spec_build_ms={}|total_ns={}|total_ms={}|exception={}",
+                dataSource,
+                records.size,
+                specBuildNs,
+                specBuildNs / 1_000_000.0,
+                totalNs,
+                totalNs / 1_000_000.0,
+                e.javaClass.simpleName
+            )
+            throw DruidException("Ingestion failed (I/O): ${e.message}", e.toString())
         }
-        // Метрика: длительность сетевого round-trip отправки task.
-        val httpRoundTripNs = System.nanoTime() - httpStartNs
         
         if (!response.status.isSuccess()) {
             val errorBody = response.bodyAsText()
@@ -369,6 +460,45 @@ class DruidClient(private val config: DruidConfig) : Closeable {
         )
     }
     
+    /**
+     * Делит входные записи на батчи, ограничивая:
+     * - максимальный размер батча по количеству записей ([config.batchSize])
+     * - максимальный размер inline NDJSON payload ([config.maxInlineBytes])
+     *
+     * Это снижает шанс сетевых ошибок при отправке ingestion spec (например, "Broken pipe").
+     */
+    private fun splitIntoSafeBatches(records: List<Map<String, Any?>>): List<List<Map<String, Any?>>> {
+        if (records.isEmpty()) return emptyList()
+
+        val maxRecords = config.batchSize.coerceAtLeast(1)
+        val maxBytes = config.maxInlineBytes.coerceAtLeast(10_000)
+
+        val result = ArrayList<List<Map<String, Any?>>>(kotlin.math.max(1, records.size / maxRecords))
+        val current = ArrayList<Map<String, Any?>>(kotlin.math.min(maxRecords, records.size))
+        var currentBytes = 0
+
+        for (r in records) {
+            // Оценка размера одной строки NDJSON.
+            val line = objectMapper.writeValueAsString(r)
+            val lineBytes = line.toByteArray(Charsets.UTF_8).size + 1 // + newline
+
+            val wouldExceedCount = current.size >= maxRecords
+            val wouldExceedBytes = current.isNotEmpty() && (currentBytes + lineBytes > maxBytes)
+
+            if (wouldExceedCount || wouldExceedBytes) {
+                result.add(current.toList())
+                current.clear()
+                currentBytes = 0
+            }
+
+            current.add(r)
+            currentBytes += lineBytes
+        }
+
+        if (current.isNotEmpty()) result.add(current.toList())
+        return result
+    }
+
     /**
      * Создаёт спецификацию для inline batch ingestion.
      * 

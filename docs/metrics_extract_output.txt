@@ -1,0 +1,327 @@
+=== PARSE (parse_one + file_parse) per strategy ===
+
+--- default ---
+  parse_one.json_chars: min=8933.0 max=23857.0 avg=15467.648 n=1000
+  parse_one.json_bytes: min=9024.0 max=23982.0 avg=15576.693 n=1000
+  parse_one.deserialize_ns: min=1050600.0 max=1517615720.0 avg=4838427.863 n=1000
+  parse_one.deserialize_ms: min=1.0506 max=1517.6157 avg=4.8384 n=1000
+  parse_one.total_ns: min=1051054.0 max=1517617483.0 avg=4839536.154 n=1000
+  parse_one.total_ms: min=1.0511 max=1517.6175 avg=4.8395 n=1000
+  parse_one.throughput_mb_s: min=0.01 max=13.704 avg=5.8388 n=1000
+  file_parse.file_size_bytes: min=9024.0 max=23982.0 avg=15576.693 n=1000
+  file_parse.read_ns: min=11887843.0 max=220253919.0 avg=26509848.926 n=1000
+  file_parse.read_ms: min=11.8878 max=220.2539 avg=26.5098 n=1000
+  file_parse.parse_ns: min=1571255.0 max=1521061199.0 avg=6348661.495 n=1000
+  file_parse.parse_ms: min=1.5713 max=1521.0612 avg=6.3487 n=1000
+  file_parse.file_total_ns: min=17075795.0 max=1536103157.0 avg=32875668.175 n=1000
+  file_parse.file_total_ms: min=17.0758 max=1536.1032 avg=32.8757 n=1000
+
+--- eav ---
+  parse_one.json_chars: min=8933.0 max=23857.0 avg=15467.648 n=1000
+  parse_one.json_bytes: min=9024.0 max=23982.0 avg=15576.693 n=1000
+  parse_one.deserialize_ns: min=802392.0 max=1570613061.0 avg=4738002.99 n=1000
+  parse_one.deserialize_ms: min=0.8024 max=1570.6131 avg=4.738 n=1000
+  parse_one.total_ns: min=802690.0 max=1570615058.0 avg=4739095.874 n=1000
+  parse_one.total_ms: min=0.8027 max=1570.6151 avg=4.7391 n=1000
+  parse_one.throughput_mb_s: min=0.0097 max=16.2468 avg=6.1417 n=1000
+  file_parse.file_size_bytes: min=9024.0 max=23982.0 avg=15576.693 n=1000
+  file_parse.read_ns: min=10613039.0 max=373059375.0 avg=27517577.943 n=1000
+  file_parse.read_ms: min=10.613 max=373.0594 avg=27.5176 n=1000
+  file_parse.parse_ns: min=1279794.0 max=1575020391.0 avg=6267163.575 n=1000
+  file_parse.parse_ms: min=1.2798 max=1575.0204 avg=6.2672 n=1000
+  file_parse.file_total_ns: min=17253021.0 max=1592900386.0 avg=33802240.307 n=1000
+  file_parse.file_total_ms: min=17.253 max=1592.9004 avg=33.8022 n=1000
+
+--- hybrid ---
+  parse_one.json_chars: min=8933.0 max=23857.0 avg=15467.648 n=1000
+  parse_one.json_bytes: min=9024.0 max=23982.0 avg=15576.693 n=1000
+  parse_one.deserialize_ns: min=1046277.0 max=1274680391.0 avg=4530396.416 n=1000
+  parse_one.deserialize_ms: min=1.0463 max=1274.6804 avg=4.5304 n=1000
+  parse_one.total_ns: min=1046802.0 max=1274682173.0 avg=4531791.758 n=1000
+  parse_one.total_ms: min=1.0468 max=1274.6822 avg=4.5318 n=1000
+  parse_one.throughput_mb_s: min=0.0119 max=13.8452 avg=5.8222 n=1000
+  file_parse.file_size_bytes: min=9024.0 max=23982.0 avg=15576.693 n=1000
+  file_parse.read_ns: min=8710016.0 max=184406479.0 avg=27870309.771 n=1000
+  file_parse.read_ms: min=8.71 max=184.4065 avg=27.8703 n=1000
+  file_parse.parse_ns: min=1630399.0 max=1278154747.0 avg=6246891.635 n=1000
+  file_parse.parse_ms: min=1.6304 max=1278.1547 avg=6.2469 n=1000
+  file_parse.file_total_ns: min=15133208.0 max=1294909315.0 avg=34136305.841 n=1000
+  file_parse.file_total_ms: min=15.1332 max=1294.9093 avg=34.1363 n=1000
+
+--- combined ---
+  parse_one.json_chars: min=8933.0 max=23857.0 avg=15467.648 n=1000
+  parse_one.json_bytes: min=9024.0 max=23982.0 avg=15576.693 n=1000
+  parse_one.deserialize_ns: min=756919.0 max=1375226522.0 avg=4470556.66 n=1000
+  parse_one.deserialize_ms: min=0.7569 max=1375.2265 avg=4.4706 n=1000
+  parse_one.total_ns: min=757794.0 max=1375228215.0 avg=4472003.713 n=1000
+  parse_one.total_ms: min=0.7578 max=1375.2282 avg=4.472 n=1000
+  parse_one.throughput_mb_s: min=0.0111 max=18.9145 avg=6.6677 n=1000
+  file_parse.file_size_bytes: min=9024.0 max=23982.0 avg=15576.693 n=1000
+  file_parse.read_ns: min=10481195.0 max=377489458.0 avg=26883321.12 n=1000
+  file_parse.read_ms: min=10.4812 max=377.4895 avg=26.8833 n=1000
+  file_parse.parse_ns: min=1202966.0 max=1377932315.0 avg=5937494.763 n=1000
+  file_parse.parse_ms: min=1.203 max=1377.9323 avg=5.9375 n=1000
+  file_parse.file_total_ns: min=12550731.0 max=1394578529.0 avg=32833149.223 n=1000
+  file_parse.file_total_ms: min=12.5507 max=1394.5785 avg=32.8331 n=1000
+
+--- compcom ---
+  parse_one.json_chars: min=8933.0 max=23857.0 avg=15467.648 n=1000
+  parse_one.json_bytes: min=9024.0 max=23982.0 avg=15576.693 n=1000
+  parse_one.deserialize_ns: min=756653.0 max=2026494077.0 avg=5241252.767 n=1000
+  parse_one.deserialize_ms: min=0.7567 max=2026.4941 avg=5.2413 n=1000
+  parse_one.total_ns: min=756905.0 max=2026496179.0 avg=5242041.37 n=1000
+  parse_one.total_ms: min=0.7569 max=2026.4962 avg=5.242 n=1000
+  parse_one.throughput_mb_s: min=0.0075 max=18.7833 avg=6.8727 n=1000
+  file_parse.file_size_bytes: min=9024.0 max=23982.0 avg=15576.693 n=1000
+  file_parse.read_ns: min=4969048.0 max=674966302.0 avg=35276784.437 n=1000
+  file_parse.read_ms: min=4.969 max=674.9663 avg=35.2768 n=1000
+  file_parse.parse_ns: min=1176479.0 max=2032486563.0 avg=6616929.063 n=1000
+  file_parse.parse_ms: min=1.1765 max=2032.4866 avg=6.6169 n=1000
+  file_parse.file_total_ns: min=7514461.0 max=2049736810.0 avg=41909206.246 n=1000
+  file_parse.file_total_ms: min=7.5145 max=2049.7368 avg=41.9092 n=1000
+
+=== INGEST (batch_submit + ingest_summary + ingest_datasource + ingest_stage_summary) ===
+
+--- default ---
+  batch_submit.batch_index: min=1.0 max=6.0 avg=3.5 n=6
+  batch_submit.batch_count: min=6.0 max=6.0 avg=6.0 n=6
+  batch_submit.batch_records: min=107.0 max=188.0 avg=166.6667 n=6
+  batch_submit.spec_build_ns: min=25541970.0 max=125517798.0 avg=58622508.1667 n=6
+  batch_submit.spec_build_ms: min=25.542 max=125.5178 avg=58.6225 n=6
+  batch_submit.http_round_trip_ns: min=1072789661.0 max=4251055498.0 avg=2232022119.1667 n=6
+  batch_submit.http_round_trip_ms: min=1072.7897 max=4251.0555 avg=2232.0221 n=6
+  batch_submit.response_decode_ns: min=708073.0 max=21515507.0 avg=4545214.5 n=6
+  batch_submit.response_decode_ms: min=0.7081 max=21.5155 avg=4.5452 n=6
+  batch_submit.batch_total_ns: min=1099110512.0 max=4398113196.0 avg=2295200834.5 n=6
+  batch_submit.batch_total_ms: min=1099.1105 max=4398.1132 avg=2295.2008 n=6
+  ingest_summary[process_default]: records_total=1000 batches_total=6 batch_size_config=1000
+    split_ms=679.69031 sum_spec_build_ms=351.735049 sum_http_round_trip_ms=13392.132715 sum_response_decode_ms=27.271287
+    min_batch_total_ms=1099.110512 max_batch_total_ms=4398.113196 ingest_total_ms=14466.662868 avg_batch_ms=2411.110478 records_per_sec=69.12444211387425 batches_per_sec=0.4147466526832455
+  ingest_datasource: data_source=process_default records_count=1000 ingest_ms=14469.827444
+  ingest_stage_summary: ingest_ms=14470.324028 warm_variables_limit_effective=null
+
+--- eav ---
+  batch_submit.batch_index: min=1.0 max=359.0 avg=179.5028 n=360
+  batch_submit.batch_count: min=1.0 max=359.0 avg=358.0056 n=360
+  batch_submit.batch_records: min=9.0 max=1000.0 avg=997.2472 n=360
+  batch_submit.spec_build_ns: min=165717.0 max=145776733.0 avg=14311375.325 n=360
+  batch_submit.spec_build_ms: min=0.1657 max=145.7767 avg=14.3114 n=360
+  batch_submit.http_round_trip_ns: min=42095653.0 max=1366128453.0 avg=215946125.9806 n=360
+  batch_submit.http_round_trip_ms: min=42.0957 max=1366.1285 avg=215.9461 n=360
+  batch_submit.response_decode_ns: min=594170.0 max=117901114.0 avg=2520997.0861 n=360
+  batch_submit.response_decode_ms: min=0.5942 max=117.9011 avg=2.521 n=360
+  batch_submit.batch_total_ns: min=43985414.0 max=1508870443.0 avg=232810002.9694 n=360
+  batch_submit.batch_total_ms: min=43.9854 max=1508.8704 avg=232.81 n=360
+  ingest_summary[process_events]: records_total=1000 batches_total=1 batch_size_config=1000
+    split_ms=39.515552 sum_spec_build_ms=24.751285 sum_http_round_trip_ms=1366.128453 sum_response_decode_ms=117.901114
+    min_batch_total_ms=1508.870443 max_batch_total_ms=1508.870443 ingest_total_ms=1575.458225 avg_batch_ms=1575.458225 records_per_sec=634.7359670549182 batches_per_sec=0.6347359670549183
+  ingest_summary[process_variables]: records_total=358009 batches_total=359 batch_size_config=1000
+    split_ms=4091.516304 sum_spec_build_ms=5127.343832 sum_http_round_trip_ms=76374.4769 sum_response_decode_ms=789.657837
+    min_batch_total_ms=43.985414 max_batch_total_ms=715.202071 ingest_total_ms=87543.476912 avg_batch_ms=243.85369613370474 records_per_sec=4089.4994422014556 batches_per_sec=4.100819531772449
+  ingest_datasource: data_source=process_events records_count=1000 ingest_ms=1582.958047
+  ingest_datasource: data_source=process_variables records_count=358009 ingest_ms=87545.036083
+  ingest_stage_summary: ingest_ms=94758.281083 warm_variables_limit_effective=null
+
+--- hybrid ---
+  batch_submit.batch_index: min=1.0 max=3.0 avg=2.0 n=3
+  batch_submit.batch_count: min=3.0 max=3.0 avg=3.0 n=3
+  batch_submit.batch_records: min=285.0 max=361.0 avg=333.3333 n=3
+  batch_submit.spec_build_ns: min=31164938.0 max=124778454.0 avg=73506344.6667 n=3
+  batch_submit.spec_build_ms: min=31.1649 max=124.7785 avg=73.5063 n=3
+  batch_submit.http_round_trip_ns: min=2065126563.0 max=4269989856.0 avg=3267188216.3333 n=3
+  batch_submit.http_round_trip_ms: min=2065.1266 max=4269.9899 avg=3267.1882 n=3
+  batch_submit.response_decode_ns: min=1101655.0 max=26878593.0 avg=9707154.6667 n=3
+  batch_submit.response_decode_ms: min=1.1017 max=26.8786 avg=9.7072 n=3
+  batch_submit.batch_total_ns: min=2097400321.0 max=4421678880.0 avg=3350416582.6667 n=3
+  batch_submit.batch_total_ms: min=2097.4003 max=4421.6789 avg=3350.4166 n=3
+  ingest_summary[process_hybrid]: records_total=1000 batches_total=3 batch_size_config=1000
+    split_ms=401.113459 sum_spec_build_ms=220.519034 sum_http_round_trip_ms=9801.564649 sum_response_decode_ms=29.121464
+    min_batch_total_ms=2097.400321 max_batch_total_ms=4421.67888 ingest_total_ms=10466.711254 avg_batch_ms=3488.9037513333333 records_per_sec=95.54099427533515 batches_per_sec=0.28662298282600546
+  ingest_datasource: data_source=process_hybrid records_count=1000 ingest_ms=10471.014807
+  ingest_stage_summary: ingest_ms=10471.619516 warm_variables_limit_effective=null
+
+--- combined ---
+  batch_submit.batch_index: min=1.0 max=69.0 avg=34.5143 n=70
+  batch_submit.batch_count: min=1.0 max=69.0 avg=68.0286 n=70
+  batch_submit.batch_records: min=862.0 max=1000.0 avg=998.0286 n=70
+  batch_submit.spec_build_ns: min=3589156.0 max=78107147.0 avg=9761578.7714 n=70
+  batch_submit.spec_build_ms: min=3.5892 max=78.1071 avg=9.7616 n=70
+  batch_submit.http_round_trip_ns: min=135089903.0 max=2645616205.0 avg=236799685.7 n=70
+  batch_submit.http_round_trip_ms: min=135.0899 max=2645.6162 avg=236.7997 n=70
+  batch_submit.response_decode_ns: min=789358.0 max=21588546.0 avg=2242704.9 n=70
+  batch_submit.response_decode_ms: min=0.7894 max=21.5885 avg=2.2427 n=70
+  batch_submit.batch_total_ns: min=142309343.0 max=2701820243.0 avg=248846315.9 n=70
+  batch_submit.batch_total_ms: min=142.3093 max=2701.8202 avg=248.8463 n=70
+  ingest_summary[process_main]: records_total=1000 batches_total=1 batch_size_config=1000
+    split_ms=40.603849 sum_spec_build_ms=34.587059 sum_http_round_trip_ms=2645.616205 sum_response_decode_ms=21.588546
+    min_batch_total_ms=2701.820243 max_batch_total_ms=2701.820243 ingest_total_ms=2755.294719 avg_batch_ms=2755.294719 records_per_sec=362.9375809071117 batches_per_sec=0.36293758090711165
+  ingest_summary[process_variables_indexed]: records_total=68862 batches_total=69 batch_size_config=1000
+    split_ms=438.038427 sum_spec_build_ms=648.723455 sum_http_round_trip_ms=13930.361794 sum_response_decode_ms=135.400797
+    min_batch_total_ms=142.309343 max_batch_total_ms=329.68212 ingest_total_ms=15251.573187 avg_batch_ms=221.0372925652174 records_per_sec=4515.075209336173 batches_per_sec=4.524123456248671
+  ingest_datasource: data_source=process_main records_count=1000 ingest_ms=2759.01573
+  ingest_datasource: data_source=process_variables_indexed records_count=68862 ingest_ms=15252.599378
+  ingest_stage_summary: ingest_ms=20318.196106 warm_variables_limit_effective=210
+
+--- compcom ---
+  batch_submit.batch_index: min=1.0 max=69.0 avg=34.5143 n=70
+  batch_submit.batch_count: min=1.0 max=69.0 avg=68.0286 n=70
+  batch_submit.batch_records: min=862.0 max=1000.0 avg=998.0286 n=70
+  batch_submit.spec_build_ns: min=3211015.0 max=77422715.0 avg=9968524.7286 n=70
+  batch_submit.spec_build_ms: min=3.211 max=77.4227 avg=9.9685 n=70
+  batch_submit.http_round_trip_ns: min=122021037.0 max=2065769250.0 avg=212168349.1571 n=70
+  batch_submit.http_round_trip_ms: min=122.021 max=2065.7692 avg=212.1683 n=70
+  batch_submit.response_decode_ns: min=771562.0 max=39577172.0 avg=2483472.9857 n=70
+  batch_submit.response_decode_ms: min=0.7716 max=39.5772 avg=2.4835 n=70
+  batch_submit.batch_total_ns: min=126032905.0 max=2138407500.0 avg=224634079.4143 n=70
+  batch_submit.batch_total_ms: min=126.0329 max=2138.4075 avg=224.6341 n=70
+  ingest_summary[process_main_compact]: records_total=1000 batches_total=1 batch_size_config=1000
+    split_ms=53.59964 sum_spec_build_ms=32.958457 sum_http_round_trip_ms=2065.76925 sum_response_decode_ms=39.577172
+    min_batch_total_ms=2138.4075 max_batch_total_ms=2138.4075 ingest_total_ms=2205.055367 avg_batch_ms=2205.055367 records_per_sec=453.50335187297816 batches_per_sec=0.4535033518729782
+  ingest_summary[process_variables_indexed]: records_total=68862 batches_total=69 batch_size_config=1000
+    split_ms=973.029577 sum_spec_build_ms=664.838274 sum_http_round_trip_ms=12786.015191 sum_response_decode_ms=134.265937
+    min_batch_total_ms=126.032905 max_batch_total_ms=400.83851 ingest_total_ms=14679.979061 avg_batch_ms=212.7533197246377 records_per_sec=4690.878625497789 batches_per_sec=4.70027918386552
+  ingest_datasource: data_source=process_main_compact records_count=1000 ingest_ms=2209.60206
+  ingest_datasource: data_source=process_variables_indexed records_count=68862 ingest_ms=14680.414729
+  ingest_stage_summary: ingest_ms=19951.664291 warm_variables_limit_effective=210
+
+=== SELECT / QUERY (sql_request + query_summary) per strategy ===
+
+--- default ---
+  sql_request.sql_chars: min=57.0 max=192.0 avg=134.9231 n=13
+  sql_request.rows_count: min=0.0 max=1000.0 avg=293.4615 n=13
+  sql_request.http_round_trip_ns: min=1283437947.0 max=5426698795.0 avg=1940440231.3846 n=13
+  sql_request.http_round_trip_ms: min=1283.4379 max=5426.6988 avg=1940.4402 n=13
+  sql_request.body_read_ns: min=60687179.0 max=631258903.0 avg=169050753.1538 n=13
+  sql_request.body_read_ms: min=60.6872 max=631.2589 avg=169.0508 n=13
+  sql_request.json_decode_ns: min=53334565.0 max=389652172.0 avg=138034224.6154 n=13
+  sql_request.json_decode_ms: min=53.3346 max=389.6522 avg=138.0342 n=13
+  sql_request.total_ns: min=1409731493.0 max=6447660793.0 avg=2247568074.0769 n=13
+  sql_request.total_ms: min=1409.7315 max=6447.6608 avg=2247.5681 n=13
+  sql_request.avg_per_row_ms: min=0.0 max=64.4766 avg=13.3825 n=13
+  sql_request.response_body_chars: min=3.0 max=2078922.0 avg=239393.6154 n=13
+  query_summary.raw_sql_chars: min=167.0 max=1199.0 avg=372.6154 n=13
+  query_summary.prepared_sql_chars: min=57.0 max=192.0 avg=134.9231 n=13
+  query_summary.read_ns: min=31917398.0 max=139416342.0 avg=71508245.6923 n=13
+  query_summary.read_ms: min=31.9174 max=139.4163 avg=71.5082 n=13
+  query_summary.prepare_ns: min=18315577.0 max=130438591.0 avg=36772845.4615 n=13
+  query_summary.prepare_ms: min=18.3156 max=130.4386 avg=36.7728 n=13
+  query_summary.druid_exec_ns: min=1420219709.0 max=6488153664.0 avg=2264213368.0 n=13
+  query_summary.druid_exec_ms: min=1420.2197 max=6488.1537 avg=2264.2134 n=13
+  query_summary.print_ns: min=25984.0 max=1155800437.0 avg=160254816.1538 n=13
+  query_summary.print_ms: min=0.026 max=1155.8004 avg=160.2548 n=13
+  query_summary.rows_count: min=0.0 max=1000.0 avg=293.4615 n=13
+  query_summary.query_command_total_ns: min=1801155654.0 max=7837775634.0 avg=2871027211.0 n=13
+  query_summary.query_command_total_ms: min=1801.1557 max=7837.7756 avg=2871.0272 n=13
+  query_summary.avg_per_row_ms: min=0.0 max=78.3778 avg=16.6856 n=13
+
+--- eav ---
+  sql_request.sql_chars: min=103.0 max=430.0 avg=181.8841 n=69
+  sql_request.rows_count: min=0.0 max=1000.0 avg=55.971 n=69
+  sql_request.http_round_trip_ns: min=964405358.0 max=5552587781.0 avg=1692156753.6377 n=69
+  sql_request.http_round_trip_ms: min=964.4054 max=5552.5878 avg=1692.1568 n=69
+  sql_request.body_read_ns: min=38130910.0 max=208052459.0 avg=88747709.8406 n=69
+  sql_request.body_read_ms: min=38.1309 max=208.0525 avg=88.7477 n=69
+  sql_request.json_decode_ns: min=33344113.0 max=150347101.0 avg=70148798.971 n=69
+  sql_request.json_decode_ms: min=33.3441 max=150.3471 avg=70.1488 n=69
+  sql_request.total_ns: min=1038157996.0 max=5876122058.0 avg=1851091295.6667 n=69
+  sql_request.total_ms: min=1038.158 max=5876.1221 avg=1851.0913 n=69
+  sql_request.avg_per_row_ms: min=0.0 max=4151.3216 avg=462.548 n=69
+  sql_request.response_body_chars: min=3.0 max=115988.0 avg=6190.1449 n=69
+  query_summary.raw_sql_chars: min=1231.0 max=1883.0 avg=1446.1594 n=69
+  query_summary.prepared_sql_chars: min=103.0 max=430.0 avg=181.8841 n=69
+  query_summary.read_ns: min=23181286.0 max=459592692.0 avg=85950926.7536 n=69
+  query_summary.read_ms: min=23.1813 max=459.5927 avg=85.9509 n=69
+  query_summary.prepare_ns: min=18694129.0 max=95996228.0 avg=32732657.5362 n=69
+  query_summary.prepare_ms: min=18.6941 max=95.9962 avg=32.7327 n=69
+  query_summary.druid_exec_ns: min=1047440113.0 max=5906416910.0 avg=1864392830.6377 n=69
+  query_summary.druid_exec_ms: min=1047.4401 max=5906.4169 avg=1864.3928 n=69
+  query_summary.print_ns: min=13044.0 max=223039273.0 avg=9065621.6957 n=69
+  query_summary.print_ms: min=0.013 max=223.0393 avg=9.0656 n=69
+  query_summary.rows_count: min=0.0 max=1000.0 avg=55.971 n=69
+  query_summary.query_command_total_ns: min=1349437712.0 max=7132812908.0 avg=2320240334.8696 n=69
+  query_summary.query_command_total_ms: min=1349.4377 max=7132.8129 avg=2320.2403 n=69
+  query_summary.avg_per_row_ms: min=0.0 max=6251.4784 avg=590.2145 n=69
+
+--- hybrid ---
+  sql_request.sql_chars: min=123.0 max=551.0 avg=211.1579 n=57
+  sql_request.rows_count: min=0.0 max=967.0 avg=67.1228 n=57
+  sql_request.http_round_trip_ns: min=1253824513.0 max=4978426291.0 avg=1786932882.9123 n=57
+  sql_request.http_round_trip_ms: min=1253.8245 max=4978.4263 avg=1786.9329 n=57
+  sql_request.body_read_ns: min=52068683.0 max=302877758.0 avg=98988754.8596 n=57
+  sql_request.body_read_ms: min=52.0687 max=302.8778 avg=98.9888 n=57
+  sql_request.json_decode_ns: min=47955358.0 max=229547243.0 avg=82910944.807 n=57
+  sql_request.json_decode_ms: min=47.9554 max=229.5472 avg=82.9109 n=57
+  sql_request.total_ns: min=1375835220.0 max=5508704465.0 avg=1968871431.5789 n=57
+  sql_request.total_ms: min=1375.8352 max=5508.7045 avg=1968.8714 n=57
+  sql_request.avg_per_row_ms: min=0.0 max=2403.4999 avg=225.188 n=57
+  sql_request.response_body_chars: min=3.0 max=177603.0 avg=12254.2281 n=57
+  query_summary.raw_sql_chars: min=1020.0 max=1881.0 avg=1435.2632 n=57
+  query_summary.prepared_sql_chars: min=123.0 max=551.0 avg=211.1579 n=57
+  query_summary.read_ns: min=30744416.0 max=320223548.0 avg=87627284.6316 n=57
+  query_summary.read_ms: min=30.7444 max=320.2235 avg=87.6273 n=57
+  query_summary.prepare_ns: min=21457143.0 max=134192859.0 avg=34496733.4035 n=57
+  query_summary.prepare_ms: min=21.4571 max=134.1929 avg=34.4967 n=57
+  query_summary.druid_exec_ns: min=1388133654.0 max=5524598123.0 avg=1983272989.8947 n=57
+  query_summary.druid_exec_ms: min=1388.1337 max=5524.5981 avg=1983.273 n=57
+  query_summary.print_ns: min=19413.0 max=107568580.0 avg=11784555.7018 n=57
+  query_summary.print_ms: min=0.0194 max=107.5686 avg=11.7846 n=57
+  query_summary.rows_count: min=0.0 max=967.0 avg=67.1228 n=57
+  query_summary.query_command_total_ns: min=1729634952.0 max=7336468443.0 avg=2450763476.386 n=57
+  query_summary.query_command_total_ms: min=1729.635 max=7336.4684 avg=2450.7635 n=57
+  query_summary.avg_per_row_ms: min=0.0 max=2924.0939 avg=280.6722 n=57
+
+--- combined ---
+  sql_request.sql_chars: min=89.0 max=453.0 avg=179.3973 n=73
+  sql_request.rows_count: min=0.0 max=1000.0 avg=107.3151 n=73
+  sql_request.http_round_trip_ns: min=1069923174.0 max=3894803238.0 avg=1529136430.5342 n=73
+  sql_request.http_round_trip_ms: min=1069.9232 max=3894.8032 avg=1529.1364 n=73
+  sql_request.body_read_ns: min=37636568.0 max=279842018.0 avg=73342813.137 n=73
+  sql_request.body_read_ms: min=37.6366 max=279.842 avg=73.3428 n=73
+  sql_request.json_decode_ns: min=32199350.0 max=267742691.0 avg=65685273.1644 n=73
+  sql_request.json_decode_ms: min=32.1994 max=267.7427 avg=65.6853 n=73
+  sql_request.total_ns: min=1161508982.0 max=4342084139.0 avg=1668191538.1781 n=73
+  sql_request.total_ms: min=1161.509 max=4342.0841 avg=1668.1915 n=73
+  sql_request.avg_per_row_ms: min=0.0 max=2648.906 avg=162.6899 n=73
+  sql_request.response_body_chars: min=3.0 max=2157095.0 avg=43498.2055 n=73
+  query_summary.raw_sql_chars: min=1069.0 max=2097.0 avg=1512.411 n=73
+  query_summary.prepared_sql_chars: min=89.0 max=453.0 avg=179.3973 n=73
+  query_summary.read_ns: min=19951122.0 max=157819140.0 avg=74373875.7123 n=73
+  query_summary.read_ms: min=19.9511 max=157.8191 avg=74.3739 n=73
+  query_summary.prepare_ns: min=17052848.0 max=87163207.0 avg=29172229.0959 n=73
+  query_summary.prepare_ms: min=17.0528 max=87.1632 avg=29.1722 n=73
+  query_summary.druid_exec_ns: min=1168664127.0 max=4359868351.0 avg=1679176131.0411 n=73
+  query_summary.druid_exec_ms: min=1168.6641 max=4359.8684 avg=1679.1761 n=73
+  query_summary.print_ns: min=13163.0 max=506873223.0 avg=17690767.6849 n=73
+  query_summary.print_ms: min=0.0132 max=506.8732 avg=17.6908 n=73
+  query_summary.rows_count: min=0.0 max=1000.0 avg=107.3151 n=73
+  query_summary.query_command_total_ns: min=1464685413.0 max=5017907610.0 avg=2070407544.589 n=73
+  query_summary.query_command_total_ms: min=1464.6854 max=5017.9076 avg=2070.4075 n=73
+  query_summary.avg_per_row_ms: min=0.0 max=3541.4574 avg=205.2152 n=73
+
+--- compcom ---
+  sql_request.sql_chars: min=97.0 max=461.0 avg=182.4789 n=71
+  sql_request.rows_count: min=0.0 max=1000.0 avg=110.1268 n=71
+  sql_request.http_round_trip_ns: min=1114057736.0 max=6481803427.0 avg=2523786083.0845 n=71
+  sql_request.http_round_trip_ms: min=1114.0577 max=6481.8034 avg=2523.7861 n=71
+  sql_request.body_read_ns: min=36850202.0 max=483692226.0 avg=131494107.7887 n=71
+  sql_request.body_read_ms: min=36.8502 max=483.6922 avg=131.4941 n=71
+  sql_request.json_decode_ns: min=32408946.0 max=404938464.0 avg=115423301.4085 n=71
+  sql_request.json_decode_ms: min=32.4089 max=404.9385 avg=115.4233 n=71
+  sql_request.total_ns: min=1237876409.0 max=7103437526.0 avg=2770753455.5352 n=71
+  sql_request.total_ms: min=1237.8764 max=7103.4375 avg=2770.7535 n=71
+  sql_request.avg_per_row_ms: min=0.0 max=3390.9246 avg=205.0178 n=71
+  sql_request.response_body_chars: min=3.0 max=1289194.0 avg=32472.6479 n=71
+  query_summary.raw_sql_chars: min=718.0 max=2107.0 avg=1504.5915 n=71
+  query_summary.prepared_sql_chars: min=97.0 max=461.0 avg=182.4789 n=71
+  query_summary.read_ns: min=20118859.0 max=455094258.0 avg=98089945.6338 n=71
+  query_summary.read_ms: min=20.1189 max=455.0943 avg=98.0899 n=71
+  query_summary.prepare_ns: min=8625283.0 max=156946223.0 avg=43474525.1408 n=71
+  query_summary.prepare_ms: min=8.6253 max=156.9462 avg=43.4745 n=71
+  query_summary.druid_exec_ns: min=1248490098.0 max=7160903448.0 avg=2791357622.4225 n=71
+  query_summary.druid_exec_ms: min=1248.4901 max=7160.9034 avg=2791.3576 n=71
+  query_summary.print_ns: min=14616.0 max=730305174.0 avg=34437902.8732 n=71
+  query_summary.print_ms: min=0.0146 max=730.3052 avg=34.4379 n=71
+  query_summary.rows_count: min=0.0 max=1000.0 avg=110.1268 n=71
+  query_summary.query_command_total_ns: min=1523389075.0 max=9197951554.0 avg=3429273053.6056 n=71
+  query_summary.query_command_total_ms: min=1523.3891 max=9197.9516 avg=3429.2731 n=71
+  query_summary.avg_per_row_ms: min=0.0 max=3791.5237 avg=245.8306 n=71

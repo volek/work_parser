@@ -133,7 +133,13 @@ internal data class DruidFileConfig(
     val routerUrl: String? = null,
     val connectTimeout: Long? = null,
     val readTimeout: Long? = null,
-    val batchSize: Int? = null
+    val batchSize: Int? = null,
+    /**
+     * Максимальный размер inline-NDJSON payload в ingestion spec (в байтах).
+     * При превышении — батч будет автоматически дробиться на более мелкие,
+     * чтобы снизить вероятность сетевых обрывов/лимитов (e.g. Broken pipe).
+     */
+    val maxInlineBytes: Int? = null
 )
 
 /**
@@ -153,7 +159,12 @@ data class DruidConfig(
     val routerUrl: String = "http://localhost:8888",
     val connectTimeout: Long = 30000,
     val readTimeout: Long = 60000,
-    val batchSize: Int = 1000
+    val batchSize: Int = 1000,
+    /**
+     * Максимальный размер inline-NDJSON payload в ingestion spec (в байтах).
+     * Нужен для стабилизации submit в Overlord (избежать "Broken pipe" при больших запросах).
+     */
+    val maxInlineBytes: Int = 4_000_000
 ) {
     companion object {
         private val logger = LoggerFactory.getLogger(DruidConfig::class.java)
@@ -188,7 +199,10 @@ data class DruidConfig(
                     ?: 60000,
                 batchSize = System.getenv("DRUID_BATCH_SIZE")?.toIntOrNull() 
                     ?: fileConfig?.batchSize 
-                    ?: 1000
+                    ?: 1000,
+                maxInlineBytes = System.getenv("DRUID_MAX_INLINE_BYTES")?.toIntOrNull()
+                    ?: fileConfig?.maxInlineBytes
+                    ?: 4_000_000
             )
             
             logger.info("Druid configuration loaded:")
@@ -196,6 +210,8 @@ data class DruidConfig(
             logger.info("  Broker URL: ${config.brokerUrl}")
             logger.info("  Coordinator URL: ${config.coordinatorUrl}")
             logger.info("  Overlord URL: ${config.overlordUrl}")
+            logger.info("  Ingest batch size: ${config.batchSize}")
+            logger.info("  Ingest max inline bytes: ${config.maxInlineBytes}")
             
             return config
         }
