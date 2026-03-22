@@ -1,12 +1,17 @@
 # Gradle
 .gradle/
-build/
-**/build/
 out/
+# build/: track only packaged outputs (not Kotlin caches, tmp, classes)
+build/**
+!build/libs/
+!build/libs/**
+!build/distributions/
+!build/distributions/**
 
 # Kotlin/Java compiled artifacts
 *.class
 *.jar
+!build/libs/**/*.jar
 *.war
 *.ear
 *.kotlin_module
