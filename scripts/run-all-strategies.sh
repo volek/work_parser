@@ -27,12 +27,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$ROOT"
 
-if [[ ! -f "$ROOT/build.gradle.kts" ]]; then
-  echo "Ошибка: запускайте скрипт из корня репозитория (ожидается build.gradle.kts). Текущий каталог: $ROOT" >&2
-  exit 1
+# Репозиторий с Gradle: JAR в build/libs/. Распакованный linux-host.zip: JAR в libs/.
+if [[ -f "$ROOT/build.gradle.kts" ]]; then
+  DEFAULT_JAR="$ROOT/build/libs/bpm-druid-parser-1.0.0.jar"
+else
+  DEFAULT_JAR="$ROOT/libs/bpm-druid-parser-1.0.0.jar"
 fi
-
-JAR="${PARSER_JAR:-$ROOT/build/libs/bpm-druid-parser-1.0.0.jar}"
+JAR="${PARSER_JAR:-$DEFAULT_JAR}"
 JAVA_BIN="${JAVA_CMD:-java}"
 MESSAGE_COUNT=500
 WARM_VARIANTS=()

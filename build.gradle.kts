@@ -68,12 +68,13 @@ tasks.jar {
 }
 
 /**
- * ZIP для переноса на Linux-хост: fat JAR, весь каталог [scripts], все *.md в дереве проекта
- * (без каталогов сборки). Собирать на Windows: gradlew.bat linuxHostBundle
+ * ZIP для переноса на Linux-хост: fat JAR, scripts/, query/, messages/, config.yaml,
+ * DEPLOYMENT.md (корень архива), все *.md в дереве проекта в markdown/.
+ * Собирать: ./gradlew linuxHostBundle или gradlew.bat linuxHostBundle
  */
 tasks.register<Zip>("linuxHostBundle") {
     group = "distribution"
-    description = "ZIP: fat JAR + scripts/ + все Markdown для Linux-хоста (Java 17)"
+    description = "ZIP: fat JAR + scripts + query + messages + config.yaml + DEPLOYMENT.md + markdown (Java 17)"
     dependsOn(tasks.jar)
 
     destinationDirectory.set(layout.buildDirectory.dir("distributions"))
@@ -86,6 +87,20 @@ tasks.register<Zip>("linuxHostBundle") {
 
     from(file("scripts")) {
         into("scripts")
+    }
+
+    from(file("query")) {
+        into("query")
+    }
+
+    from(file("messages")) {
+        into("messages")
+    }
+
+    from("config.yaml")
+
+    from("distribution/DEPLOYMENT.md") {
+        rename { "DEPLOYMENT.md" }
     }
 
     from(projectDir) {
