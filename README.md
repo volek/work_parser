@@ -6,6 +6,8 @@ Kotlin-парсер BPM-сообщений для Apache Druid с поддерж
 
 - [Обзор](#обзор)
 - [Требования](#требования)
+- [Запуск на Linux-хосте (Java 17)](#linux-host)
+- [Сборка на Windows для переноса на Linux](#windows-build-linux)
 - [Быстрый старт](#быстрый-старт)
 - [Установка и настройка](#установка-и-настройка)
 - [Использование](#использование)
@@ -48,6 +50,106 @@ Kotlin-парсер BPM-сообщений для Apache Druid с поддерж
 - **JDK** 17+
 - **Gradle** 8.x (опционально, есть wrapper)
 - **Apache Druid** 28.0+ (опционально для тестов)
+
+---
+
+<a id="linux-host"></a>
+## Запуск на Linux-хосте (Java 17)
+
+Приложение собирается в один fat JAR и запускается на Linux любой архитектуры, поддерживаемой JVM, при установленной **Java 17** (JDK для сборки, JRE достаточно для запуска готового JAR).
+
+<a id="windows-build-linux"></a>
+### Сборка на Windows для переноса на Linux-хост
+
+На **Windows** установите **JDK 17** (или используйте уже установленный), откройте **cmd** или **PowerShell** в корне репозитория (рядом с `gradlew.bat`):
+
+```bat
+gradlew.bat jar
+gradlew.bat linuxHostBundle
+```
+
+| Команда | Результат |
+|---------|-----------|
+| `gradlew.bat jar` | Только fat JAR: `build\libs\bpm-druid-parser-1.0.0.jar` (версия из `build.gradle.kts`). |
+| `gradlew.bat linuxHostBundle` | Архив **`build\distributions\bpm-druid-parser-1.0.0-linux-host.zip`**, в который включены: каталог **`scripts`** целиком (все скрипты из репозитория), дерево **`markdown`** со **всеми файлами `*.md`** проекта (сохранены относительные пути; исключены только каталоги сборки `build`, `.gradle` и `.git`), а также подкаталог **`libs`** с тем же fat JAR. |
+
+На целевом Linux скопируйте ZIP, распакуйте (`unzip bpm-druid-parser-*-linux-host.zip -d parser-dist`), перейдите в каталог распаковки, выставьте права на shell-скрипты: `chmod +x scripts/*.sh`. Запуск приложения: `java -jar libs/bpm-druid-parser-1.0.0.jar help`. Для **`scripts/run-all-strategies.sh`** задайте путь к JAR: `export PARSER_JAR="$PWD/libs/bpm-druid-parser-1.0.0.jar"` (или скопируйте JAR в `build/libs/` и работайте из корня полного репозитория). Для сценариев из README дополнительно перенесите из клона репозитория каталоги **`query/`**, **`messages/`** (при необходимости), файл **`config.yaml`** и др. — они в архив **не входят**, в нём только JAR, скрипты и документация в Markdown.
+
+### 1. Проверка Java
+
+```bash
+java -version   # ожидается 17.x
+```
+
+Если Java нет или другая версия, установите пакет с JDK/JRE 17 (пример для Debian/Ubuntu: `sudo apt install openjdk-17-jdk`, либо [Eclipse Temurin 17](https://adoptium.net/)).
+
+### 2. Сборка из исходников на Linux
+
+В корне репозитория:
+
+```bash
+chmod +x gradlew
+./gradlew jar
+```
+
+Готовый артефакт: **`build/libs/bpm-druid-parser-1.0.0.jar`** (имя совпадает с `version` в `build.gradle.kts`).
+
+Сборка на другой ОС (например, Windows или macOS) даёт тот же JAR — его можно скопировать на Linux-хост.
+
+### 3. Что положить рядом с JAR
+
+Запускайте из каталога, где есть нужные данные и конфигурация (или укажите пути в аргументах):
+
+| Нужно | Назначение |
+|-------|------------|
+| `config.yaml` | Опционально; иначе — только переменные окружения и значения по умолчанию |
+| `messages/` | Входные JSON для `parse` (по умолчанию) |
+| `query/` | SQL-файлы для `query` и `query-suite` |
+| `samples/` | По необходимости для сценариев с примерами |
+
+Переменные окружения Druid те же, что в таблице в разделе [Установка и настройка](#установка-и-настройка) (`DRUID_BROKER_URL`, `DRUID_COORDINATOR_URL` и т.д.).
+
+### 4. Примеры команд
+
+```bash
+# Справка
+java -jar build/libs/bpm-druid-parser-1.0.0.jar help
+
+# Генерация тестовых сообщений
+java -jar build/libs/bpm-druid-parser-1.0.0.jar generate messages 100
+
+# Парсинг (стратегия hybrid, вход из messages/)
+java -jar build/libs/bpm-druid-parser-1.0.0.jar parse hybrid messages
+
+# Парсинг и загрузка в Druid
+java -jar build/libs/bpm-druid-parser-1.0.0.jar parse hybrid messages --ingest
+
+# SQL-запрос из файла
+java -jar build/libs/bpm-druid-parser-1.0.0.jar query query/hybrid/q01_select_all.sql
+```
+
+Память JVM при необходимости: `java -Xms256m -Xmx512m -jar ...`.
+
+### 5. Пакетный прогон на Linux (аналог `run-all-strategies.ps1`)
+
+Скрипт **`scripts/run-all-strategies.sh`** выполняет тот же сценарий, что и PowerShell-версия, но **без Docker**: вызывает `java -jar` с fat JAR из `build/libs/` (см. переменную `PARSER_JAR`).
+
+1. Очистка `logs/`, `query-results/`, `messages/`.
+2. При заданном **`COORDINATOR_URL`** или **`DRUID_COORDINATOR_URL`** — вызов `scripts/clean-druid-remote.sh` для удаления datasource'ов парсера в Druid.
+3. Генерация сообщений: `generate messages <N>`.
+4. Для стратегий `combined` → `compcom` → `eav` → `hybrid` → `default`: `parse <strategy> messages --ingest` (для `combined`/`compcom` при `-w` — несколько прогонов с `PARSER_WARM_VARIABLES_LIMIT`).
+5. Все `.sql` из `query/<strategy>/` → вывод в `query-results/<strategy>.txt`.
+
+```bash
+chmod +x scripts/run-all-strategies.sh
+./gradlew jar   # если JAR ещё не собран
+
+./scripts/run-all-strategies.sh
+./scripts/run-all-strategies.sh -m 100
+./scripts/run-all-strategies.sh -w 10,110,210
+```
+
+Переменные окружения: `PARSER_JAR`, `JAVA_CMD`, `JAVA_OPTS`, `COORDINATOR_URL` / `DRUID_COORDINATOR_URL` (см. комментарии в начале скрипта).
 
 ---
 
@@ -209,6 +311,8 @@ cp .env.example .env
 ---
 
 ## Использование
+
+После `./gradlew jar` fat JAR лежит в `build/libs/bpm-druid-parser-1.0.0.jar` — подставьте этот путь вместо `app.jar` в примерах ниже. В Docker-образе JAR копируется как `app.jar`. Подробности для Linux без Docker: [Запуск на Linux-хосте (Java 17)](#linux-host).
 
 ### Команды CLI
 

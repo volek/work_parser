@@ -66,3 +66,31 @@ tasks.jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
 }
+
+/**
+ * ZIP для переноса на Linux-хост: fat JAR, весь каталог [scripts], все *.md в дереве проекта
+ * (без каталогов сборки). Собирать на Windows: gradlew.bat linuxHostBundle
+ */
+tasks.register<Zip>("linuxHostBundle") {
+    group = "distribution"
+    description = "ZIP: fat JAR + scripts/ + все Markdown для Linux-хоста (Java 17)"
+    dependsOn(tasks.jar)
+
+    destinationDirectory.set(layout.buildDirectory.dir("distributions"))
+    archiveFileName.set("${rootProject.name}-${project.version}-linux-host.zip")
+
+    val jarTask = tasks.jar.get()
+    from(jarTask.archiveFile) {
+        into("libs")
+    }
+
+    from(file("scripts")) {
+        into("scripts")
+    }
+
+    from(projectDir) {
+        include("**/*.md")
+        exclude("build/**", "**/build/**", ".gradle/**", "**/.gradle/**", "**/.git/**")
+        into("markdown")
+    }
+}
