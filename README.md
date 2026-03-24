@@ -271,6 +271,8 @@ parser/
 | `DRUID_COORDINATOR_URL` | `http://localhost:8081` | URL Druid Coordinator |
 | `DRUID_OVERLORD_URL` | `http://localhost:8081` | URL Druid Overlord (в кластере часто 8090) |
 | `DRUID_ROUTER_URL` | `http://localhost:8888` | URL Druid Router |
+| `DRUID_USERNAME` | _(пусто)_ | Логин для Basic Auth (если требуется) |
+| `DRUID_PASSWORD` | _(пусто)_ | Пароль для Basic Auth (если требуется) |
 | `DRUID_CONNECT_TIMEOUT` | `30000` | Таймаут подключения (мс) |
 | `DRUID_READ_TIMEOUT` | `60000` | Таймаут чтения (мс) |
 | `DRUID_BATCH_SIZE` | `1000` | Размер пакета для ingestion |
@@ -284,6 +286,8 @@ druid:
   coordinatorUrl: "http://localhost:8081"
   overlordUrl: "http://localhost:8090"
   routerUrl: "http://localhost:8888"
+  # username: "my-user"
+  # password: "my-password"
   connectTimeout: 30000
   readTimeout: 60000
   batchSize: 1000

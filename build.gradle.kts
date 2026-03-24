@@ -41,6 +41,7 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:2.3.9")
     implementation("io.ktor:ktor-serialization-jackson:2.3.9")
     implementation("io.ktor:ktor-client-logging:2.3.9")
+    implementation("io.ktor:ktor-client-auth:2.3.9")
     
     // Logging
     implementation("org.slf4j:slf4j-api:2.0.12")

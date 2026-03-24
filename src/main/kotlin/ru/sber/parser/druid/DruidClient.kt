@@ -8,6 +8,8 @@ import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
+import io.ktor.client.plugins.auth.*
+import io.ktor.client.plugins.auth.providers.*
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
@@ -107,6 +109,20 @@ class DruidClient(private val config: DruidConfig) : Closeable {
         install(HttpTimeout) {
             requestTimeoutMillis = config.readTimeout
             connectTimeoutMillis = config.connectTimeout
+        }
+        val user = config.username
+        if (!user.isNullOrBlank()) {
+            install(Auth) {
+                basic {
+                    credentials {
+                        BasicAuthCredentials(
+                            username = user,
+                            password = config.password.orEmpty()
+                        )
+                    }
+                    sendWithoutRequest { true }
+                }
+            }
         }
         defaultRequest {
             contentType(ContentType.Application.Json)

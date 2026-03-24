@@ -140,6 +140,8 @@ internal data class DruidFileConfig(
     val coordinatorUrl: String? = null,
     val overlordUrl: String? = null,
     val routerUrl: String? = null,
+    val username: String? = null,
+    val password: String? = null,
     val connectTimeout: Long? = null,
     val readTimeout: Long? = null,
     val batchSize: Int? = null,
@@ -166,6 +168,8 @@ data class DruidConfig(
     val coordinatorUrl: String = "http://localhost:8081",
     val overlordUrl: String = "http://localhost:8081",
     val routerUrl: String = "http://localhost:8888",
+    val username: String? = null,
+    val password: String? = null,
     val connectTimeout: Long = 30000,
     val readTimeout: Long = 60000,
     val batchSize: Int = 1000,
@@ -177,6 +181,12 @@ data class DruidConfig(
 ) {
     companion object {
         private val logger = LoggerFactory.getLogger(DruidConfig::class.java)
+
+        private fun normalizeUrl(raw: String?, fallback: String): String {
+            val value = raw?.trim().orEmpty()
+            if (value.isBlank()) return fallback
+            return if (value.contains("://")) value else "http://$value"
+        }
         
         /**
          * Создаёт конфигурацию только из переменных окружения
@@ -188,18 +198,24 @@ data class DruidConfig(
          */
         internal fun fromEnvironmentWithFallback(fileConfig: DruidFileConfig?): DruidConfig {
             val config = DruidConfig(
-                brokerUrl = System.getenv("DRUID_BROKER_URL") 
-                    ?: fileConfig?.brokerUrl 
-                    ?: "http://localhost:8082",
-                coordinatorUrl = System.getenv("DRUID_COORDINATOR_URL") 
-                    ?: fileConfig?.coordinatorUrl 
-                    ?: "http://localhost:8081",
-                overlordUrl = System.getenv("DRUID_OVERLORD_URL") 
-                    ?: fileConfig?.overlordUrl 
-                    ?: "http://localhost:8081",
-                routerUrl = System.getenv("DRUID_ROUTER_URL") 
-                    ?: fileConfig?.routerUrl 
-                    ?: "http://localhost:8888",
+                brokerUrl = normalizeUrl(
+                    System.getenv("DRUID_BROKER_URL") ?: fileConfig?.brokerUrl,
+                    "http://localhost:8082"
+                ),
+                coordinatorUrl = normalizeUrl(
+                    System.getenv("DRUID_COORDINATOR_URL") ?: fileConfig?.coordinatorUrl,
+                    "http://localhost:8081"
+                ),
+                overlordUrl = normalizeUrl(
+                    System.getenv("DRUID_OVERLORD_URL") ?: fileConfig?.overlordUrl,
+                    "http://localhost:8081"
+                ),
+                routerUrl = normalizeUrl(
+                    System.getenv("DRUID_ROUTER_URL") ?: fileConfig?.routerUrl,
+                    "http://localhost:8888"
+                ),
+                username = System.getenv("DRUID_USERNAME") ?: fileConfig?.username,
+                password = System.getenv("DRUID_PASSWORD") ?: fileConfig?.password,
                 connectTimeout = System.getenv("DRUID_CONNECT_TIMEOUT")?.toLongOrNull() 
                     ?: fileConfig?.connectTimeout 
                     ?: 30000,
@@ -219,6 +235,7 @@ data class DruidConfig(
             logger.info("  Broker URL: ${config.brokerUrl}")
             logger.info("  Coordinator URL: ${config.coordinatorUrl}")
             logger.info("  Overlord URL: ${config.overlordUrl}")
+            logger.info("  Auth enabled: ${!config.username.isNullOrBlank()}")
             logger.info("  Ingest batch size: ${config.batchSize}")
             logger.info("  Ingest max inline bytes: ${config.maxInlineBytes}")
             
