@@ -1,3 +1,14 @@
+import org.apache.commons.compress.archivers.zip.ZipFile
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.apache.commons:commons-compress:1.27.1")
+    }
+}
+
 plugins {
     kotlin("jvm") version "1.9.22"
     kotlin("plugin.serialization") version "1.9.22"
@@ -107,5 +118,46 @@ tasks.register<Zip>("linuxHostBundle") {
         include("**/*.md")
         exclude("build/**", "**/build/**", ".gradle/**", "**/.gradle/**", "**/.git/**")
         into("markdown")
+    }
+
+    // Ensure every shell script in the archive is executable on Linux.
+    eachFile {
+        if (name.endsWith(".sh")) {
+            mode = Integer.parseInt("755", 8)
+        }
+    }
+}
+
+tasks.register("verifyLinuxHostBundleScriptModes") {
+    group = "verification"
+    description = "Verifies that all *.sh files in linuxHostBundle ZIP have 0755 mode"
+    dependsOn("linuxHostBundle")
+
+    doLast {
+        val zipTask = tasks.named<Zip>("linuxHostBundle").get()
+        val zipFile = zipTask.archiveFile.get().asFile
+        val invalidEntries = mutableListOf<String>()
+
+        ZipFile(zipFile).use { archive ->
+            val entries = archive.entries
+            while (entries.hasMoreElements()) {
+                val entry = entries.nextElement()
+                if (!entry.isDirectory && entry.name.endsWith(".sh")) {
+                    val mode = entry.unixMode and 0x1FF // permission bits only
+                    if (mode != Integer.parseInt("755", 8)) {
+                        invalidEntries.add("${entry.name}: ${mode.toString(8).padStart(3, '0')}")
+                    }
+                }
+            }
+        }
+
+        if (invalidEntries.isNotEmpty()) {
+            throw GradleException(
+                buildString {
+                    appendLine("Found *.sh entries without 0755 mode in ${zipFile.name}:")
+                    invalidEntries.forEach { appendLine(" - $it") }
+                }
+            )
+        }
     }
 }

@@ -12,6 +12,9 @@
 # Варианты warm-лимита для combined/compcom (10..1010, шаг 100), несколько прогонов:
 #   ./scripts/run-all-strategies.sh -w 10,110,210
 #
+# Пропуск генерации messages (использовать уже существующие файлы в messages/):
+#   ./scripts/run-all-strategies.sh --skip-generate
+#
 # Переменные окружения:
 #   PARSER_JAR      — путь к fat JAR (по умолчанию build/libs/bpm-druid-parser-1.0.0.jar)
 #   JAVA_CMD        — бинарник JVM (по умолчанию java)
@@ -37,6 +40,7 @@ JAR="${PARSER_JAR:-$DEFAULT_JAR}"
 JAVA_BIN="${JAVA_CMD:-java}"
 MESSAGE_COUNT=500
 WARM_VARIANTS=()
+SKIP_GENERATE=false
 
 usage() {
   cat <<EOF
@@ -44,6 +48,7 @@ usage() {
 
   -m, --message-count N   Число генерируемых сообщений (по умолчанию 500)
   -w, --warm-variants L   Список лимитов warm через запятую для combined/compcom (напр. 10,110,210)
+      --skip-generate      Пропустить этап generate messages
   -h, --help              Эта справка
 
 Переменные: PARSER_JAR, JAVA_CMD, JAVA_OPTS, COORDINATOR_URL / DRUID_COORDINATOR_URL
@@ -59,6 +64,10 @@ while [[ $# -gt 0 ]]; do
     -w|--warm-variants)
       IFS=',' read -r -a WARM_VARIANTS <<< "${2:?}"
       shift 2
+      ;;
+    --skip-generate)
+      SKIP_GENERATE=true
+      shift
       ;;
     -h|--help)
       usage
@@ -80,7 +89,7 @@ fi
 
 run_jar() {
   # shellcheck disable=SC2086
-  "$JAVA_BIN" $JAVA_OPTS -jar "$JAR" "$@"
+  "$JAVA_BIN" ${JAVA_OPTS:-} -jar "$JAR" "$@"
 }
 
 LOGS_DIR="$ROOT/logs"
@@ -103,14 +112,18 @@ else
   echo "Пропуск очистки Druid: не заданы COORDINATOR_URL / DRUID_COORDINATOR_URL."
 fi
 
-echo "=== Генерация $MESSAGE_COUNT сообщений ==="
-set +e
-run_jar generate messages "$MESSAGE_COUNT" 2>&1 | tee "$LOGS_DIR/generate.log"
-gen_rc="${PIPESTATUS[0]}"
-set -e
-if [[ "$gen_rc" -ne 0 ]]; then
-  echo "Ошибка генерации (код $gen_rc). См. $LOGS_DIR/generate.log" >&2
-  exit "$gen_rc"
+if [[ "$SKIP_GENERATE" == true ]]; then
+  echo "=== Пропуск генерации messages (--skip-generate) ==="
+else
+  echo "=== Генерация $MESSAGE_COUNT сообщений ==="
+  set +e
+  run_jar generate messages "$MESSAGE_COUNT" 2>&1 | tee "$LOGS_DIR/generate.log"
+  gen_rc="${PIPESTATUS[0]}"
+  set -e
+  if [[ "$gen_rc" -ne 0 ]]; then
+    echo "Ошибка генерации (код $gen_rc). См. $LOGS_DIR/generate.log" >&2
+    exit "$gen_rc"
+  fi
 fi
 
 STRATEGIES=(combined compcom eav hybrid default)

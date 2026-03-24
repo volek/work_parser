@@ -9,7 +9,7 @@
 # Удаляются только datasource'ы, создаваемые BPM Parser:
 #   Hybrid:   process_hybrid
 #   EAV:      process_events, process_variables
-#   Combined: process_main, process_variables_indexed
+#   Combined: process_main, process_main_compact, process_variables_indexed
 #   Default:  process_default
 #
 # Требуется URL Coordinator (порт 8081), не Router (8888).
@@ -34,6 +34,7 @@ DATASOURCES=(
   process_events
   process_variables
   process_main
+  process_main_compact
   process_variables_indexed
   process_default
 )
@@ -52,6 +53,23 @@ for ds in "${DATASOURCES[@]}"; do
     else
       echo "  Error $code: $ds"
       echo "$response" | head -n -1
+    fi
+
+    # Дополнительно удаляем все сегменты datasource (kill task).
+    if [[ "$ds" == "process_main_compact" ]]; then
+      if seg_response=$(curl -s -w "\n%{http_code}" -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/$ds?kill=true&interval=1000-01-01T00:00:00.000Z/3000-01-01T00:00:00.000Z"); then
+        seg_code=$(echo "$seg_response" | tail -n1)
+        if [[ "$seg_code" == "200" ]]; then
+          echo "    Segments kill requested: $ds"
+        elif [[ "$seg_code" == "404" ]]; then
+          echo "    Segments skip (not found): $ds"
+        else
+          echo "    Segments error $seg_code: $ds"
+          echo "$seg_response" | head -n -1
+        fi
+      else
+        echo "    Failed to reach Coordinator for segments: $ds"
+      fi
     fi
   else
     echo "  Failed to reach Coordinator: $ds"
