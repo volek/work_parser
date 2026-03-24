@@ -38,6 +38,23 @@ druid:
   # ---------------------------------------------------------------------------
   connectTimeout: 30000
   readTimeout: 60000
+
+  # ---------------------------------------------------------------------------
+  # TLS/SSL (для https:// endpoint'ов Druid)
+  # ---------------------------------------------------------------------------
+  # Рекомендуемый путь: задать truststore с корпоративным CA/сертификатом.
+  # Можно переопределить переменными окружения:
+  #   DRUID_TRUST_STORE_PATH
+  #   DRUID_TRUST_STORE_PASSWORD
+  #   DRUID_TRUST_STORE_TYPE (JKS|PKCS12)
+  #
+  # Пример:
+  # trustStorePath: "C:/certs/druid-truststore.jks"
+  # trustStorePassword: "changeit"
+  # trustStoreType: "JKS"
+  #
+  # КРАЙНИЙ случай для dev/test: отключить проверку TLS (опасно).
+  # insecureSkipTlsVerify: false
   
   # ---------------------------------------------------------------------------
   # Настройки пакетной обработки

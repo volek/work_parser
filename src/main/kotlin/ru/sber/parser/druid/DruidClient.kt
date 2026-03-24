@@ -20,6 +20,11 @@ import io.ktor.serialization.jackson.*
 import org.slf4j.LoggerFactory
 import ru.sber.parser.config.DruidConfig
 import java.io.Closeable
+import java.io.FileInputStream
+import java.security.KeyStore
+import java.security.cert.X509Certificate
+import javax.net.ssl.TrustManagerFactory
+import javax.net.ssl.X509TrustManager
 
 /**
  * HTTP-клиент для взаимодействия с Apache Druid.
@@ -69,6 +74,7 @@ import java.io.Closeable
 class DruidClient(private val config: DruidConfig) : Closeable {
     
     private val logger = LoggerFactory.getLogger(DruidClient::class.java)
+    private val trustManager: X509TrustManager? = createTrustManager(config)
     
     /** Jackson ObjectMapper для сериализации/десериализации JSON */
     private val objectMapper: ObjectMapper = jacksonObjectMapper()
@@ -85,6 +91,13 @@ class DruidClient(private val config: DruidConfig) : Closeable {
      * - defaultRequest: Content-Type: application/json
      */
     private val httpClient = HttpClient(CIO) {
+        engine {
+            https {
+                if (trustManager != null) {
+                    this.trustManager = trustManager
+                }
+            }
+        }
         install(ContentNegotiation) {
             jackson {
                 registerModule(JavaTimeModule())
@@ -706,6 +719,46 @@ class DruidClient(private val config: DruidConfig) : Closeable {
      */
     override fun close() {
         httpClient.close()
+    }
+
+    private fun createTrustManager(config: DruidConfig): X509TrustManager? {
+        if (config.insecureSkipTlsVerify) {
+            logger.warn("TLS certificate verification is DISABLED (insecureSkipTlsVerify=true). Use only in dev/test.")
+            return trustAllManager
+        }
+
+        val trustStorePath = config.trustStorePath?.takeIf { it.isNotBlank() } ?: return null
+        return try {
+            val trustStore = KeyStore.getInstance(config.trustStoreType)
+            FileInputStream(trustStorePath).use { input ->
+                trustStore.load(input, config.trustStorePassword?.toCharArray())
+            }
+
+            val tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm()
+            val tmf = TrustManagerFactory.getInstance(tmfAlgorithm)
+            tmf.init(trustStore)
+            val manager = tmf.trustManagers.firstOrNull { it is X509TrustManager } as? X509TrustManager
+                ?: throw IllegalStateException("No X509TrustManager in TrustManagerFactory")
+
+            logger.info(
+                "TLS trustStore loaded: path={}, type={}, acceptedIssuers={}",
+                trustStorePath,
+                config.trustStoreType,
+                manager.acceptedIssuers.size
+            )
+            manager
+        } catch (e: Exception) {
+            throw DruidException(
+                "Failed to initialize TLS trustStore from '$trustStorePath': ${e.message}",
+                e.toString()
+            )
+        }
+    }
+
+    private val trustAllManager = object : X509TrustManager {
+        override fun getAcceptedIssuers(): Array<X509Certificate> = emptyArray()
+        override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) = Unit
+        override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) = Unit
     }
 
     /**

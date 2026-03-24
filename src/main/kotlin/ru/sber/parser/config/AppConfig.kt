@@ -146,6 +146,22 @@ internal data class DruidFileConfig(
     val readTimeout: Long? = null,
     val batchSize: Int? = null,
     /**
+     * Полный путь к truststore (JKS/PKCS12) для TLS-подключений к Druid.
+     */
+    val trustStorePath: String? = null,
+    /**
+     * Пароль truststore.
+     */
+    val trustStorePassword: String? = null,
+    /**
+     * Тип truststore: JKS (по умолчанию) или PKCS12.
+     */
+    val trustStoreType: String? = null,
+    /**
+     * Опасный dev-only режим: отключает проверку TLS-сертификата.
+     */
+    val insecureSkipTlsVerify: Boolean? = null,
+    /**
      * Максимальный размер inline-NDJSON payload в ingestion spec (в байтах).
      * При превышении — батч будет автоматически дробиться на более мелкие,
      * чтобы снизить вероятность сетевых обрывов/лимитов (e.g. Broken pipe).
@@ -173,6 +189,22 @@ data class DruidConfig(
     val connectTimeout: Long = 30000,
     val readTimeout: Long = 60000,
     val batchSize: Int = 1000,
+    /**
+     * Полный путь к truststore (JKS/PKCS12) для TLS-подключений к Druid.
+     */
+    val trustStorePath: String? = null,
+    /**
+     * Пароль truststore.
+     */
+    val trustStorePassword: String? = null,
+    /**
+     * Тип truststore: JKS (по умолчанию) или PKCS12.
+     */
+    val trustStoreType: String = "JKS",
+    /**
+     * Опасный dev-only режим: отключает проверку TLS-сертификата.
+     */
+    val insecureSkipTlsVerify: Boolean = false,
     /**
      * Максимальный размер inline-NDJSON payload в ingestion spec (в байтах).
      * Нужен для стабилизации submit в Overlord (избежать "Broken pipe" при больших запросах).
@@ -225,6 +257,19 @@ data class DruidConfig(
                 batchSize = System.getenv("DRUID_BATCH_SIZE")?.toIntOrNull() 
                     ?: fileConfig?.batchSize 
                     ?: 1000,
+                trustStorePath = System.getenv("DRUID_TRUST_STORE_PATH")
+                    ?: fileConfig?.trustStorePath,
+                trustStorePassword = System.getenv("DRUID_TRUST_STORE_PASSWORD")
+                    ?: fileConfig?.trustStorePassword,
+                trustStoreType = System.getenv("DRUID_TRUST_STORE_TYPE")
+                    ?: fileConfig?.trustStoreType
+                    ?: "JKS",
+                insecureSkipTlsVerify = System.getenv("DRUID_INSECURE_SKIP_TLS_VERIFY")
+                    ?.trim()
+                    ?.lowercase()
+                    ?.let { it == "true" || it == "1" || it == "yes" }
+                    ?: fileConfig?.insecureSkipTlsVerify
+                    ?: false,
                 maxInlineBytes = System.getenv("DRUID_MAX_INLINE_BYTES")?.toIntOrNull()
                     ?: fileConfig?.maxInlineBytes
                     ?: 4_000_000
@@ -237,6 +282,8 @@ data class DruidConfig(
             logger.info("  Overlord URL: ${config.overlordUrl}")
             logger.info("  Auth enabled: ${!config.username.isNullOrBlank()}")
             logger.info("  Ingest batch size: ${config.batchSize}")
+            logger.info("  TLS trustStore configured: ${!config.trustStorePath.isNullOrBlank()}")
+            logger.info("  TLS insecureSkipTlsVerify: ${config.insecureSkipTlsVerify}")
             logger.info("  Ingest max inline bytes: ${config.maxInlineBytes}")
             
             return config
