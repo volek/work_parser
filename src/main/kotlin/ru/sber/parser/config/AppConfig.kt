@@ -45,17 +45,26 @@ data class AppConfig(
         
         /**
          * Загружает конфигурацию приложения.
-         * 
+         *
          * Порядок приоритета источников:
          * 1. Переменные окружения (DRUID_BROKER_URL, DRUID_BATCH_SIZE и т.д.)
-         * 2. Значения из config.yaml (если файл существует)
+         * 2. Значения из YAML-файла конфигурации (если файл существует)
+         *    - путь берётся из PARSER_CONFIG_PATH, если переменная задана
+         *    - иначе используется параметр configPath (по умолчанию config.yaml)
          * 3. Значения по умолчанию (localhost:8082, batch=1000 и т.д.)
-         * 
-         * @param configPath Путь к YAML-файлу конфигурации
+         *
+         * @param configPath Путь к YAML-файлу конфигурации по умолчанию
          * @return Загруженная конфигурация приложения
          */
         fun load(configPath: String = "config.yaml"): AppConfig {
-            val configFile = File(configPath)
+            val configPathFromEnv = System.getenv("PARSER_CONFIG_PATH")?.takeIf { it.isNotBlank() }
+            val effectiveConfigPath = configPathFromEnv ?: configPath
+            val configFile = File(effectiveConfigPath)
+            logger.info(
+                "Config resolution: PARSER_CONFIG_PATH={}, effective path={}",
+                configPathFromEnv ?: "<not set>",
+                configFile.absolutePath
+            )
             
             // Пытаемся загрузить конфигурацию из файла
             val fileConfig: FileConfig? = if (configFile.exists()) {
@@ -67,7 +76,7 @@ data class AppConfig(
                     null
                 }
             } else {
-                logger.info("Config file not found at $configPath, using environment variables and defaults")
+                logger.info("Config file not found at $effectiveConfigPath, using environment variables and defaults")
                 null
             }
             

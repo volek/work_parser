@@ -95,6 +95,27 @@ run_jar() {
 LOGS_DIR="$ROOT/logs"
 OUT_DIR="$ROOT/query-results"
 MESSAGES_DIR="$ROOT/messages"
+CONFIG_FILE="$ROOT/config.yaml"
+
+read_config_coordinator_url() {
+  local cfg="$1"
+  [[ -f "$cfg" ]] || return 0
+
+  awk '
+    /^[[:space:]]*druid:[[:space:]]*$/ { in_druid=1; next }
+    in_druid && /^[^[:space:]]/ { in_druid=0 }
+    in_druid && /^[[:space:]]*coordinatorUrl:[[:space:]]*/ {
+      line=$0
+      sub(/^[[:space:]]*coordinatorUrl:[[:space:]]*/, "", line)
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", line)
+      if (line ~ /^".*"$/ || line ~ /^'\''.*'\''$/) {
+        line=substr(line, 2, length(line)-2)
+      }
+      print line
+      exit
+    }
+  ' "$cfg"
+}
 
 echo "=== Очистка артефактов: logs, query-results, messages ==="
 mkdir -p "$LOGS_DIR" "$OUT_DIR" "$MESSAGES_DIR"
@@ -102,14 +123,22 @@ rm -rf "${LOGS_DIR:?}/"* 2>/dev/null || true
 rm -rf "${OUT_DIR:?}/"* 2>/dev/null || true
 rm -rf "${MESSAGES_DIR:?}/"* 2>/dev/null || true
 
-COORD="${COORDINATOR_URL:-${DRUID_COORDINATOR_URL:-}}"
+CONFIG_COORD="$(read_config_coordinator_url "$CONFIG_FILE")"
+COORD="${COORDINATOR_URL:-${DRUID_COORDINATOR_URL:-${CONFIG_COORD:-}}}"
 if [[ -n "$COORD" ]]; then
   echo "=== Очистка datasource'ов в Druid (Coordinator: $COORD) ==="
   COORDINATOR_URL="$COORD" "$ROOT/scripts/clean-druid-remote.sh" || {
     echo "Предупреждение: clean-druid-remote.sh завершился с ошибкой, продолжаем." >&2
   }
 else
-  echo "Пропуск очистки Druid: не заданы COORDINATOR_URL / DRUID_COORDINATOR_URL."
+  echo "Пропуск очистки Druid: не заданы COORDINATOR_URL / DRUID_COORDINATOR_URL и не найден druid.coordinatorUrl в config.yaml."
+fi
+
+if [[ -f "$CONFIG_FILE" ]]; then
+  export PARSER_CONFIG_PATH="$CONFIG_FILE"
+  echo "=== PARSER_CONFIG_PATH: $PARSER_CONFIG_PATH ==="
+else
+  echo "Предупреждение: config.yaml не найден по пути $CONFIG_FILE; приложение будет использовать ENV/defaults." >&2
 fi
 
 if [[ "$SKIP_GENERATE" == true ]]; then
