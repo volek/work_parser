@@ -115,6 +115,10 @@ tasks.register<Zip>("linuxHostBundle") {
         rename { "DEPLOYMENT.md" }
     }
 
+    from(file("distribution/cert")) {
+        into("distribution/cert")
+    }
+
     from(projectDir) {
         include("**/*.md")
         exclude("build/**", "**/build/**", ".gradle/**", "**/.gradle/**", "**/.git/**")
