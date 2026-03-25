@@ -2,7 +2,7 @@
 # =============================================================================
 # Полный цикл на Linux-хосте под Java 17 (без Docker): как run-all-strategies.ps1
 # =============================================================================
-# Запуск из корня проекта (рядом с build.gradle.kts, query/, config.yaml):
+# Запуск из корня проекта (рядом с build.gradle.kts, query/, distribution/config.yaml):
 #   chmod +x scripts/run-all-strategies.sh
 #   ./scripts/run-all-strategies.sh
 #
@@ -95,7 +95,7 @@ run_jar() {
 LOGS_DIR="$ROOT/logs"
 OUT_DIR="$ROOT/query-results"
 MESSAGES_DIR="$ROOT/messages"
-CONFIG_FILE="$ROOT/config.yaml"
+CONFIG_FILE="${PARSER_CONFIG_PATH:-$ROOT/config.yaml}"
 
 needs_tls_truststore() {
   # Проверяем, есть ли вообще https:// в конфиге/ENV.
@@ -209,21 +209,27 @@ if needs_tls_truststore; then
       url_for_tls="$(first_https_url || true)"
       host_for_tls=""
       port_for_tls=""
-      if [[ -n "$url_for_tls" ]]; then
-        read -r host_for_tls port_for_tls <<<"$(parse_host_port_from_https_url "$url_for_tls")"
-      fi
       store_path="$ROOT/druid-truststore.p12"
       store_pass="${DRUID_TRUST_STORE_PASSWORD:-changeit}"
       store_type="${DRUID_TRUST_STORE_TYPE:-PKCS12}"
 
       echo "=== TLS: обнаружены https:// URL. Truststore не задан — генерируем через scripts/create-druid-truststore.sh ==="
-      if [[ -n "$host_for_tls" && -n "$port_for_tls" ]]; then
-        echo "=== TLS: цель для truststore: ${host_for_tls}:${port_for_tls} (из $url_for_tls) ==="
-        "$ROOT/scripts/create-druid-truststore.sh" "$host_for_tls" "$port_for_tls" "$store_path" "$store_pass" >/dev/null
+      if [[ -f "$ROOT/distribution/cert/root.pem" ]]; then
+        # Локальный импорт: create-druid-truststore.sh сам возьмёт нужные сертификаты из distribution/cert.
+        "$ROOT/scripts/create-druid-truststore.sh" "" "" "$store_path" "$store_pass" >/dev/null
       else
-        echo "ОШИБКА: обнаружен https://, но не удалось извлечь host:port из ENV/config.yaml." >&2
-        echo "Задайте DRUID_*_URL (https://host:port) или DRUID_TRUST_STORE_PATH/DRUID_TRUST_STORE_PASSWORD вручную." >&2
-        exit 2
+        # Fallback: собрать цепочку по host:port из первых https:// URL.
+        if [[ -n "$url_for_tls" ]]; then
+          read -r host_for_tls port_for_tls <<<"$(parse_host_port_from_https_url "$url_for_tls")"
+        fi
+        if [[ -n "$host_for_tls" && -n "$port_for_tls" ]]; then
+          echo "=== TLS: цель для truststore: ${host_for_tls}:${port_for_tls} (из $url_for_tls) ==="
+          "$ROOT/scripts/create-druid-truststore.sh" "$host_for_tls" "$port_for_tls" "$store_path" "$store_pass" >/dev/null
+        else
+          echo "ОШИБКА: обнаружен https://, но не удалось извлечь host:port из ENV/$CONFIG_FILE." >&2
+          echo "Задайте DRUID_*_URL (https://host:port) или DRUID_TRUST_STORE_PATH/DRUID_TRUST_STORE_PASSWORD вручную." >&2
+          exit 2
+        fi
       fi
       export DRUID_TRUST_STORE_PATH="$store_path"
       export DRUID_TRUST_STORE_PASSWORD="$store_pass"

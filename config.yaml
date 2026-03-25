@@ -14,25 +14,25 @@ druid:
   # URL-адреса компонентов Druid
   # ---------------------------------------------------------------------------
   # Broker - для SQL запросов
-  brokerUrl: "http://localhost:8082"
+  brokerUrl: "https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282"
   
   # Coordinator - управление сегментами
-  coordinatorUrl: "http://localhost:8081"
+  coordinatorUrl: "https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281"
   
   # Overlord - управление задачами индексации (часто 8081, в standalone по умолчанию 8090)
-  overlordUrl: "http://localhost:8081"
+  overlordUrl: "https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8290"
   
   # Router - унифицированная точка входа (Web Console)
-  routerUrl: "http://localhost:8888"
-
-  # ---------------------------------------------------------------------------
+  routerUrl: "https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088"
+  
+    # ---------------------------------------------------------------------------
   # Basic auth (если Druid/прокси требует логин/пароль)
   # Можно оставить пустым и задать через переменные окружения:
   #   DRUID_USERNAME, DRUID_PASSWORD
   # ---------------------------------------------------------------------------
-  # username: "my-user"
-  # password: "my-password"
-  
+  username: "admin"
+  password: "admin"
+
   # ---------------------------------------------------------------------------
   # Таймауты подключения (в миллисекундах)
   # ---------------------------------------------------------------------------
@@ -40,33 +40,17 @@ druid:
   readTimeout: 60000
 
   # ---------------------------------------------------------------------------
-  # TLS/SSL (для https:// endpoint'ов Druid)
+  # TLS/SSL truststore для подключения к Druid
   # ---------------------------------------------------------------------------
-  # Рекомендуемый путь: задать truststore с корпоративным CA/сертификатом.
-  # Можно переопределить переменными окружения:
-  #   DRUID_TRUST_STORE_PATH
-  #   DRUID_TRUST_STORE_PASSWORD
-  #   DRUID_TRUST_STORE_TYPE (JKS|PKCS12)
-  #
-  # Пример:
-  # trustStorePath: "C:/certs/druid-truststore.jks"
-  # trustStorePassword: "changeit"
-  # trustStoreType: "JKS"
-  #
-  # КРАЙНИЙ случай для dev/test: отключить проверку TLS (опасно).
-  insecureSkipTlsVerify: true
+  # Truststore создаётся на Linux скриптом `scripts/create-druid-truststore.sh`
+  # (по умолчанию — в корне проекта: `druid-truststore.p12`).
+  trustStorePath: "druid-truststore.p12"
+  trustStorePassword: "changeit"
+  trustStoreType: "PKCS12"
+  insecureSkipTlsVerify: false
   
   # ---------------------------------------------------------------------------
   # Настройки пакетной обработки
   # ---------------------------------------------------------------------------
   # Размер пакета для ingestion
   batchSize: 1000
-
-# =============================================================================
-# Parser (для стратегий combined и compcom)
-# =============================================================================
-# Переменная окружения PARSER_WARM_VARIABLES_LIMIT переопределяет значение из файла.
-# parser:
-#   # Лимит записей process_variables_indexed на одно сообщение (10..1010, шаг 100).
-#   # Не задано = без ограничения.
-#   warmVariablesLimit: 110
