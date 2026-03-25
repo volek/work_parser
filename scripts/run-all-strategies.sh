@@ -97,6 +97,62 @@ OUT_DIR="$ROOT/query-results"
 MESSAGES_DIR="$ROOT/messages"
 CONFIG_FILE="$ROOT/config.yaml"
 
+needs_tls_truststore() {
+  # Проверяем, есть ли вообще https:// в конфиге/ENV.
+  # Если есть — без truststore JVM, скорее всего, упадёт с SunCertPathBuilderException.
+  if [[ -n "${DRUID_ROUTER_URL:-}" && "${DRUID_ROUTER_URL:-}" == https://* ]]; then return 0; fi
+  if [[ -n "${DRUID_BROKER_URL:-}" && "${DRUID_BROKER_URL:-}" == https://* ]]; then return 0; fi
+  if [[ -n "${DRUID_COORDINATOR_URL:-}" && "${DRUID_COORDINATOR_URL:-}" == https://* ]]; then return 0; fi
+  if [[ -n "${DRUID_OVERLORD_URL:-}" && "${DRUID_OVERLORD_URL:-}" == https://* ]]; then return 0; fi
+  if [[ -f "$CONFIG_FILE" ]] && grep -q "https://" "$CONFIG_FILE"; then return 0; fi
+  return 1
+}
+
+first_https_url() {
+  # Пытаемся взять URL из ENV (приоритет), иначе — из config.yaml (первый https://).
+  for v in DRUID_ROUTER_URL DRUID_OVERLORD_URL DRUID_COORDINATOR_URL DRUID_BROKER_URL; do
+    local val="${!v:-}"
+    if [[ -n "$val" && "$val" == https://* ]]; then
+      echo "$val"
+      return 0
+    fi
+  done
+  if [[ -f "$CONFIG_FILE" ]]; then
+    # Простейшее извлечение: берём первую строку, где встречается https:// и есть URL.
+    local line
+    line="$(grep -m 1 "https://" "$CONFIG_FILE" || true)"
+    if [[ -n "$line" ]]; then
+      # выдёргиваем то, что похоже на URL, без кавычек
+      echo "$line" | sed -E 's/.*(https:\/\/[^"'\''[:space:]]+).*/\1/'
+      return 0
+    fi
+  fi
+  return 1
+}
+
+parse_host_port_from_https_url() {
+  # Вход: https://host:port/...
+  # Выход: "host port" (port может быть 443, если не указан)
+  local url="$1"
+  local rest="${url#https://}"
+  local authority="${rest%%/*}"
+  local host="$authority"
+  local port="443"
+
+  # IPv6 в [] тут не обрабатываем — если будет нужно, добавим.
+  if [[ "$authority" == *:* ]]; then
+    host="${authority%%:*}"
+    port="${authority##*:}"
+  fi
+  echo "$host $port"
+}
+
+normalize_bool() {
+  local v="${1:-}"
+  v="$(echo "$v" | tr '[:upper:]' '[:lower:]' | xargs)"
+  [[ "$v" == "true" || "$v" == "1" || "$v" == "yes" ]]
+}
+
 read_config_coordinator_url() {
   local cfg="$1"
   [[ -f "$cfg" ]] || return 0
@@ -139,6 +195,42 @@ if [[ -f "$CONFIG_FILE" ]]; then
   echo "=== PARSER_CONFIG_PATH: $PARSER_CONFIG_PATH ==="
 else
   echo "Предупреждение: config.yaml не найден по пути $CONFIG_FILE; приложение будет использовать ENV/defaults." >&2
+fi
+
+# ---------------------------------------------------------------------------
+# TLS truststore (для https:// Druid endpoint'ов)
+# ---------------------------------------------------------------------------
+if needs_tls_truststore; then
+  insecure_env="${DRUID_INSECURE_SKIP_TLS_VERIFY:-}"
+  if normalize_bool "$insecure_env"; then
+    echo "=== TLS: insecureSkipTlsVerify включён через DRUID_INSECURE_SKIP_TLS_VERIFY=$DRUID_INSECURE_SKIP_TLS_VERIFY (ОПАСНО, только dev/test) ==="
+  else
+    if [[ -z "${DRUID_TRUST_STORE_PATH:-}" ]]; then
+      url_for_tls="$(first_https_url || true)"
+      host_for_tls=""
+      port_for_tls=""
+      if [[ -n "$url_for_tls" ]]; then
+        read -r host_for_tls port_for_tls <<<"$(parse_host_port_from_https_url "$url_for_tls")"
+      fi
+      store_path="$ROOT/druid-truststore.p12"
+      store_pass="${DRUID_TRUST_STORE_PASSWORD:-changeit}"
+      store_type="${DRUID_TRUST_STORE_TYPE:-PKCS12}"
+
+      echo "=== TLS: обнаружены https:// URL. Truststore не задан — генерируем через scripts/create-druid-truststore.sh ==="
+      if [[ -n "$host_for_tls" && -n "$port_for_tls" ]]; then
+        echo "=== TLS: цель для truststore: ${host_for_tls}:${port_for_tls} (из $url_for_tls) ==="
+        "$ROOT/scripts/create-druid-truststore.sh" "$host_for_tls" "$port_for_tls" "$store_path" "$store_pass" >/dev/null
+      else
+        echo "ОШИБКА: обнаружен https://, но не удалось извлечь host:port из ENV/config.yaml." >&2
+        echo "Задайте DRUID_*_URL (https://host:port) или DRUID_TRUST_STORE_PATH/DRUID_TRUST_STORE_PASSWORD вручную." >&2
+        exit 2
+      fi
+      export DRUID_TRUST_STORE_PATH="$store_path"
+      export DRUID_TRUST_STORE_PASSWORD="$store_pass"
+      export DRUID_TRUST_STORE_TYPE="$store_type"
+    fi
+    echo "=== TLS truststore: path=${DRUID_TRUST_STORE_PATH:-<not set>} type=${DRUID_TRUST_STORE_TYPE:-<not set>} ==="
+  fi
 fi
 
 if [[ "$SKIP_GENERATE" == true ]]; then
