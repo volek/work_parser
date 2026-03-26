@@ -214,9 +214,10 @@ if needs_tls_truststore; then
       store_type="${DRUID_TRUST_STORE_TYPE:-PKCS12}"
 
       echo "=== TLS: обнаружены https:// URL. Truststore не задан — генерируем через scripts/create-druid-truststore.sh ==="
+      echo "=== TLS: DRUID_TRUSTSTORE_MODE=${DRUID_TRUSTSTORE_MODE:-<default>} truststore-log=$LOGS_DIR/truststore-create.log ==="
       if [[ -f "$ROOT/distribution/cert/root.pem" ]]; then
-        # Локальный импорт: create-druid-truststore.sh сам возьмёт нужные сертификаты из distribution/cert.
-        "$ROOT/scripts/create-druid-truststore.sh" "" "" "$store_path" "$store_pass" >/dev/null
+        # create-druid-truststore.sh: может использовать локальные cert'ы и/или собрать chain по host:port.
+        "$ROOT/scripts/create-druid-truststore.sh" "" "" "$store_path" "$store_pass" >>"$LOGS_DIR/truststore-create.log" 2>&1
       else
         # Fallback: собрать цепочку по host:port из первых https:// URL.
         if [[ -n "$url_for_tls" ]]; then
@@ -224,7 +225,7 @@ if needs_tls_truststore; then
         fi
         if [[ -n "$host_for_tls" && -n "$port_for_tls" ]]; then
           echo "=== TLS: цель для truststore: ${host_for_tls}:${port_for_tls} (из $url_for_tls) ==="
-          "$ROOT/scripts/create-druid-truststore.sh" "$host_for_tls" "$port_for_tls" "$store_path" "$store_pass" >/dev/null
+          "$ROOT/scripts/create-druid-truststore.sh" "$host_for_tls" "$port_for_tls" "$store_path" "$store_pass" >>"$LOGS_DIR/truststore-create.log" 2>&1
         else
           echo "ОШИБКА: обнаружен https://, но не удалось извлечь host:port из ENV/$CONFIG_FILE." >&2
           echo "Задайте DRUID_*_URL (https://host:port) или DRUID_TRUST_STORE_PATH/DRUID_TRUST_STORE_PASSWORD вручную." >&2

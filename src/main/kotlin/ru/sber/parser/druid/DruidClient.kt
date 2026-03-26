@@ -746,6 +746,22 @@ class DruidClient(private val config: DruidConfig) : Closeable {
                 config.trustStoreType,
                 manager.acceptedIssuers.size
             )
+
+            // Debug aid: show what trust anchors JSSE actually sees.
+            // This helps diagnose PKIX failures on remote Druid endpoints.
+            val acceptedIssuers = manager.acceptedIssuers
+            if (acceptedIssuers.isNotEmpty()) {
+                acceptedIssuers.forEachIndexed { idx, cert ->
+                    logger.info(
+                        "TLS trustStore acceptedIssuer[{}]: subject='{}', issuer='{}'",
+                        idx,
+                        cert.subjectX500Principal.name,
+                        cert.issuerX500Principal.name
+                    )
+                }
+            } else {
+                logger.info("TLS trustStore acceptedIssuer list is empty (unexpected unless truststore is wrong).")
+            }
             manager
         } catch (e: Exception) {
             throw DruidException(

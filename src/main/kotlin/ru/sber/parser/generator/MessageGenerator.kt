@@ -417,6 +417,8 @@ class MessageGenerator {
      * Добавляет в variables несколько переменных-массивов разной длины и с элементами разных типов.
      */
     private fun addRandomArrayVariables(variables: MutableMap<String, Any?>, messageIndex: Int) {
+        @Suppress("UNUSED_VARIABLE")
+        val ignoredMessageIndex = messageIndex
         val count = random.nextInt(2, 6)
         val namesPool = arrayVariableNames.shuffled(random)
         (0 until count).forEach { i ->
@@ -634,7 +636,7 @@ class MessageGenerator {
         }
 
         // Массив событий аудита с глубоко вложенными деталями.
-        variables["auditTrail"] = (1..random.nextInt(1, 5)).map { idx ->
+        variables["auditTrail"] = (1..random.nextInt(1, 5)).map { _ ->
             mapOf(
                 "eventId" to "EVT_${generateHex(6)}",
                 "eventType" to listOf("CREATE", "STATE_CHANGE", "NOTIFY", "ROUTE").random(),

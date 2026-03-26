@@ -84,6 +84,7 @@ rm -f "${STORE}"
 # 2) Импорт локальных сертификатов (если включено)
 if "$want_local" && (( ${#cert_files[@]} > 0 )); then
   echo "[1/x] Импорт локальных сертификатов из ${CERT_DIR} в truststore ${STORE} ..."
+  echo "[local] local cert files count=${#cert_files[@]}"
   idx=0
   for cert in "${cert_files[@]}"; do
     idx=$((idx + 1))
@@ -106,6 +107,9 @@ fi
 if "$want_chain"; then
   CHAIN_RAW_FILE="${TMP_DIR}/chain.txt"
   CHAIN_PREFIX="${TMP_DIR}/cert"
+  S_CLIENT_ERR_FILE="${TMP_DIR}/s_client.err"
+  rm -f "$S_CLIENT_ERR_FILE" || true
+  : > "$S_CLIENT_ERR_FILE"
 
   echo "[2/x] Получение цепочки сертификатов с ${HOST}:${PORT} ..."
   set +e
@@ -113,9 +117,14 @@ if "$want_chain"; then
     -connect "${HOST}:${PORT}" \
     -servername "${HOST}" \
     -showcerts \
-    </dev/null 2>/dev/null > "${CHAIN_RAW_FILE}"
+    </dev/null > "${CHAIN_RAW_FILE}" 2> "$S_CLIENT_ERR_FILE"
   s_client_rc=$?
   set -e
+  echo "[chain] openssl s_client rc=${s_client_rc}"
+  if [[ "$s_client_rc" -ne 0 ]]; then
+    echo "[chain] openssl s_client stderr (first 20 lines) from ${S_CLIENT_ERR_FILE}:"
+    sed -n '1,20p' "$S_CLIENT_ERR_FILE" || true
+  fi
 
   echo "[3/x] Извлечение PEM-сертификатов из chain..."
   awk '
@@ -131,8 +140,11 @@ if "$want_chain"; then
     }
   ' "${CHAIN_RAW_FILE}"
 
+  shopt -s nullglob
   chain_cert_files=( "${CHAIN_PREFIX}"-*.pem )
-  if [ -e "${chain_cert_files[0]}" ]; then
+  shopt -u nullglob
+  echo "[chain] extracted cert pem files count=${#chain_cert_files[@]}"
+  if (( ${#chain_cert_files[@]} > 0 )); then
     echo "[4/x] Импорт сертификатов (chain) в ${STORE} ..."
     idx=0
     for cert in "${chain_cert_files[@]}"; do
@@ -151,7 +163,7 @@ if "$want_chain"; then
       echo "  импортирован: ${alias_name} -> ${subject}"
     done
   else
-    echo "ОШИБКА: из TLS-цепочки ${HOST}:${PORT} не удалось извлечь сертификаты. openssl_rc=${s_client_rc}" >&2
+    echo "ОШИБКА: из TLS-цепочки ${HOST}:${PORT} не удалось извлечь сертификаты. openssl_rc=${s_client_rc} raw_file=${CHAIN_RAW_FILE}" >&2
     if [[ "$MODE" == "chain" || "$MODE" == "auto" ]]; then
       exit 1
     else
