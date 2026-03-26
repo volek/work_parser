@@ -22,6 +22,8 @@ import ru.sber.parser.config.DruidConfig
 import java.io.Closeable
 import java.io.FileInputStream
 import java.security.KeyStore
+import java.security.MessageDigest
+import java.security.cert.CertificateException
 import java.security.cert.X509Certificate
 import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
@@ -740,6 +742,14 @@ class DruidClient(private val config: DruidConfig) : Closeable {
             val manager = tmf.trustManagers.firstOrNull { it is X509TrustManager } as? X509TrustManager
                 ?: throw IllegalStateException("No X509TrustManager in TrustManagerFactory")
 
+            val pinnedFingerprints = linkedSetOf<String>()
+            val aliases = trustStore.aliases()
+            while (aliases.hasMoreElements()) {
+                val alias = aliases.nextElement()
+                val cert = trustStore.getCertificate(alias) as? X509Certificate ?: continue
+                pinnedFingerprints += sha256Hex(cert)
+            }
+
             logger.info(
                 "TLS trustStore loaded: path={}, type={}, acceptedIssuers={}",
                 trustStorePath,
@@ -762,13 +772,44 @@ class DruidClient(private val config: DruidConfig) : Closeable {
             } else {
                 logger.info("TLS trustStore acceptedIssuer list is empty (unexpected unless truststore is wrong).")
             }
-            manager
+            object : X509TrustManager {
+                override fun getAcceptedIssuers(): Array<X509Certificate> = manager.acceptedIssuers
+
+                override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) {
+                    manager.checkClientTrusted(chain, authType)
+                }
+
+                override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) {
+                    try {
+                        manager.checkServerTrusted(chain, authType)
+                    } catch (e: CertificateException) {
+                        val leaf = chain.firstOrNull()
+                        val leafFp = leaf?.let { sha256Hex(it) }
+                        if (leaf != null && leafFp != null && pinnedFingerprints.contains(leafFp)) {
+                            logger.warn(
+                                "TLS PKIX failed, but leaf certificate is pinned in truststore; accepting fallback. " +
+                                    "leafSubject='{}', leafIssuer='{}', leafSha256={}",
+                                leaf.subjectX500Principal.name,
+                                leaf.issuerX500Principal.name,
+                                leafFp
+                            )
+                            return
+                        }
+                        throw e
+                    }
+                }
+            }
         } catch (e: Exception) {
             throw DruidException(
                 "Failed to initialize TLS trustStore from '$trustStorePath': ${e.message}",
                 e.toString()
             )
         }
+    }
+
+    private fun sha256Hex(cert: X509Certificate): String {
+        val digest = MessageDigest.getInstance("SHA-256").digest(cert.encoded)
+        return digest.joinToString(":") { "%02X".format(it) }
     }
 
     private val trustAllManager = object : X509TrustManager {
