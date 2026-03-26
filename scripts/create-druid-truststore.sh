@@ -86,19 +86,44 @@ if "$want_local" && (( ${#cert_files[@]} > 0 )); then
   echo "[1/x] Импорт локальных сертификатов из ${CERT_DIR} в truststore ${STORE} ..."
   echo "[local] local cert files count=${#cert_files[@]}"
   idx=0
+  local_split_prefix="${TMP_DIR}/local-cert"
+  local_part_idx=0
+
   for cert in "${cert_files[@]}"; do
+    # Один PEM-файл может содержать несколько сертификатов (chain bundle).
+    awk '
+      /BEGIN CERTIFICATE/ {
+        in_cert = 1
+        cert_index++
+        file = sprintf("'"${local_split_prefix}"'-%04d.pem", cert_index)
+      }
+      in_cert { print > file }
+      /END CERTIFICATE/ {
+        in_cert = 0
+        close(file)
+      }
+    ' "${cert}"
+  done
+
+  shopt -s nullglob
+  local_cert_parts=( "${local_split_prefix}"-*.pem )
+  shopt -u nullglob
+  echo "[local] extracted cert parts count=${#local_cert_parts[@]}"
+
+  for cert_part in "${local_cert_parts[@]}"; do
     idx=$((idx + 1))
+    local_part_idx=$((local_part_idx + 1))
     alias_name="druid-local-${idx}"
 
     keytool -importcert \
       -alias "${alias_name}" \
-      -file "${cert}" \
+      -file "${cert_part}" \
       -keystore "${STORE}" \
       -storetype PKCS12 \
       -storepass "${PASS}" \
       -noprompt >/dev/null
 
-    subject="$(openssl x509 -in "${cert}" -noout -subject 2>/dev/null | sed 's/^subject=//' || true)"
+    subject="$(openssl x509 -in "${cert_part}" -noout -subject 2>/dev/null | sed 's/^subject=//' || true)"
     echo "  импортирован: ${alias_name} -> ${subject}"
   done
 fi
@@ -180,7 +205,7 @@ cat <<EOF
 Готово.
 Перед запуском парсера задайте переменные окружения:
 
-  export DRUID_TRUST_STORE_PATH="$(pwd)/${STORE}"
+  export DRUID_TRUST_STORE_PATH="$(if [[ "${STORE}" = /* ]]; then echo "${STORE}"; else echo "$(pwd)/${STORE}"; fi)"
   export DRUID_TRUST_STORE_PASSWORD="${PASS}"
   export DRUID_TRUST_STORE_TYPE="PKCS12"
 
