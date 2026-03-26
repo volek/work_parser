@@ -3,10 +3,11 @@ set -euo pipefail
 
 # Создаёт PKCS12 truststore для TLS-подключений к Druid.
 #
-# Приоритет:
-#  1) Если в `distribution/cert` есть сертификаты (root.pem и *.crt) — импортируем их локально
-#     (без сетевого запроса по host:port).
-#  2) Иначе — собираем truststore из полной TLS-цепочки целевого хоста (как раньше).
+# Режим сборки truststore (по умолчанию: local+chain):
+#  - local: только импорт локальных сертификатов из `distribution/cert` (без сетевого запроса)
+#  - chain: только импорт сертификатов из полной TLS-цепочки целевого host:port
+#  - local+chain: сначала импорт локальных, затем добавляем цепочку с host:port
+#  - auto: если локальные сертификаты есть — только local, иначе — chain
 #
 # Использование:
 #   ./scripts/create-druid-truststore.sh
@@ -30,8 +31,12 @@ CERT_DIR="${DRUID_CERT_DIR:-$ROOT/distribution/cert}"
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
+# Режим доверительной сборки:
+# (можно переопределить переменной окружения DRUID_TRUSTSTORE_MODE)
+MODE="${DRUID_TRUSTSTORE_MODE:-local+chain}"
+
 #
-# 1) Попытка импортировать сертификаты локально из distribution/cert
+# 1) Проверяем наличие локальных сертификатов в distribution/cert
 #
 ROOT_PEM="${CERT_DIR}/root.pem"
 shopt -s nullglob
@@ -44,10 +49,41 @@ for f in "${CERT_DIR}"/*.crt; do
 done
 shopt -u nullglob
 
-if (( ${#cert_files[@]} > 0 )); then
-  echo "[1/3] Импорт локальных сертификатов из ${CERT_DIR} в truststore ${STORE} ..."
-  rm -f "${STORE}"
+want_local=false
+want_chain=false
 
+case "$MODE" in
+  local) want_local=true ;;
+  chain) want_chain=true ;;
+  local+chain) want_local=true; want_chain=true ;;
+  auto)
+    if (( ${#cert_files[@]} > 0 )); then
+      want_local=true
+      want_chain=false
+    else
+      want_local=false
+      want_chain=true
+    fi
+    ;;
+  *)
+    echo "ОШИБКА: неизвестный DRUID_TRUSTSTORE_MODE='$MODE' (ожидается local|chain|local+chain|auto)" >&2
+    exit 2
+    ;;
+esac
+
+if ! $want_local && ! $want_chain; then
+  echo "ОШИБКА: неверный режим сборки truststore ($MODE)." >&2
+  exit 2
+fi
+
+echo "=== Truststore сборка: MODE=$MODE (local=$want_local, chain=$want_chain) ==="
+
+# Всегда пересоздаём truststore (чтобы не накапливать устаревшие cert'ы).
+rm -f "${STORE}"
+
+# 2) Импорт локальных сертификатов (если включено)
+if "$want_local" && (( ${#cert_files[@]} > 0 )); then
+  echo "[1/x] Импорт локальных сертификатов из ${CERT_DIR} в truststore ${STORE} ..."
   idx=0
   for cert in "${cert_files[@]}"; do
     idx=$((idx + 1))
@@ -64,26 +100,24 @@ if (( ${#cert_files[@]} > 0 )); then
     subject="$(openssl x509 -in "${cert}" -noout -subject 2>/dev/null | sed 's/^subject=//' || true)"
     echo "  импортирован: ${alias_name} -> ${subject}"
   done
+fi
 
-  echo "[2/3] Проверка содержимого truststore ..."
-  keytool -list -keystore "${STORE}" -storetype PKCS12 -storepass "${PASS}"
-
-  echo "[3/3] Готово."
-else
-  #
-  # 2) Fallback: собрать truststore из полной TLS-цепочки по host:port
-  #
+# 3) Импорт цепочки сертификатов (если включено)
+if "$want_chain"; then
   CHAIN_RAW_FILE="${TMP_DIR}/chain.txt"
   CHAIN_PREFIX="${TMP_DIR}/cert"
 
-  echo "[1/5] Получение цепочки сертификатов с ${HOST}:${PORT} ..."
+  echo "[2/x] Получение цепочки сертификатов с ${HOST}:${PORT} ..."
+  set +e
   openssl s_client \
     -connect "${HOST}:${PORT}" \
     -servername "${HOST}" \
     -showcerts \
     </dev/null 2>/dev/null > "${CHAIN_RAW_FILE}"
+  s_client_rc=$?
+  set -e
 
-  echo "[2/5] Извлечение PEM-сертификатов ..."
+  echo "[3/x] Извлечение PEM-сертификатов из chain..."
   awk '
     /BEGIN CERTIFICATE/ {
       in_cert = 1
@@ -97,36 +131,37 @@ else
     }
   ' "${CHAIN_RAW_FILE}"
 
-  cert_files=( "${CHAIN_PREFIX}"-*.pem )
-  if [ ! -e "${cert_files[0]}" ]; then
-    echo "ОШИБКА: из серверной цепочки не удалось извлечь сертификаты."
-    exit 1
+  chain_cert_files=( "${CHAIN_PREFIX}"-*.pem )
+  if [ -e "${chain_cert_files[0]}" ]; then
+    echo "[4/x] Импорт сертификатов (chain) в ${STORE} ..."
+    idx=0
+    for cert in "${chain_cert_files[@]}"; do
+      idx=$((idx + 1))
+      alias_name="druid-chain-${idx}"
+
+      keytool -importcert \
+        -alias "${alias_name}" \
+        -file "${cert}" \
+        -keystore "${STORE}" \
+        -storetype PKCS12 \
+        -storepass "${PASS}" \
+        -noprompt >/dev/null
+
+      subject="$(openssl x509 -in "${cert}" -noout -subject | sed 's/^subject=//' || true)"
+      echo "  импортирован: ${alias_name} -> ${subject}"
+    done
+  else
+    echo "ОШИБКА: из TLS-цепочки ${HOST}:${PORT} не удалось извлечь сертификаты. openssl_rc=${s_client_rc}" >&2
+    if [[ "$MODE" == "chain" || "$MODE" == "auto" ]]; then
+      exit 1
+    else
+      echo "Продолжаем без chain (режим=$MODE)." >&2
+    fi
   fi
-
-  echo "[3/5] Пересоздание truststore ${STORE} ..."
-  rm -f "${STORE}"
-
-  echo "[4/5] Импорт сертификатов в ${STORE} ..."
-  idx=0
-  for cert in "${cert_files[@]}"; do
-    idx=$((idx + 1))
-    alias_name="druid-chain-${idx}"
-
-    keytool -importcert \
-      -alias "${alias_name}" \
-      -file "${cert}" \
-      -keystore "${STORE}" \
-      -storetype PKCS12 \
-      -storepass "${PASS}" \
-      -noprompt >/dev/null
-
-    subject="$(openssl x509 -in "${cert}" -noout -subject | sed 's/^subject=//' || true)"
-    echo "  импортирован: ${alias_name} -> ${subject}"
-  done
-
-  echo "[5/5] Проверка содержимого truststore ..."
-  keytool -list -keystore "${STORE}" -storetype PKCS12 -storepass "${PASS}"
 fi
+
+echo "[x] Проверка содержимого truststore ..."
+keytool -list -keystore "${STORE}" -storetype PKCS12 -storepass "${PASS}"
 
 cat <<EOF
 
