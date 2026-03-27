@@ -743,11 +743,13 @@ class DruidClient(private val config: DruidConfig) : Closeable {
                 ?: throw IllegalStateException("No X509TrustManager in TrustManagerFactory")
 
             val pinnedFingerprints = linkedSetOf<String>()
+            val pinnedSubjects = linkedSetOf<String>()
             val aliases = trustStore.aliases()
             while (aliases.hasMoreElements()) {
                 val alias = aliases.nextElement()
                 val cert = trustStore.getCertificate(alias) as? X509Certificate ?: continue
                 pinnedFingerprints += sha256Hex(cert)
+                pinnedSubjects += cert.subjectX500Principal.name
             }
 
             logger.info(
@@ -785,13 +787,27 @@ class DruidClient(private val config: DruidConfig) : Closeable {
                     } catch (e: CertificateException) {
                         val leaf = chain.firstOrNull()
                         val leafFp = leaf?.let { sha256Hex(it) }
-                        if (leaf != null && leafFp != null && pinnedFingerprints.contains(leafFp)) {
+                        val chainFingerprints = chain.map { sha256Hex(it) }
+                        val chainMatchesPinnedFingerprint = chainFingerprints.any { pinnedFingerprints.contains(it) }
+                        val issuerMatchesPinnedSubject = chain.any { pinnedSubjects.contains(it.issuerX500Principal.name) }
+
+                        if (
+                            leaf != null &&
+                            (
+                                (leafFp != null && pinnedFingerprints.contains(leafFp)) ||
+                                    chainMatchesPinnedFingerprint ||
+                                    issuerMatchesPinnedSubject
+                                )
+                        ) {
                             logger.warn(
-                                "TLS PKIX failed, but leaf certificate is pinned in truststore; accepting fallback. " +
-                                    "leafSubject='{}', leafIssuer='{}', leafSha256={}",
+                                "TLS PKIX failed; accepting fallback based on truststore pin match. " +
+                                    "leafSubject='{}', leafIssuer='{}', leafSha256={}, " +
+                                    "chainMatchByFingerprint={}, chainMatchByIssuerSubject={}",
                                 leaf.subjectX500Principal.name,
                                 leaf.issuerX500Principal.name,
-                                leafFp
+                                leafFp,
+                                chainMatchesPinnedFingerprint,
+                                issuerMatchesPinnedSubject
                             )
                             return
                         }
