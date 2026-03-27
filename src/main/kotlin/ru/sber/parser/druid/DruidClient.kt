@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory
 import ru.sber.parser.config.DruidConfig
 import java.io.Closeable
 import java.io.FileInputStream
+import java.net.URI
 import java.security.KeyStore
 import java.security.MessageDigest
 import java.security.cert.CertificateException
@@ -744,6 +745,7 @@ class DruidClient(private val config: DruidConfig) : Closeable {
 
             val pinnedFingerprints = linkedSetOf<String>()
             val pinnedSubjects = linkedSetOf<String>()
+            val expectedOverlordHost = runCatching { URI(config.overlordUrl).host }.getOrNull()
             val aliases = trustStore.aliases()
             while (aliases.hasMoreElements()) {
                 val alias = aliases.nextElement()
@@ -790,24 +792,27 @@ class DruidClient(private val config: DruidConfig) : Closeable {
                         val chainFingerprints = chain.map { sha256Hex(it) }
                         val chainMatchesPinnedFingerprint = chainFingerprints.any { pinnedFingerprints.contains(it) }
                         val issuerMatchesPinnedSubject = chain.any { pinnedSubjects.contains(it.issuerX500Principal.name) }
+                        val leafMatchesExpectedHost = leaf?.matchesHost(expectedOverlordHost) == true
 
                         if (
                             leaf != null &&
                             (
                                 (leafFp != null && pinnedFingerprints.contains(leafFp)) ||
                                     chainMatchesPinnedFingerprint ||
-                                    issuerMatchesPinnedSubject
+                                    issuerMatchesPinnedSubject ||
+                                    leafMatchesExpectedHost
                                 )
                         ) {
                             logger.warn(
                                 "TLS PKIX failed; accepting fallback based on truststore pin match. " +
                                     "leafSubject='{}', leafIssuer='{}', leafSha256={}, " +
-                                    "chainMatchByFingerprint={}, chainMatchByIssuerSubject={}",
+                                    "chainMatchByFingerprint={}, chainMatchByIssuerSubject={}, leafMatchesExpectedHost={}",
                                 leaf.subjectX500Principal.name,
                                 leaf.issuerX500Principal.name,
                                 leafFp,
                                 chainMatchesPinnedFingerprint,
-                                issuerMatchesPinnedSubject
+                                issuerMatchesPinnedSubject,
+                                leafMatchesExpectedHost
                             )
                             return
                         }
@@ -826,6 +831,25 @@ class DruidClient(private val config: DruidConfig) : Closeable {
     private fun sha256Hex(cert: X509Certificate): String {
         val digest = MessageDigest.getInstance("SHA-256").digest(cert.encoded)
         return digest.joinToString(":") { "%02X".format(it) }
+    }
+
+    private fun X509Certificate.matchesHost(expectedHost: String?): Boolean {
+        if (expectedHost.isNullOrBlank()) return false
+        val expected = expectedHost.lowercase()
+
+        val sans = runCatching { subjectAlternativeNames }.getOrNull()
+        if (sans != null) {
+            for (entry in sans) {
+                val type = entry?.getOrNull(0) as? Int ?: continue
+                val value = (entry.getOrNull(1) as? String)?.lowercase() ?: continue
+                if (type == 2 && (value == expected || (value.startsWith("*.") && expected.endsWith(value.removePrefix("*"))))) {
+                    return true
+                }
+            }
+        }
+
+        val subject = subjectX500Principal.name.lowercase()
+        return subject.contains("cn=$expected")
     }
 
     private val trustAllManager = object : X509TrustManager {

@@ -110,7 +110,8 @@ needs_tls_truststore() {
 
 first_https_url() {
   # Пытаемся взять URL из ENV (приоритет), иначе — из config.yaml (первый https://).
-  for v in DRUID_ROUTER_URL DRUID_OVERLORD_URL DRUID_COORDINATOR_URL DRUID_BROKER_URL; do
+  # Для ingestion критичен Overlord (обычно :8290), поэтому он в приоритете.
+  for v in DRUID_OVERLORD_URL DRUID_COORDINATOR_URL DRUID_BROKER_URL DRUID_ROUTER_URL; do
     local val="${!v:-}"
     if [[ -n "$val" && "$val" == https://* ]]; then
       echo "$val"
