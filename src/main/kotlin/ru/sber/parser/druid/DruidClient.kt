@@ -77,7 +77,7 @@ import javax.net.ssl.X509TrustManager
 class DruidClient(private val config: DruidConfig) : Closeable {
     
     private val logger = LoggerFactory.getLogger(DruidClient::class.java)
-    private val trustManager: X509TrustManager? = createTrustManager(config)
+    private val tlsTrustManager: X509TrustManager? = createTrustManager(config)
     
     /** Jackson ObjectMapper для сериализации/десериализации JSON */
     private val objectMapper: ObjectMapper = jacksonObjectMapper()
@@ -96,9 +96,7 @@ class DruidClient(private val config: DruidConfig) : Closeable {
     private val httpClient = HttpClient(CIO) {
         engine {
             https {
-                if (trustManager != null) {
-                    this.trustManager = trustManager
-                }
+                tlsTrustManager?.let { this.trustManager = it }
             }
         }
         install(ContentNegotiation) {
