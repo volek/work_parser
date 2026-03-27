@@ -2,8 +2,8 @@
 """
 Проверка доступности Druid endpoint'ов и TLS (verify on/off).
 
-Установка зависимостей:
-  python3 -m pip install requests
+Установка зависимостей (для Python 3.8):
+  python3 -m pip install "requests<2.32"
 
 Запуск:
   python3 scripts/check_druid_tls.py
@@ -12,6 +12,7 @@
   DRUID_HOST=omltd-abyss-sdp2-druid-10.opsmon.sbt
   DRUID_USERNAME=admin
   DRUID_PASSWORD=admin
+  DRUID_SUPPRESS_INSECURE_WARNING=true
   python3 scripts/check_druid_tls.py
 """
 
@@ -20,8 +21,14 @@ from __future__ import annotations
 import os
 from typing import Iterable
 
-import requests
-from requests.auth import HTTPBasicAuth
+try:
+    import requests
+    from requests.auth import HTTPBasicAuth
+except ImportError as exc:  # pragma: no cover
+    raise SystemExit(
+        "Missing dependency 'requests'. Install compatible version for Python 3.8:\n"
+        "  python3 -m pip install \"requests<2.32\""
+    ) from exc
 
 
 def env(name: str, default: str) -> str:
@@ -33,6 +40,12 @@ HOST = env("DRUID_HOST", "omltd-abyss-sdp2-druid-10.opsmon.sbt")
 USER = env("DRUID_USERNAME", "admin")
 PWD = env("DRUID_PASSWORD", "admin")
 TIMEOUT = float(env("DRUID_TIMEOUT_SECONDS", "15"))
+SUPPRESS_INSECURE_WARNING = env("DRUID_SUPPRESS_INSECURE_WARNING", "true").lower() in {
+    "1",
+    "true",
+    "yes",
+    "on",
+}
 
 URLS = [
     f"https://{HOST}:9088/status/health",  # router
@@ -68,6 +81,17 @@ def check(url: str, verify: bool) -> None:
 
 
 def run(urls: Iterable[str]) -> None:
+    if SUPPRESS_INSECURE_WARNING:
+        try:
+            import urllib3
+
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+        except Exception as exc:  # noqa: BLE001
+            print(
+                f"[WARN] Failed to disable InsecureRequestWarning: "
+                f"{type(exc).__name__}: {exc}"
+            )
+
     print("=== verify=True ===")
     for url in urls:
         check(url, True)

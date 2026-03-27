@@ -77,6 +77,9 @@ import javax.net.ssl.X509TrustManager
 class DruidClient(private val config: DruidConfig) : Closeable {
     
     private val logger = LoggerFactory.getLogger(DruidClient::class.java)
+    init {
+        configureJvmTrustStore(config)
+    }
     private val tlsTrustManager: X509TrustManager? = createTrustManager(config)
     
     /** Jackson ObjectMapper для сериализации/десериализации JSON */
@@ -720,6 +723,31 @@ class DruidClient(private val config: DruidConfig) : Closeable {
      */
     override fun close() {
         httpClient.close()
+    }
+
+    private fun configureJvmTrustStore(config: DruidConfig) {
+        if (config.insecureSkipTlsVerify) {
+            logger.warn("TLS insecure mode enabled; JVM trustStore auto-configuration is skipped.")
+            return
+        }
+
+        val trustStorePath = config.trustStorePath?.takeIf { it.isNotBlank() } ?: return
+        val trustStoreType = config.trustStoreType.ifBlank { "PKCS12" }
+        val trustStorePassword = config.trustStorePassword.orEmpty()
+
+        // CIO/JSSE may use default JVM SSL context. Keep it aligned with app config.
+        System.setProperty("javax.net.ssl.trustStore", trustStorePath)
+        System.setProperty("javax.net.ssl.trustStoreType", trustStoreType)
+        if (trustStorePassword.isNotEmpty()) {
+            System.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword)
+        }
+
+        logger.info(
+            "JVM trustStore configured: path={}, type={}, passwordSet={}",
+            trustStorePath,
+            trustStoreType,
+            trustStorePassword.isNotEmpty()
+        )
     }
 
     private fun createTrustManager(config: DruidConfig): X509TrustManager? {
