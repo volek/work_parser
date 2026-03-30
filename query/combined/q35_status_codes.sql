@@ -3,12 +3,12 @@
 -- Файл: `combined/q35_status_codes.sql`.
 -- Стратегия: Combined (Tiered Hot/Warm/Cold).
 -- Модель стратегии: горячие поля в основной записи + индексируемые переменные + cold JSON-поля для редких доступов.
--- Типовые таблицы стратегии: обычно `process_main` и (при необходимости) `process_variables_indexed`.
--- При parser.warmVariablesLimit (10..1010) число записей в process_variables_indexed на процесс может быть ограничено.
+-- Типовые таблицы стратегии: обычно `combined_process_main` и (при необходимости) `combined_process_variables_indexed`.
+-- При parser.warmVariablesLimit (10..1010) число записей в combined_process_variables_indexed на процесс может быть ограничено.
 -- Назначение данного запроса: получение детальной выборки для анализа.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_main.
+-- 1) Выбор источника данных: combined_process_main.
 -- 3) Применение фильтров WHERE для отбора релевантных строк.
 -- 4) Агрегация данных (GROUP BY и/или агрегатные функции).
 -- 6) Упорядочивание результата через ORDER BY.
@@ -24,7 +24,7 @@
 SELECT 
     var_value as status_code,
     COUNT(*) as cnt
-FROM process_variables_indexed
+FROM combined_process_variables_indexed
 WHERE var_path LIKE '%statusCode%'
 GROUP BY var_value
 ORDER BY cnt DESC

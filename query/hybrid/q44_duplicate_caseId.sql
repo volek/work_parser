@@ -3,11 +3,11 @@
 -- Файл: `hybrid/q44_duplicate_caseId.sql`.
 -- Стратегия: Hybrid (Flat + JSON).
 -- Модель стратегии: часто используемые атрибуты вынесены в плоские колонки, вложенные структуры хранятся в JSON.
--- Типовые таблицы стратегии: обычно `process_hybrid`.
+-- Типовые таблицы стратегии: обычно `hybrid_process_hybrid`.
 -- Назначение данного запроса: получение детальной выборки для анализа.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_hybrid.
+-- 1) Выбор источника данных: hybrid_process_hybrid.
 -- 3) Применение фильтров WHERE для отбора релевантных строк.
 -- 4) Агрегация данных (GROUP BY и/или агрегатные функции).
 -- 5) Фильтрация агрегированных групп через HAVING.
@@ -25,7 +25,7 @@
 SELECT 
     var_caseId,
     COUNT(*) as process_count
-FROM process_main
+FROM hybrid_process_hybrid
 WHERE var_caseId IS NOT NULL
 GROUP BY var_caseId
 HAVING COUNT(*) > 1

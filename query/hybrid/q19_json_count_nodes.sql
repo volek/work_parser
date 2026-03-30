@@ -3,11 +3,11 @@
 -- Файл: `hybrid/q19_json_count_nodes.sql`.
 -- Стратегия: Hybrid (Flat + JSON).
 -- Модель стратегии: часто используемые атрибуты вынесены в плоские колонки, вложенные структуры хранятся в JSON.
--- Типовые таблицы стратегии: обычно `process_hybrid`.
+-- Типовые таблицы стратегии: обычно `hybrid_process_hybrid`.
 -- Назначение данного запроса: извлечение/анализ JSON-полей, агрегирование и расчёт метрик.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_hybrid.
+-- 1) Выбор источника данных: hybrid_process_hybrid.
 -- 3) Применение фильтров WHERE для отбора релевантных строк.
 -- 6) Упорядочивание результата через ORDER BY.
 -- 7) Ограничение объёма выдачи через LIMIT.
@@ -25,7 +25,7 @@ SELECT
     process_id,
     process_name,
     CASE WHEN node_instances_json IS NOT NULL THEN 1 ELSE 0 END as has_nodes
-FROM process_main
+FROM hybrid_process_hybrid
 WHERE node_instances_json IS NOT NULL
 ORDER BY __time DESC
 LIMIT 50

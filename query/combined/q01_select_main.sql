@@ -3,12 +3,12 @@
 -- Файл: `combined/q01_select_main.sql`.
 -- Стратегия: Combined (Tiered Hot/Warm/Cold).
 -- Модель стратегии: горячие поля в основной записи + индексируемые переменные + cold JSON-поля для редких доступов.
--- Типовые таблицы стратегии: обычно `process_main` и (при необходимости) `process_variables_indexed`.
--- При parser.warmVariablesLimit (10..1010) число записей в process_variables_indexed на процесс может быть ограничено.
+-- Типовые таблицы стратегии: обычно `combined_process_main` и (при необходимости) `combined_process_variables_indexed`.
+-- При parser.warmVariablesLimit (10..1010) число записей в combined_process_variables_indexed на процесс может быть ограничено.
 -- Назначение данного запроса: получение детальной выборки для анализа.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_main.
+-- 1) Выбор источника данных: combined_process_main.
 -- 6) Упорядочивание результата через ORDER BY.
 -- 7) Ограничение объёма выдачи через LIMIT.
 --
@@ -37,6 +37,6 @@ SELECT
     var_fio,
     var_ucpId,
     module_id
-FROM process_main
+FROM combined_process_main
 ORDER BY __time DESC
 LIMIT 100

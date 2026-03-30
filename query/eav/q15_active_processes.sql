@@ -3,11 +3,11 @@
 -- Файл: `eav/q15_active_processes.sql`.
 -- Стратегия: EAV (Entity-Attribute-Value).
 -- Модель стратегии: данные процесса разделены на сущность процесса и набор переменных по путям/атрибутам.
--- Типовые таблицы стратегии: обычно `process_events` + `process_variables` (в текущем наборе также встречаются унифицированные представления).
+-- Типовые таблицы стратегии: обычно `eav_process_events` + `eav_process_variables` (в текущем наборе также встречаются унифицированные представления).
 -- Назначение данного запроса: получение детальной выборки для анализа.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_main.
+-- 1) Выбор источника данных: eav_process_events.
 -- 3) Применение фильтров WHERE для отбора релевантных строк.
 -- 6) Упорядочивание результата через ORDER BY.
 -- 7) Ограничение объёма выдачи через LIMIT.
@@ -25,7 +25,7 @@ SELECT
     process_id,
     process_id,
     __time as start_date
-FROM process_variables
+FROM eav_process_variables
 WHERE var_path = 'statusCode' AND var_value = '\1'
 ORDER BY __time DESC
 LIMIT 100

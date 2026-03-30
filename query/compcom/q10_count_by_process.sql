@@ -3,12 +3,12 @@
 -- Файл: `compcom/q10_count_by_process.sql`.
 -- Стратегия: Compcom (Compact combined, no cold blob).
 -- Модель стратегии: горячие поля в основной записи + индексируемые переменные, без cold blob.
--- Типовые таблицы стратегии: обычно `process_main_compact` и (при необходимости) `process_variables_indexed`.
--- При parser.warmVariablesLimit (10..1010) число записей в process_variables_indexed на процесс может быть ограничено.
+-- Типовые таблицы стратегии: обычно `compcom_process_main_compact` и (при необходимости) `compcom_process_variables_indexed`.
+-- При parser.warmVariablesLimit (10..1010) число записей в compcom_process_variables_indexed на процесс может быть ограничено.
 -- Назначение данного запроса: агрегирование и расчёт метрик.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_main_compact.
+-- 1) Выбор источника данных: compcom_process_main_compact.
 -- 4) Агрегация данных (GROUP BY и/или агрегатные функции).
 -- 6) Упорядочивание результата через ORDER BY.
 --
@@ -23,6 +23,6 @@
 SELECT 
     process_id,
     COUNT(*) as cnt_total
-FROM process_main_compact
+FROM compcom_process_main_compact
 GROUP BY process_id
 ORDER BY cnt_total DESC

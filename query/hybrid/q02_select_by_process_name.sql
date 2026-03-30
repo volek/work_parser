@@ -3,11 +3,11 @@
 -- Файл: `hybrid/q02_select_by_process_name.sql`.
 -- Стратегия: Hybrid (Flat + JSON).
 -- Модель стратегии: часто используемые атрибуты вынесены в плоские колонки, вложенные структуры хранятся в JSON.
--- Типовые таблицы стратегии: обычно `process_hybrid`.
+-- Типовые таблицы стратегии: обычно `hybrid_process_hybrid`.
 -- Назначение данного запроса: получение детальной выборки для анализа.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_hybrid.
+-- 1) Выбор источника данных: hybrid_process_hybrid.
 -- 3) Применение фильтров WHERE для отбора релевантных строк.
 -- 6) Упорядочивание результата через ORDER BY.
 --
@@ -28,6 +28,6 @@ SELECT
     var_caseId,
     var_epkId,
     __time as start_date
-FROM process_main
+FROM hybrid_process_hybrid
 WHERE process_name = 'uvskRemainderReturnCR-Service'
 ORDER BY __time DESC

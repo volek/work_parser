@@ -1,5 +1,6 @@
 package ru.sber.parser.model.druid
 
+import ru.sber.parser.druid.DruidDataSources
 import java.time.Instant
 
 /**
@@ -306,6 +307,6 @@ data class HybridRecord(
          * Название источника данных в Apache Druid.
          * Все гибридные записи направляются в этот единственный datasource.
          */
-        const val DATA_SOURCE_NAME = "process_hybrid"
+        const val DATA_SOURCE_NAME = DruidDataSources.Hybrid.MAIN
     }
 }

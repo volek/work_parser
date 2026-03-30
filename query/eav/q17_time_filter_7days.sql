@@ -3,11 +3,11 @@
 -- Файл: `eav/q17_time_filter_7days.sql`.
 -- Стратегия: EAV (Entity-Attribute-Value).
 -- Модель стратегии: данные процесса разделены на сущность процесса и набор переменных по путям/атрибутам.
--- Типовые таблицы стратегии: обычно `process_events` + `process_variables` (в текущем наборе также встречаются унифицированные представления).
+-- Типовые таблицы стратегии: обычно `eav_process_events` + `eav_process_variables` (в текущем наборе также встречаются унифицированные представления).
 -- Назначение данного запроса: фильтрация записей по условиям.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_main.
+-- 1) Выбор источника данных: eav_process_events.
 -- 3) Применение фильтров WHERE для отбора релевантных строк.
 -- 4) Агрегация данных (GROUP BY и/или агрегатные функции).
 -- 6) Упорядочивание результата через ORDER BY.
@@ -25,7 +25,7 @@ SELECT
     DATE_TRUNC('day', __time) as day_ts,
     process_id,
     COUNT(*) as cnt_total
-FROM process_events
+FROM eav_process_events
 WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '7' DAY
 GROUP BY 1, 2
 ORDER BY day_ts DESC, cnt_total DESC

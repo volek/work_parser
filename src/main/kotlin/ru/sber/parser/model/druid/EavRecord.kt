@@ -1,5 +1,6 @@
 package ru.sber.parser.model.druid
 
+import ru.sber.parser.druid.DruidDataSources
 import java.time.Instant
 
 /**
@@ -146,7 +147,7 @@ data class ProcessEventRecord(
     
     companion object {
         /** Название источника данных в Druid для событий процессов */
-        const val DATA_SOURCE_NAME = "process_events"
+        const val DATA_SOURCE_NAME = DruidDataSources.Eav.EVENTS
     }
 }
 
@@ -228,7 +229,7 @@ data class ProcessVariableRecord(
     
     companion object {
         /** Название источника данных для переменных процессов */
-        const val DATA_SOURCE_NAME = "process_variables"
+        const val DATA_SOURCE_NAME = DruidDataSources.Eav.VARIABLES
         
         // ========================================
         // КОНСТАНТЫ ТИПОВ ДАННЫХ

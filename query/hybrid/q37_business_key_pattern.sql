@@ -3,11 +3,11 @@
 -- Файл: `hybrid/q37_business_key_pattern.sql`.
 -- Стратегия: Hybrid (Flat + JSON).
 -- Модель стратегии: часто используемые атрибуты вынесены в плоские колонки, вложенные структуры хранятся в JSON.
--- Типовые таблицы стратегии: обычно `process_hybrid`.
+-- Типовые таблицы стратегии: обычно `hybrid_process_hybrid`.
 -- Назначение данного запроса: получение детальной выборки для анализа.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_hybrid.
+-- 1) Выбор источника данных: hybrid_process_hybrid.
 -- 3) Применение фильтров WHERE для отбора релевантных строк.
 -- 4) Агрегация данных (GROUP BY и/или агрегатные функции).
 -- 6) Упорядочивание результата через ORDER BY.
@@ -24,7 +24,7 @@
 SELECT 
     SUBSTRING(business_key, 1, 6) as date_prefix,
     COUNT(*) as cnt_total
-FROM process_main
+FROM hybrid_process_hybrid
 WHERE business_key IS NOT NULL
 GROUP BY 1
 ORDER BY date_prefix DESC

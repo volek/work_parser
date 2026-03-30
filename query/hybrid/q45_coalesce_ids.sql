@@ -3,11 +3,11 @@
 -- Файл: `hybrid/q45_coalesce_ids.sql`.
 -- Стратегия: Hybrid (Flat + JSON).
 -- Модель стратегии: часто используемые атрибуты вынесены в плоские колонки, вложенные структуры хранятся в JSON.
--- Типовые таблицы стратегии: обычно `process_hybrid`.
+-- Типовые таблицы стратегии: обычно `hybrid_process_hybrid`.
 -- Назначение данного запроса: получение детальной выборки для анализа.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_hybrid.
+-- 1) Выбор источника данных: hybrid_process_hybrid.
 -- 7) Ограничение объёма выдачи через LIMIT.
 --
 -- Ожидаемые возвращаемые данные и формат:
@@ -23,5 +23,5 @@ SELECT
     process_id,
     COALESCE(var_caseId, var_staticData_caseId, 'NO_CASE_ID') as effective_caseId,
     COALESCE(var_ucpId, var_epkData_ucpId, 'NO_UCP_ID') as effective_ucpId
-FROM process_main
+FROM hybrid_process_hybrid
 LIMIT 100

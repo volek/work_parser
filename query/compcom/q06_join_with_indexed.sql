@@ -3,12 +3,12 @@
 -- Файл: `compcom/q06_join_with_indexed.sql`.
 -- Стратегия: Compcom (Compact combined, no cold blob).
 -- Модель стратегии: горячие поля в основной записи + индексируемые переменные, без cold blob.
--- Типовые таблицы стратегии: обычно `process_main_compact` и (при необходимости) `process_variables_indexed`.
--- При parser.warmVariablesLimit (10..1010) число записей в process_variables_indexed на процесс может быть ограничено.
+-- Типовые таблицы стратегии: обычно `compcom_process_main_compact` и (при необходимости) `compcom_process_variables_indexed`.
+-- При parser.warmVariablesLimit (10..1010) число записей в compcom_process_variables_indexed на процесс может быть ограничено.
 -- Назначение данного запроса: сопоставление данных между наборами/атрибутами.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_main_compact.
+-- 1) Выбор источника данных: compcom_process_main_compact.
 -- 2) Объединение наборов через JOIN для связывания контекста процесса и/или переменных.
 -- 3) Применение фильтров WHERE для отбора релевантных строк.
 -- 7) Ограничение объёма выдачи через LIMIT.
@@ -32,7 +32,7 @@ SELECT
     pv.var_category,
     pv.var_path,
     pv.var_value
-FROM process_main_compact pm
-JOIN process_variables_indexed pv ON pm.process_id = pv.process_id
+FROM compcom_process_main_compact pm
+JOIN compcom_process_variables_indexed pv ON pm.process_id = pv.process_id
 WHERE pv.var_value IS NOT NULL
 LIMIT 100

@@ -5,7 +5,7 @@ SELECT
   process_name,
   var_ucpId,
   __time
-FROM process_main
+FROM default_process_default
 WHERE var_ucpId IS NOT NULL
 ORDER BY __time DESC
 LIMIT 200;

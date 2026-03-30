@@ -3,11 +3,11 @@
 -- Файл: `eav/q19_distinct_paths.sql`.
 -- Стратегия: EAV (Entity-Attribute-Value).
 -- Модель стратегии: данные процесса разделены на сущность процесса и набор переменных по путям/атрибутам.
--- Типовые таблицы стратегии: обычно `process_events` + `process_variables` (в текущем наборе также встречаются унифицированные представления).
+-- Типовые таблицы стратегии: обычно `eav_process_events` + `eav_process_variables` (в текущем наборе также встречаются унифицированные представления).
 -- Назначение данного запроса: агрегирование и расчёт метрик.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_main.
+-- 1) Выбор источника данных: eav_process_events.
 -- 4) Агрегация данных (GROUP BY и/или агрегатные функции).
 -- 6) Упорядочивание результата через ORDER BY.
 --
@@ -22,6 +22,6 @@
 SELECT 
     var_path,
     COUNT(DISTINCT process_id) as process_count
-FROM process_variables
+FROM eav_process_variables
 GROUP BY var_path
 ORDER BY process_count DESC

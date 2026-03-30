@@ -3,11 +3,11 @@
 -- Файл: `eav/q37_process_with_vars_count.sql`.
 -- Стратегия: EAV (Entity-Attribute-Value).
 -- Модель стратегии: данные процесса разделены на сущность процесса и набор переменных по путям/атрибутам.
--- Типовые таблицы стратегии: обычно `process_events` + `process_variables` (в текущем наборе также встречаются унифицированные представления).
+-- Типовые таблицы стратегии: обычно `eav_process_events` + `eav_process_variables` (в текущем наборе также встречаются унифицированные представления).
 -- Назначение данного запроса: агрегирование и расчёт метрик.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_main.
+-- 1) Выбор источника данных: eav_process_events.
 -- 2) Объединение наборов через JOIN для связывания контекста процесса и/или переменных.
 -- 4) Агрегация данных (GROUP BY и/или агрегатные функции).
 -- 6) Упорядочивание результата через ORDER BY.
@@ -28,8 +28,8 @@ SELECT
     pe.process_name,
     pe.state,
     COUNT(pv.var_path) as var_count
-FROM process_events pe
-LEFT JOIN process_variables pv ON pe.process_id = pv.process_id
+FROM eav_process_events pe
+LEFT JOIN eav_process_variables pv ON pe.process_id = pv.process_id
 GROUP BY pe.process_id, pe.process_name, pe.state
 ORDER BY var_count DESC
 LIMIT 50

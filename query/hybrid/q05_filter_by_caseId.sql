@@ -3,11 +3,11 @@
 -- Файл: `hybrid/q05_filter_by_caseId.sql`.
 -- Стратегия: Hybrid (Flat + JSON).
 -- Модель стратегии: часто используемые атрибуты вынесены в плоские колонки, вложенные структуры хранятся в JSON.
--- Типовые таблицы стратегии: обычно `process_hybrid`.
+-- Типовые таблицы стратегии: обычно `hybrid_process_hybrid`.
 -- Назначение данного запроса: фильтрация записей по условиям.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_hybrid.
+-- 1) Выбор источника данных: hybrid_process_hybrid.
 -- 3) Применение фильтров WHERE для отбора релевантных строк.
 -- 6) Упорядочивание результата через ORDER BY.
 --
@@ -28,7 +28,7 @@ SELECT
     var_caseId,
     var_staticData_casePublicId,
     var_status
-FROM process_main
+FROM hybrid_process_hybrid
 WHERE var_caseId IS NOT NULL
   AND var_caseId LIKE 'test-%'
 ORDER BY __time DESC

@@ -3,12 +3,12 @@
 -- Файл: `compcom/q02_indexed_all.sql`.
 -- Стратегия: Compcom (Compact combined, no cold blob).
 -- Модель стратегии: горячие поля в основной записи + индексируемые переменные, без cold blob.
--- Типовые таблицы стратегии: обычно `process_main_compact` и (при необходимости) `process_variables_indexed`.
--- При parser.warmVariablesLimit (10..1010) число записей в process_variables_indexed на процесс может быть ограничено.
+-- Типовые таблицы стратегии: обычно `compcom_process_main_compact` и (при необходимости) `compcom_process_variables_indexed`.
+-- При parser.warmVariablesLimit (10..1010) число записей в compcom_process_variables_indexed на процесс может быть ограничено.
 -- Назначение данного запроса: получение детальной выборки для анализа.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_main_compact.
+-- 1) Выбор источника данных: compcom_process_main_compact.
 -- 7) Ограничение объёма выдачи через LIMIT.
 --
 -- Ожидаемые возвращаемые данные и формат:
@@ -28,5 +28,5 @@ SELECT
     var_path,
     var_value,
     var_type
-FROM process_variables_indexed
+FROM compcom_process_variables_indexed
 LIMIT 100

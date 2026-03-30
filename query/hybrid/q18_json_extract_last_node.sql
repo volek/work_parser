@@ -3,11 +3,11 @@
 -- Файл: `hybrid/q18_json_extract_last_node.sql`.
 -- Стратегия: Hybrid (Flat + JSON).
 -- Модель стратегии: часто используемые атрибуты вынесены в плоские колонки, вложенные структуры хранятся в JSON.
--- Типовые таблицы стратегии: обычно `process_hybrid`.
+-- Типовые таблицы стратегии: обычно `hybrid_process_hybrid`.
 -- Назначение данного запроса: извлечение/анализ JSON-полей, фильтрация записей по условиям.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_hybrid.
+-- 1) Выбор источника данных: hybrid_process_hybrid.
 -- 3) Применение фильтров WHERE для отбора релевантных строк.
 -- 7) Ограничение объёма выдачи через LIMIT.
 --
@@ -28,6 +28,6 @@ SELECT
     state,
     JSON_VALUE(node_instances_json, '$[-1].nodeName') as last_node_name,
     JSON_VALUE(node_instances_json, '$[-1].state') as last_node_state
-FROM process_main
+FROM hybrid_process_hybrid
 WHERE state = 1
 LIMIT 50

@@ -1,5 +1,6 @@
 package ru.sber.parser.model.druid
 
+import ru.sber.parser.druid.DruidDataSources
 import java.time.Instant
 
 /**
@@ -234,7 +235,7 @@ data class ProcessMainRecord(
     
     companion object {
         /** Название источника данных (datasource) в Apache Druid */
-        const val DATA_SOURCE_NAME = "process_main"
+        const val DATA_SOURCE_NAME = DruidDataSources.Combined.MAIN
     }
 }
 
@@ -313,7 +314,7 @@ data class ProcessVariableIndexedRecord(
     
     companion object {
         /** Название источника данных для индексированных переменных */
-        const val DATA_SOURCE_NAME = "process_variables_indexed"
+        const val DATA_SOURCE_NAME = DruidDataSources.Combined.VARIABLES_INDEXED
     }
 }
 

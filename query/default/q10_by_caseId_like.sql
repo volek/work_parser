@@ -5,7 +5,7 @@ SELECT
   process_name,
   var_caseId,
   __time
-FROM process_main
+FROM default_process_default
 WHERE var_caseId LIKE '____-____-%'
 ORDER BY __time DESC
 LIMIT 200;

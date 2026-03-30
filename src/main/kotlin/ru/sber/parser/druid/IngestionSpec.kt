@@ -114,7 +114,7 @@ data class IngestionSpec(
          * - JSON-блобы (node_instances_json, var_*_json)
          */
         fun forHybrid(): IngestionSpec = IngestionSpec(
-            dataSource = "process_hybrid",
+            dataSource = DruidDataSources.Hybrid.MAIN,
             dimensions = listOf(
                 DimensionSpec("process_id", "string"),
                 DimensionSpec("process_name", "string"),
@@ -164,7 +164,7 @@ data class IngestionSpec(
          * - node_instances_json (сериализованные узлы)
          */
         fun forProcessEvents(): IngestionSpec = IngestionSpec(
-            dataSource = "process_events",
+            dataSource = DruidDataSources.Eav.EVENTS,
             dimensions = listOf(
                 DimensionSpec("process_id", "string"),
                 DimensionSpec("process_name", "string"),
@@ -190,7 +190,7 @@ data class IngestionSpec(
          * - var_type (тип данных)
          */
         fun forProcessVariables(): IngestionSpec = IngestionSpec(
-            dataSource = "process_variables",
+            dataSource = DruidDataSources.Eav.VARIABLES,
             dimensions = listOf(
                 DimensionSpec("process_id", "string"),
                 DimensionSpec("var_path", "string"),
@@ -208,7 +208,7 @@ data class IngestionSpec(
          * - Cold-блоб (var_blob_json)
          */
         fun forProcessMain(): IngestionSpec = IngestionSpec(
-            dataSource = "process_main",
+            dataSource = DruidDataSources.Combined.MAIN,
             dimensions = listOf(
                 DimensionSpec("process_id", "string"),
                 DimensionSpec("process_name", "string"),
@@ -257,7 +257,7 @@ data class IngestionSpec(
          * - var_value, var_type
          */
         fun forProcessVariablesIndexed(): IngestionSpec = IngestionSpec(
-            dataSource = "process_variables_indexed",
+            dataSource = DruidDataSources.Combined.VARIABLES_INDEXED,
             dimensions = listOf(
                 DimensionSpec("process_id", "string"),
                 DimensionSpec("var_category", "string"),
@@ -272,7 +272,7 @@ data class IngestionSpec(
          * Основная таблица без cold-блоба: нет колонки var_blob_json.
          */
         fun forProcessMainCompact(): IngestionSpec = IngestionSpec(
-            dataSource = "process_main_compact",
+            dataSource = DruidDataSources.Compcom.MAIN_COMPACT,
             dimensions = listOf(
                 DimensionSpec("process_id", "string"),
                 DimensionSpec("process_name", "string"),
@@ -307,6 +307,21 @@ data class IngestionSpec(
                 DimensionSpec("var_tracingHeaders_requestId", "string"),
                 DimensionSpec("var_tracingHeaders_traceId", "string"),
                 DimensionSpec("node_instances_json", "string")
+            )
+        )
+
+        /**
+         * Спецификация для Compcom-indexed (compact combined).
+         * Отдельный datasource от combined для изоляции данных стратегий.
+         */
+        fun forProcessVariablesIndexedCompact(): IngestionSpec = IngestionSpec(
+            dataSource = DruidDataSources.Compcom.VARIABLES_INDEXED,
+            dimensions = listOf(
+                DimensionSpec("process_id", "string"),
+                DimensionSpec("var_category", "string"),
+                DimensionSpec("var_path", "string"),
+                DimensionSpec("var_value", "string"),
+                DimensionSpec("var_type", "string")
             )
         )
     }

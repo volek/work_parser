@@ -250,8 +250,8 @@ parser/
 ├── query/                  # SQL-запросы по стратегиям
 │   ├── hybrid/             # 50+ queries for Hybrid
 │   ├── eav/                # 50+ queries for EAV
-│   ├── combined/           # 68 queries for Combined (process_main + process_variables_indexed)
-│   ├── compcom/            # 70 queries for Compcom (process_main_compact + process_variables_indexed)
+│   ├── combined/           # 68 queries for Combined (combined_process_main + combined_process_variables_indexed)
+│   ├── compcom/            # 70 queries for Compcom (compcom_process_main_compact + compcom_process_variables_indexed)
 │   └── default/            # запросы для Default (все поля как колонки)
 └── samples/                # Sample BPM messages
 ```
@@ -786,7 +786,7 @@ ru.sber.parser/
 
 ### 1. Hybrid Strategy (Flat + JSON)
 
-**Таблица:** `process_hybrid`
+**Таблица:** `hybrid_process_hybrid`
 
 Оптимальна для:
 - Частых запросов по фиксированным полям
@@ -795,13 +795,13 @@ ru.sber.parser/
 ```sql
 SELECT process_name, var_epkId, var_caseId,
        JSON_VALUE(var_epkData_json, '$.epkEntity.ucpId')
-FROM process_hybrid
+FROM hybrid_process_hybrid
 WHERE state = 1 AND var_fio LIKE '%Иванов%'
 ```
 
 ### 2. EAV Strategy (Entity-Attribute-Value)
 
-**Таблицы:** `process_events`, `process_variables`
+**Таблицы:** `eav_process_events`, `eav_process_variables`
 
 Оптимальна для:
 - Гибких запросов по любым переменным
@@ -809,14 +809,14 @@ WHERE state = 1 AND var_fio LIKE '%Иванов%'
 
 ```sql
 SELECT pe.process_name, pv.var_value as epkId
-FROM process_events pe
-JOIN process_variables pv ON pe.process_id = pv.process_id
+FROM eav_process_events pe
+JOIN eav_process_variables pv ON pe.process_id = pv.process_id
 WHERE pv.var_path = 'epkId'
 ```
 
 ### 3. Combined Strategy (Tiered)
 
-**Таблицы:** `process_main`, `process_variables_indexed`
+**Таблицы:** `combined_process_main`, `combined_process_variables_indexed`
 
 Оптимальна для:
 - Баланса между производительностью и гибкостью
@@ -824,25 +824,25 @@ WHERE pv.var_path = 'epkId'
 
 ```sql
 -- Tier 1: Hot columns (прямой доступ)
-SELECT var_epkId, var_caseId FROM process_main
+SELECT var_epkId, var_caseId FROM combined_process_main
 
 -- Tier 2: Indexed variables (через JOIN)
 SELECT pm.*, pvi.var_value
-FROM process_main pm
-JOIN process_variables_indexed pvi 
+FROM combined_process_main pm
+JOIN combined_process_variables_indexed pvi 
   ON pm.process_id = pvi.process_id
 WHERE pvi.var_category = 'epkData'
 
 -- Tier 3: Cold blobs (JSON extraction) — только в combined, в compcom колонки var_blob_json нет
 SELECT JSON_VALUE(var_blob_json, '$.answerGFL')
-FROM process_main
+FROM combined_process_main
 ```
 
-При задании в `config.yaml` секции `parser.warmVariablesLimit` (10..1010, шаг 100) число записей в `process_variables_indexed` на одно сообщение ограничивается (для тестов и вариативности объёма warm-переменных). Подробнее: [strategies.md](strategies.md).
+При задании в `config.yaml` секции `parser.warmVariablesLimit` (10..1010, шаг 100) число записей в `combined_process_variables_indexed`/`compcom_process_variables_indexed` на одно сообщение ограничивается (для тестов и вариативности объёма warm-переменных). Подробнее: [strategies.md](strategies.md).
 
 ### 4. Compcom Strategy (compact combined, без cold blob)
 
-**Таблицы:** `process_main_compact`, `process_variables_indexed`
+**Таблицы:** `compcom_process_main_compact`, `compcom_process_variables_indexed`
 
 Как Combined, но **без сохранения cold blob в Druid**: в основной таблице нет колонки `var_blob_json`. Поддерживается тот же лимит warm-переменных (`parser.warmVariablesLimit`).
 
@@ -852,14 +852,14 @@ FROM process_main
 
 ```sql
 SELECT process_id, process_name, var_epkId, var_caseId
-FROM process_main_compact
+FROM compcom_process_main_compact
 WHERE state = 1
 LIMIT 100
 ```
 
 ### 5. Default Strategy (все поля как колонки)
 
-**Таблица:** `process_default`
+**Таблица:** `default_process_default`
 
 Парсит все поля входящего сообщения и сохраняет их в Druid в виде отдельных колонок. Имена колонок для переменных формируются из путей с разделителем «точка» (например, `variables.caseId`, `variables.staticData.clientEpkId`). В SQL идентификаторы с точкой указываются в двойных кавычках.
 
@@ -869,11 +869,11 @@ LIMIT 100
 
 ```sql
 -- Все колонки
-SELECT * FROM process_default ORDER BY __time DESC LIMIT 100
+SELECT * FROM default_process_default ORDER BY __time DESC LIMIT 100
 
 -- Колонки с точкой в имени — в кавычках
 SELECT id, process_name, "variables.caseId", "variables.staticData.caseId"
-FROM process_default
+FROM default_process_default
 WHERE state = 2
 ```
 
@@ -895,8 +895,8 @@ query/
 │   ├── basic/
 │   ├── joins/          # JOIN таблиц
 │   └── aggregations/
-├── combined/           # 68 запросов (process_main + process_variables_indexed)
-├── compcom/            # 70 запросов (process_main_compact + process_variables_indexed)
+├── combined/           # 68 запросов (combined_process_main + combined_process_variables_indexed)
+├── compcom/            # 70 запросов (compcom_process_main_compact + compcom_process_variables_indexed)
 └── default/            # Default: все поля как колонки
 ```
 
@@ -904,20 +904,20 @@ query/
 
 ```sql
 -- Найти процессы за последние 24 часа
-SELECT * FROM process_hybrid
+SELECT * FROM hybrid_process_hybrid
 WHERE start_date >= CURRENT_TIMESTAMP - INTERVAL '24' HOUR
 
 -- Топ-10 процессов по количеству
 SELECT process_name, COUNT(*) as cnt
-FROM process_hybrid
+FROM hybrid_process_hybrid
 GROUP BY process_name
 ORDER BY cnt DESC
 LIMIT 10
 
 -- Поиск по вложенным данным (EAV)
 SELECT pe.process_id, pv.var_value
-FROM process_events pe
-JOIN process_variables pv ON pe.process_id = pv.process_id
+FROM eav_process_events pe
+JOIN eav_process_variables pv ON pe.process_id = pv.process_id
 WHERE pv.var_path LIKE 'epkData.epkEntity.%'
 ```
 
@@ -958,11 +958,11 @@ docker compose down -v
 
 | Стратегия  | Datasource'ы |
 |------------|----------------|
-| Hybrid     | `process_hybrid` |
-| EAV        | `process_events`, `process_variables` |
-| Combined   | `process_main`, `process_variables_indexed` |
-| Compcom    | `process_main_compact`, `process_variables_indexed` |
-| Default    | `process_default` |
+| Hybrid     | `hybrid_process_hybrid` |
+| EAV        | `eav_process_events`, `eav_process_variables` |
+| Combined   | `combined_process_main`, `combined_process_variables_indexed` |
+| Compcom    | `compcom_process_main_compact`, `compcom_process_variables_indexed` |
+| Default    | `default_process_default` |
 
 **Требования:** нужен URL **Coordinator** (порт 8081), не Router. В `.env` это `DRUID_COORDINATOR_URL`. Пример: Coordinator на отдельном хосте `192.168.1.27` → `http://192.168.1.27:8081`.
 
@@ -975,13 +975,14 @@ curl -s "http://192.168.1.27:8081/druid/coordinator/v1/datasources"
 ```bash
 COORDINATOR_URL="http://192.168.1.27:8081"
 
-curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/process_hybrid"
-curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/process_events"
-curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/process_variables"
-curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/process_main"
-curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/process_main_compact"
-curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/process_variables_indexed"
-curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/process_default"
+curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/hybrid_process_hybrid"
+curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/eav_process_events"
+curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/eav_process_variables"
+curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/combined_process_main"
+curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/combined_process_variables_indexed"
+curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/compcom_process_main_compact"
+curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/compcom_process_variables_indexed"
+curl -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/default_process_default"
 ```
 
 Удаляйте только те datasource'ы, которые реально созданы парсером (лишние запросы вернут 404).

@@ -3,11 +3,11 @@
 -- Файл: `hybrid/q55_json_other_keys_presence.sql`.
 -- Стратегия: Hybrid (Flat + JSON).
 -- Модель стратегии: hot/warm поля в колонках + JSON-блобы для полноты данных.
--- Типовые таблицы стратегии: обычно `process_hybrid`.
+-- Типовые таблицы стратегии: обычно `hybrid_process_hybrid`.
 -- Назначение данного запроса: просмотр содержимого var_other_json (JSON blob "прочих" переменных).
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_hybrid.
+-- 1) Выбор источника данных: hybrid_process_hybrid.
 -- 3) Применение фильтров WHERE для отбора релевантных строк.
 -- 7) Ограничение объёма выдачи через LIMIT.
 --
@@ -19,7 +19,7 @@ SELECT
     process_id,
     process_name,
     var_other_json
-FROM process_main
+FROM hybrid_process_hybrid
 WHERE var_other_json IS NOT NULL
 LIMIT 50
 

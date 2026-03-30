@@ -3,11 +3,11 @@
 -- Файл: `eav/q55_process_with_multi_vars.sql`.
 -- Стратегия: EAV (Entity-Attribute-Value).
 -- Модель стратегии: данные процесса разделены на сущность процесса и набор переменных по путям/атрибутам.
--- Типовые таблицы стратегии: обычно `process_events` + `process_variables` (в текущем наборе также встречаются унифицированные представления).
+-- Типовые таблицы стратегии: обычно `eav_process_events` + `eav_process_variables` (в текущем наборе также встречаются унифицированные представления).
 -- Назначение данного запроса: сопоставление данных между наборами/атрибутами.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_main.
+-- 1) Выбор источника данных: eav_process_events.
 -- 2) Объединение наборов через JOIN для связывания контекста процесса и/или переменных.
 -- 3) Применение фильтров WHERE для отбора релевантных строк.
 -- 4) Агрегация данных (GROUP BY и/или агрегатные функции).
@@ -26,8 +26,8 @@ SELECT
     pe.process_id,
     pe.process_id,
     COUNT(DISTINCT pv.var_path) as matched_paths
-FROM process_events pe
-JOIN process_variables pv ON pe.process_id = pv.process_id
+FROM eav_process_events pe
+JOIN eav_process_variables pv ON pe.process_id = pv.process_id
 WHERE pv.var_path IN ('epkId', 'caseId', 'fio', 'productCode')
 GROUP BY pe.process_id, pe.process_id
 HAVING COUNT(DISTINCT pv.var_path) >= 3

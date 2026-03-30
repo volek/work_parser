@@ -3,12 +3,12 @@
 -- Файл: `combined/q16_hourly.sql`.
 -- Стратегия: Combined (Tiered Hot/Warm/Cold).
 -- Модель стратегии: горячие поля в основной записи + индексируемые переменные + cold JSON-поля для редких доступов.
--- Типовые таблицы стратегии: обычно `process_main` и (при необходимости) `process_variables_indexed`.
--- При parser.warmVariablesLimit (10..1010) число записей в process_variables_indexed на процесс может быть ограничено.
+-- Типовые таблицы стратегии: обычно `combined_process_main` и (при необходимости) `combined_process_variables_indexed`.
+-- При parser.warmVariablesLimit (10..1010) число записей в combined_process_variables_indexed на процесс может быть ограничено.
 -- Назначение данного запроса: временной анализ.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_main.
+-- 1) Выбор источника данных: combined_process_main.
 -- 4) Агрегация данных (GROUP BY и/или агрегатные функции).
 -- 6) Упорядочивание результата через ORDER BY.
 -- 7) Ограничение объёма выдачи через LIMIT.
@@ -24,7 +24,7 @@
 SELECT 
     DATE_TRUNC('hour', __time) as hour_ts,
     COUNT(*) as cnt
-FROM process_main
+FROM combined_process_main
 GROUP BY 1
 ORDER BY hour_ts DESC
 LIMIT 48

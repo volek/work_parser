@@ -3,11 +3,11 @@
 -- Файл: `hybrid/q09_count_by_process_name.sql`.
 -- Стратегия: Hybrid (Flat + JSON).
 -- Модель стратегии: часто используемые атрибуты вынесены в плоские колонки, вложенные структуры хранятся в JSON.
--- Типовые таблицы стратегии: обычно `process_hybrid`.
+-- Типовые таблицы стратегии: обычно `hybrid_process_hybrid`.
 -- Назначение данного запроса: агрегирование и расчёт метрик.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_hybrid.
+-- 1) Выбор источника данных: hybrid_process_hybrid.
 -- 4) Агрегация данных (GROUP BY и/или агрегатные функции).
 -- 6) Упорядочивание результата через ORDER BY.
 --
@@ -22,6 +22,6 @@
 SELECT 
     process_name,
     COUNT(*) as process_count
-FROM process_main
+FROM hybrid_process_hybrid
 GROUP BY process_name
 ORDER BY process_count DESC

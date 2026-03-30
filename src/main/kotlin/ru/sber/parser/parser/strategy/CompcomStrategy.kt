@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import ru.sber.parser.config.FieldClassification
+import ru.sber.parser.druid.DruidDataSources
 import ru.sber.parser.model.BpmMessage
 import ru.sber.parser.model.druid.ProcessMainRecord
 import ru.sber.parser.model.druid.ProcessVariableIndexedRecord
@@ -32,8 +33,8 @@ class CompcomStrategy(
     private val maxWarmVariables: Int? = null
 ) : ParseStrategy {
 
-    override val dataSourceName: String = PROCESS_MAIN_COMPACT
-    override val additionalDataSources: List<String> = listOf(ProcessVariableIndexedRecord.DATA_SOURCE_NAME)
+    override val dataSourceName: String = DruidDataSources.Compcom.MAIN_COMPACT
+    override val additionalDataSources: List<String> = listOf(DruidDataSources.Compcom.VARIABLES_INDEXED)
 
     private val objectMapper: ObjectMapper = jacksonObjectMapper()
         .registerModule(JavaTimeModule())
@@ -43,12 +44,12 @@ class CompcomStrategy(
         val records = mutableListOf<Map<String, Any?>>()
         val mainRecord = createMainRecord(message)
         val mainMap = mainRecord.toMap() - "var_blob_json"
-        records.add(mainMap + ("_dataSource" to PROCESS_MAIN_COMPACT))
+        records.add(mainMap + ("_dataSource" to DruidDataSources.Compcom.MAIN_COMPACT))
 
         val variableRecords = createWarmVariableRecords(message)
         records.addAll(
             variableRecords.map {
-                it.toMap() + ("_dataSource" to ProcessVariableIndexedRecord.DATA_SOURCE_NAME)
+                it.toMap() + ("_dataSource" to DruidDataSources.Compcom.VARIABLES_INDEXED)
             }
         )
         return records
@@ -62,8 +63,8 @@ class CompcomStrategy(
             variableRecords.addAll(createWarmVariableRecords(message).map { it.toMap() })
         }
         return mapOf(
-            PROCESS_MAIN_COMPACT to mainRecords,
-            ProcessVariableIndexedRecord.DATA_SOURCE_NAME to variableRecords
+            DruidDataSources.Compcom.MAIN_COMPACT to mainRecords,
+            DruidDataSources.Compcom.VARIABLES_INDEXED to variableRecords
         )
     }
 
@@ -215,7 +216,7 @@ class CompcomStrategy(
     }
 
     companion object {
-        const val PROCESS_MAIN_COMPACT = "process_main_compact"
+        const val PROCESS_MAIN_COMPACT = DruidDataSources.Compcom.MAIN_COMPACT
 
         val MAIN_SCHEMA = mapOf(
             "process_id" to "VARCHAR",

@@ -3,12 +3,12 @@
 -- Файл: `compcom/q34_ucpId_from_indexed.sql`.
 -- Стратегия: Compcom (Compact combined, no cold blob).
 -- Модель стратегии: горячие поля в основной записи + индексируемые переменные, без cold blob.
--- Типовые таблицы стратегии: обычно `process_main_compact` и (при необходимости) `process_variables_indexed`.
--- При parser.warmVariablesLimit (10..1010) число записей в process_variables_indexed на процесс может быть ограничено.
+-- Типовые таблицы стратегии: обычно `compcom_process_main_compact` и (при необходимости) `compcom_process_variables_indexed`.
+-- При parser.warmVariablesLimit (10..1010) число записей в compcom_process_variables_indexed на процесс может быть ограничено.
 -- Назначение данного запроса: получение детальной выборки для анализа.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_main_compact.
+-- 1) Выбор источника данных: compcom_process_main_compact.
 -- 2) Объединение наборов через JOIN для связывания контекста процесса и/или переменных.
 -- 3) Применение фильтров WHERE для отбора релевантных строк.
 -- 7) Ограничение объёма выдачи через LIMIT.
@@ -28,8 +28,8 @@ SELECT
     pm.process_name,
     pm.var_ucpId,
     pv.var_value as ucpId
-FROM process_main_compact pm
-JOIN process_variables_indexed pv ON pm.process_id = pv.process_id
+FROM compcom_process_main_compact pm
+JOIN compcom_process_variables_indexed pv ON pm.process_id = pv.process_id
 WHERE pv.var_category = 'epkData'
   AND pv.var_path = 'epkEntity.ucpId'
 LIMIT 50

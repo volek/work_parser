@@ -3,11 +3,11 @@
 -- Файл: `eav/q18_hourly_trend.sql`.
 -- Стратегия: EAV (Entity-Attribute-Value).
 -- Модель стратегии: данные процесса разделены на сущность процесса и набор переменных по путям/атрибутам.
--- Типовые таблицы стратегии: обычно `process_events` + `process_variables` (в текущем наборе также встречаются унифицированные представления).
+-- Типовые таблицы стратегии: обычно `eav_process_events` + `eav_process_variables` (в текущем наборе также встречаются унифицированные представления).
 -- Назначение данного запроса: временной анализ.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_main.
+-- 1) Выбор источника данных: eav_process_events.
 -- 3) Применение фильтров WHERE для отбора релевантных строк.
 -- 4) Агрегация данных (GROUP BY и/или агрегатные функции).
 -- 6) Упорядочивание результата через ORDER BY.
@@ -23,7 +23,7 @@
 SELECT 
     DATE_TRUNC('hour', __time) as hour_ts,
     COUNT(*) as processes_started
-FROM process_events
+FROM eav_process_events
 WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '24' HOUR
 GROUP BY 1
 ORDER BY hour_ts DESC

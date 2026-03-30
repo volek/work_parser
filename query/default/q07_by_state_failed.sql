@@ -6,7 +6,7 @@ SELECT
   state,
   error,
   __time
-FROM process_main
+FROM default_process_default
 WHERE state = 2
 ORDER BY __time DESC
 LIMIT 200;

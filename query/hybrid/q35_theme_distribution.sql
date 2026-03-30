@@ -3,11 +3,11 @@
 -- Файл: `hybrid/q35_theme_distribution.sql`.
 -- Стратегия: Hybrid (Flat + JSON).
 -- Модель стратегии: часто используемые атрибуты вынесены в плоские колонки, вложенные структуры хранятся в JSON.
--- Типовые таблицы стратегии: обычно `process_hybrid`.
+-- Типовые таблицы стратегии: обычно `hybrid_process_hybrid`.
 -- Назначение данного запроса: агрегирование и расчёт метрик.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_hybrid.
+-- 1) Выбор источника данных: hybrid_process_hybrid.
 -- 3) Применение фильтров WHERE для отбора релевантных строк.
 -- 4) Агрегация данных (GROUP BY и/или агрегатные функции).
 -- 6) Упорядочивание результата через ORDER BY.
@@ -25,7 +25,7 @@ SELECT
     var_theme,
     COUNT(*) as cnt_total,
     COUNT(DISTINCT var_epkId) as unique_clients
-FROM process_main
+FROM hybrid_process_hybrid
 WHERE var_theme IS NOT NULL
 GROUP BY var_theme
 ORDER BY cnt_total DESC

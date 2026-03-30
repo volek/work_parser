@@ -3,11 +3,11 @@
 -- Файл: `hybrid/q06_filter_last_hour.sql`.
 -- Стратегия: Hybrid (Flat + JSON).
 -- Модель стратегии: часто используемые атрибуты вынесены в плоские колонки, вложенные структуры хранятся в JSON.
--- Типовые таблицы стратегии: обычно `process_hybrid`.
+-- Типовые таблицы стратегии: обычно `hybrid_process_hybrid`.
 -- Назначение данного запроса: фильтрация записей по условиям.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_hybrid.
+-- 1) Выбор источника данных: hybrid_process_hybrid.
 -- 3) Применение фильтров WHERE для отбора релевантных строк.
 -- 6) Упорядочивание результата через ORDER BY.
 --
@@ -26,6 +26,6 @@ SELECT
     process_name,
     state,
     __time as start_date
-FROM process_main
+FROM hybrid_process_hybrid
 WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '1' HOUR
 ORDER BY __time DESC

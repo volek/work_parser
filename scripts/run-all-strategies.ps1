@@ -43,6 +43,17 @@ New-Item -ItemType Directory -Path $logsDir -Force | Out-Null
 New-Item -ItemType Directory -Path $outDir -Force | Out-Null
 New-Item -ItemType Directory -Path $messagesDir -Force | Out-Null
 
+# Validate query folders against manifest before pipeline run
+Write-Host "=== Validate SQL manifest consistency ===" -ForegroundColor Cyan
+$pythonCmd = if ($env:PYTHON_BIN) { $env:PYTHON_BIN } else { "python" }
+$manifestCheckLog = Join-Path $logsDir "query_manifest_check.log"
+$ErrorActionPreference = "Continue"
+& $pythonCmd (Join-Path $root "scripts" "generate_queries.py") --check 2>&1 | Tee-Object -FilePath $manifestCheckLog
+$ErrorActionPreference = "Stop"
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "SQL manifest check failed (exit code $LASTEXITCODE). See log: $manifestCheckLog"
+}
+
 # Clean Druid datasources using existing helper. Coordinator URL is taken from env COORDINATOR_URL or DRUID_COORDINATOR_URL.
 $coordinatorUrl = $env:COORDINATOR_URL
 if (-not $coordinatorUrl -and $env:DRUID_COORDINATOR_URL) {

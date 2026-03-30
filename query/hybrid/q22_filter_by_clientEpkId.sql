@@ -3,11 +3,11 @@
 -- Файл: `hybrid/q22_filter_by_clientEpkId.sql`.
 -- Стратегия: Hybrid (Flat + JSON).
 -- Модель стратегии: часто используемые атрибуты вынесены в плоские колонки, вложенные структуры хранятся в JSON.
--- Типовые таблицы стратегии: обычно `process_hybrid`.
+-- Типовые таблицы стратегии: обычно `hybrid_process_hybrid`.
 -- Назначение данного запроса: фильтрация записей по условиям.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_hybrid.
+-- 1) Выбор источника данных: hybrid_process_hybrid.
 -- 3) Применение фильтров WHERE для отбора релевантных строк.
 --
 -- Ожидаемые возвращаемые данные и формат:
@@ -27,5 +27,5 @@ SELECT
     var_staticData_clientEpkId,
     var_staticData_casePublicId,
     var_fio
-FROM process_main
+FROM hybrid_process_hybrid
 WHERE var_staticData_clientEpkId = 1234567890123456789

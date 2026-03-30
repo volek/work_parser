@@ -3,12 +3,12 @@
 -- Файл: `compcom/q54_cross_category.sql`.
 -- Стратегия: Compcom (Compact combined, no cold blob).
 -- Модель стратегии: горячие поля в основной записи + индексируемые переменные, без cold blob.
--- Типовые таблицы стратегии: обычно `process_main_compact` и (при необходимости) `process_variables_indexed`.
--- При parser.warmVariablesLimit (10..1010) число записей в process_variables_indexed на процесс может быть ограничено.
+-- Типовые таблицы стратегии: обычно `compcom_process_main_compact` и (при необходимости) `compcom_process_variables_indexed`.
+-- При parser.warmVariablesLimit (10..1010) число записей в compcom_process_variables_indexed на процесс может быть ограничено.
 -- Назначение данного запроса: получение детальной выборки для анализа.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_main_compact.
+-- 1) Выбор источника данных: compcom_process_main_compact.
 -- 4) Агрегация данных (GROUP BY и/или агрегатные функции).
 -- 5) Фильтрация агрегированных групп через HAVING.
 -- 6) Упорядочивание результата через ORDER BY.
@@ -25,7 +25,7 @@
 SELECT 
     process_id,
     COUNT(DISTINCT var_category) as categories
-FROM process_variables_indexed
+FROM compcom_process_variables_indexed
 GROUP BY process_id
 HAVING COUNT(DISTINCT var_category) > 1
 ORDER BY categories DESC

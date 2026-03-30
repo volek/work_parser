@@ -3,11 +3,11 @@
 -- Файл: `eav/q36_case_public_id.sql`.
 -- Стратегия: EAV (Entity-Attribute-Value).
 -- Модель стратегии: данные процесса разделены на сущность процесса и набор переменных по путям/атрибутам.
--- Типовые таблицы стратегии: обычно `process_events` + `process_variables` (в текущем наборе также встречаются унифицированные представления).
+-- Типовые таблицы стратегии: обычно `eav_process_events` + `eav_process_variables` (в текущем наборе также встречаются унифицированные представления).
 -- Назначение данного запроса: получение детальной выборки для анализа.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_main.
+-- 1) Выбор источника данных: eav_process_events.
 -- 2) Объединение наборов через JOIN для связывания контекста процесса и/или переменных.
 -- 3) Применение фильтров WHERE для отбора релевантных строк.
 -- 6) Упорядочивание результата через ORDER BY.
@@ -26,8 +26,8 @@ SELECT
     pe.process_id,
     pe.process_id,
     pv.var_value as casePublicId
-FROM process_events pe
-JOIN process_variables pv ON pe.process_id = pv.process_id
+FROM eav_process_events pe
+JOIN eav_process_variables pv ON pe.process_id = pv.process_id
 WHERE pv.var_path = 'casePublicId'
 ORDER BY pe.__time DESC
 LIMIT 50

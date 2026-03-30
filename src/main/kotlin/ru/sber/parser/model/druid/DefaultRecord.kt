@@ -1,5 +1,6 @@
 package ru.sber.parser.model.druid
 
+import ru.sber.parser.druid.DruidDataSources
 /**
  * Модель записи стратегии Default для Apache Druid.
  *
@@ -22,5 +23,5 @@ object DefaultRecord {
     /**
      * Название источника данных в Apache Druid для стратегии Default.
      */
-    const val DATA_SOURCE_NAME = "process_default"
+    const val DATA_SOURCE_NAME = DruidDataSources.Default.MAIN
 }

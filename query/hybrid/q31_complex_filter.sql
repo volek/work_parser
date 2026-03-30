@@ -3,11 +3,11 @@
 -- Файл: `hybrid/q31_complex_filter.sql`.
 -- Стратегия: Hybrid (Flat + JSON).
 -- Модель стратегии: часто используемые атрибуты вынесены в плоские колонки, вложенные структуры хранятся в JSON.
--- Типовые таблицы стратегии: обычно `process_hybrid`.
+-- Типовые таблицы стратегии: обычно `hybrid_process_hybrid`.
 -- Назначение данного запроса: фильтрация записей по условиям.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_hybrid.
+-- 1) Выбор источника данных: hybrid_process_hybrid.
 -- 3) Применение фильтров WHERE для отбора релевантных строк.
 -- 6) Упорядочивание результата через ORDER BY.
 --
@@ -28,7 +28,7 @@ SELECT
     var_epkId,
     var_status,
     state
-FROM process_main
+FROM hybrid_process_hybrid
 WHERE process_name IN ('uvskRemainderReturnCR-Service', 'uvskFraudFin_front')
   AND state = 1
   AND __time >= CURRENT_TIMESTAMP - INTERVAL '24' HOUR

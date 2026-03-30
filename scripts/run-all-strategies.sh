@@ -180,6 +180,28 @@ rm -rf "${LOGS_DIR:?}/"* 2>/dev/null || true
 rm -rf "${OUT_DIR:?}/"* 2>/dev/null || true
 rm -rf "${MESSAGES_DIR:?}/"* 2>/dev/null || true
 
+echo "=== Проверка консистентности SQL (manifest) ==="
+PYTHON_BIN="${PYTHON_BIN:-}"
+if [[ -z "$PYTHON_BIN" ]]; then
+  if command -v python3 >/dev/null 2>&1; then
+    PYTHON_BIN="python3"
+  elif command -v python >/dev/null 2>&1; then
+    PYTHON_BIN="python"
+  else
+    echo "Ошибка: не найден Python (python3/python) для scripts/generate_queries.py --check" >&2
+    exit 2
+  fi
+fi
+
+set +e
+"$PYTHON_BIN" "$ROOT/scripts/generate_queries.py" --check 2>&1 | tee "$LOGS_DIR/query_manifest_check.log"
+manifest_rc="${PIPESTATUS[0]}"
+set -e
+if [[ "$manifest_rc" -ne 0 ]]; then
+  echo "Ошибка: проверка SQL по manifest завершилась с кодом $manifest_rc. См. $LOGS_DIR/query_manifest_check.log" >&2
+  exit "$manifest_rc"
+fi
+
 CONFIG_COORD="$(read_config_coordinator_url "$CONFIG_FILE")"
 COORD="${COORDINATOR_URL:-${DRUID_COORDINATOR_URL:-${CONFIG_COORD:-}}}"
 if [[ -n "$COORD" ]]; then

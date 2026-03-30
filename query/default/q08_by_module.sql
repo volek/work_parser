@@ -6,7 +6,7 @@ SELECT
   module_id,
   state,
   __time
-FROM process_main
+FROM default_process_default
 WHERE module_id = 'psi-fl-5g'
 ORDER BY __time DESC
 LIMIT 200;

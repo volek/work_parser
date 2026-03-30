@@ -3,12 +3,12 @@
 -- Файл: `combined/q30_hot_col_nulls.sql`.
 -- Стратегия: Combined (Tiered Hot/Warm/Cold).
 -- Модель стратегии: горячие поля в основной записи + индексируемые переменные + cold JSON-поля для редких доступов.
--- Типовые таблицы стратегии: обычно `process_main` и (при необходимости) `process_variables_indexed`.
--- При parser.warmVariablesLimit (10..1010) число записей в process_variables_indexed на процесс может быть ограничено.
+-- Типовые таблицы стратегии: обычно `combined_process_main` и (при необходимости) `combined_process_variables_indexed`.
+-- При parser.warmVariablesLimit (10..1010) число записей в combined_process_variables_indexed на процесс может быть ограничено.
 -- Назначение данного запроса: получение детальной выборки для анализа.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_main.
+-- 1) Выбор источника данных: combined_process_main.
 -- 4) Агрегация данных (GROUP BY и/или агрегатные функции).
 --
 -- Ожидаемые возвращаемые данные и формат:
@@ -26,4 +26,4 @@ SELECT
     SUM(CASE WHEN var_fio IS NULL THEN 1 ELSE 0 END) as null_fio,
     SUM(CASE WHEN var_caseId IS NULL THEN 1 ELSE 0 END) as null_case,
     COUNT(*) as total
-FROM process_main
+FROM combined_process_main

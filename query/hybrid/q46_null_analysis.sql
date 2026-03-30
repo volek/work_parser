@@ -3,11 +3,11 @@
 -- Файл: `hybrid/q46_null_analysis.sql`.
 -- Стратегия: Hybrid (Flat + JSON).
 -- Модель стратегии: часто используемые атрибуты вынесены в плоские колонки, вложенные структуры хранятся в JSON.
--- Типовые таблицы стратегии: обычно `process_hybrid`.
+-- Типовые таблицы стратегии: обычно `hybrid_process_hybrid`.
 -- Назначение данного запроса: получение детальной выборки для анализа.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_hybrid.
+-- 1) Выбор источника данных: hybrid_process_hybrid.
 -- 4) Агрегация данных (GROUP BY и/или агрегатные функции).
 --
 -- Ожидаемые возвращаемые данные и формат:
@@ -27,4 +27,4 @@ SELECT
     SUM(CASE WHEN var_epkId IS NULL THEN 1 ELSE 0 END) as null_epkId,
     SUM(CASE WHEN var_fio IS NULL THEN 1 ELSE 0 END) as null_fio,
     SUM(CASE WHEN var_staticData_clientEpkId IS NULL THEN 1 ELSE 0 END) as null_clientEpkId
-FROM process_main
+FROM hybrid_process_hybrid

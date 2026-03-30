@@ -4,7 +4,7 @@
 -- Стратегия: Default (все поля как отдельные колонки).
 -- Модель стратегии: переменные сплющиваются в колонки вида "variables.<path>",
 --   при этом массивы кодируются индексами в имени пути (например, items[0].name).
--- Типовой datasource стратегии: process_default.
+-- Типовой datasource стратегии: default_process_default.
 -- Назначение данного запроса: найти все колонки, соответствующие элементам массивов
 --   (т.е. содержащие `[` в имени колонки).
 --
@@ -16,7 +16,7 @@ SELECT
   COLUMN_NAME,
   DATA_TYPE
 FROM INFORMATION_SCHEMA.COLUMNS
-WHERE TABLE_NAME = 'process_default'
+WHERE TABLE_NAME = 'default_process_default'
   AND COLUMN_NAME LIKE '%[%'
 ORDER BY COLUMN_NAME
 LIMIT 500

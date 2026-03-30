@@ -3,12 +3,12 @@
 -- Файл: `combined/q34_ucpId_from_indexed.sql`.
 -- Стратегия: Combined (Tiered Hot/Warm/Cold).
 -- Модель стратегии: горячие поля в основной записи + индексируемые переменные + cold JSON-поля для редких доступов.
--- Типовые таблицы стратегии: обычно `process_main` и (при необходимости) `process_variables_indexed`.
--- При parser.warmVariablesLimit (10..1010) число записей в process_variables_indexed на процесс может быть ограничено.
+-- Типовые таблицы стратегии: обычно `combined_process_main` и (при необходимости) `combined_process_variables_indexed`.
+-- При parser.warmVariablesLimit (10..1010) число записей в combined_process_variables_indexed на процесс может быть ограничено.
 -- Назначение данного запроса: получение детальной выборки для анализа.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_main.
+-- 1) Выбор источника данных: combined_process_main.
 -- 2) Объединение наборов через JOIN для связывания контекста процесса и/или переменных.
 -- 3) Применение фильтров WHERE для отбора релевантных строк.
 -- 7) Ограничение объёма выдачи через LIMIT.
@@ -28,8 +28,8 @@ SELECT
     pm.process_name,
     pm.var_ucpId,
     pv.var_value as ucpId
-FROM process_main pm
-JOIN process_variables_indexed pv ON pm.process_id = pv.process_id
+FROM combined_process_main pm
+JOIN combined_process_variables_indexed pv ON pm.process_id = pv.process_id
 WHERE pv.var_category = 'epkData'
   AND pv.var_path = 'epkEntity.ucpId'
 LIMIT 50

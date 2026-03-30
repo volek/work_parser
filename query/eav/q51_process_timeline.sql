@@ -3,11 +3,11 @@
 -- Файл: `eav/q51_process_timeline.sql`.
 -- Стратегия: EAV (Entity-Attribute-Value).
 -- Модель стратегии: данные процесса разделены на сущность процесса и набор переменных по путям/атрибутам.
--- Типовые таблицы стратегии: обычно `process_events` + `process_variables` (в текущем наборе также встречаются унифицированные представления).
+-- Типовые таблицы стратегии: обычно `eav_process_events` + `eav_process_variables` (в текущем наборе также встречаются унифицированные представления).
 -- Назначение данного запроса: временной анализ.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_main.
+-- 1) Выбор источника данных: eav_process_events.
 -- 4) Агрегация данных (GROUP BY и/или агрегатные функции).
 -- 6) Упорядочивание результата через ORDER BY.
 -- 7) Ограничение объёма выдачи через LIMIT.
@@ -27,7 +27,7 @@ SELECT
     process_id,
     var_value,
     COUNT(*) as cnt
-FROM process_variables
+FROM eav_process_variables
 GROUP BY 1, 2, 3
 ORDER BY day_ts DESC, cnt DESC
 LIMIT 100

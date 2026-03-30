@@ -3,11 +3,11 @@
 -- Файл: `eav/q39_processes_per_client.sql`.
 -- Стратегия: EAV (Entity-Attribute-Value).
 -- Модель стратегии: данные процесса разделены на сущность процесса и набор переменных по путям/атрибутам.
--- Типовые таблицы стратегии: обычно `process_events` + `process_variables` (в текущем наборе также встречаются унифицированные представления).
+-- Типовые таблицы стратегии: обычно `eav_process_events` + `eav_process_variables` (в текущем наборе также встречаются унифицированные представления).
 -- Назначение данного запроса: получение детальной выборки для анализа.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_main.
+-- 1) Выбор источника данных: eav_process_events.
 -- 2) Объединение наборов через JOIN для связывания контекста процесса и/или переменных.
 -- 3) Применение фильтров WHERE для отбора релевантных строк.
 -- 4) Агрегация данных (GROUP BY и/или агрегатные функции).
@@ -27,8 +27,8 @@ SELECT
     pv.var_value as epkId,
     COUNT(DISTINCT pe.process_id) as process_count,
     COUNT(DISTINCT pe.process_id) as process_types
-FROM process_events pe
-JOIN process_variables pv ON pe.process_id = pv.process_id
+FROM eav_process_events pe
+JOIN eav_process_variables pv ON pe.process_id = pv.process_id
 WHERE pv.var_path = 'epkId'
 GROUP BY pv.var_value
 ORDER BY process_count DESC

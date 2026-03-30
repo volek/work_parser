@@ -6,7 +6,7 @@ SELECT
   state,
   __time,
   module_id
-FROM process_main
+FROM default_process_default
 WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '7' DAY
 ORDER BY __time DESC;
 

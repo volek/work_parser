@@ -3,11 +3,11 @@
 -- Файл: `hybrid/q30_json_staticData_closed.sql`.
 -- Стратегия: Hybrid (Flat + JSON).
 -- Модель стратегии: часто используемые атрибуты вынесены в плоские колонки, вложенные структуры хранятся в JSON.
--- Типовые таблицы стратегии: обычно `process_hybrid`.
+-- Типовые таблицы стратегии: обычно `hybrid_process_hybrid`.
 -- Назначение данного запроса: извлечение/анализ JSON-полей.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_hybrid.
+-- 1) Выбор источника данных: hybrid_process_hybrid.
 -- 3) Применение фильтров WHERE для отбора релевантных строк.
 -- 6) Упорядочивание результата через ORDER BY.
 -- 7) Ограничение объёма выдачи через LIMIT.
@@ -37,7 +37,7 @@ SELECT
         )
         ELSE NULL
     END as hours_to_close
-FROM process_main
+FROM hybrid_process_hybrid
 WHERE var_staticData_closedTime IS NOT NULL
 ORDER BY __time DESC
 LIMIT 50

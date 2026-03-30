@@ -3,11 +3,11 @@
 -- Файл: `hybrid/q41_gfl_check.sql`.
 -- Стратегия: Hybrid (Flat + JSON).
 -- Модель стратегии: часто используемые атрибуты вынесены в плоские колонки, вложенные структуры хранятся в JSON.
--- Типовые таблицы стратегии: обычно `process_hybrid`.
+-- Типовые таблицы стратегии: обычно `hybrid_process_hybrid`.
 -- Назначение данного запроса: получение детальной выборки для анализа.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_hybrid.
+-- 1) Выбор источника данных: hybrid_process_hybrid.
 -- 3) Применение фильтров WHERE для отбора релевантных строк.
 -- 7) Ограничение объёма выдачи через LIMIT.
 --
@@ -24,6 +24,6 @@ SELECT
     process_id,
     process_name,
     var_answerGFL_json IS NOT NULL as has_gfl_answer
-FROM process_hybrid
+FROM hybrid_process_hybrid
 WHERE var_answerGFL_json IS NOT NULL
 LIMIT 50

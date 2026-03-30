@@ -7,10 +7,11 @@
 #   ./scripts/clean-druid-remote.sh http://druid-host:8081
 #
 # Удаляются только datasource'ы, создаваемые BPM Parser:
-#   Hybrid:   process_hybrid
-#   EAV:      process_events, process_variables
-#   Combined: process_main, process_main_compact, process_variables_indexed
-#   Default:  process_default
+#   Hybrid:   hybrid_process_hybrid
+#   EAV:      eav_process_events, eav_process_variables
+#   Combined: combined_process_main, combined_process_variables_indexed
+#   Compcom:  compcom_process_main_compact, compcom_process_variables_indexed
+#   Default:  default_process_default
 #
 # Требуется URL Coordinator (порт 8081), не Router (8888).
 # =============================================================================
@@ -30,13 +31,14 @@ fi
 COORDINATOR_URL="${COORDINATOR_URL%/}"
 
 DATASOURCES=(
-  process_hybrid
-  process_events
-  process_variables
-  process_main
-  process_main_compact
-  process_variables_indexed
-  process_default
+  hybrid_process_hybrid
+  eav_process_events
+  eav_process_variables
+  combined_process_main
+  combined_process_variables_indexed
+  compcom_process_main_compact
+  compcom_process_variables_indexed
+  default_process_default
 )
 
 echo "Druid Coordinator: $COORDINATOR_URL"
@@ -56,7 +58,7 @@ for ds in "${DATASOURCES[@]}"; do
     fi
 
     # Дополнительно удаляем все сегменты datasource (kill task).
-    if [[ "$ds" == "process_main_compact" ]]; then
+    if [[ "$ds" == "compcom_process_main_compact" ]]; then
       if seg_response=$(curl -s -w "\n%{http_code}" -X DELETE "$COORDINATOR_URL/druid/coordinator/v1/datasources/$ds?kill=true&interval=1000-01-01T00:00:00.000Z/3000-01-01T00:00:00.000Z"); then
         seg_code=$(echo "$seg_response" | tail -n1)
         if [[ "$seg_code" == "200" ]]; then

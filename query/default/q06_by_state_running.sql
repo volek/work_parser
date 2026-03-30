@@ -5,7 +5,7 @@ SELECT
   process_name,
   state,
   __time
-FROM process_main
+FROM default_process_default
 WHERE state = 1
 ORDER BY __time DESC
 LIMIT 200;

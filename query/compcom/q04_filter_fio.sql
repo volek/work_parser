@@ -3,12 +3,12 @@
 -- Файл: `compcom/q04_filter_fio.sql`.
 -- Стратегия: Compcom (Compact combined, no cold blob).
 -- Модель стратегии: горячие поля в основной записи + индексируемые переменные, без cold blob.
--- Типовые таблицы стратегии: обычно `process_main_compact` и (при необходимости) `process_variables_indexed`.
--- При parser.warmVariablesLimit (10..1010) число записей в process_variables_indexed на процесс может быть ограничено.
+-- Типовые таблицы стратегии: обычно `compcom_process_main_compact` и (при необходимости) `compcom_process_variables_indexed`.
+-- При parser.warmVariablesLimit (10..1010) число записей в compcom_process_variables_indexed на процесс может быть ограничено.
 -- Назначение данного запроса: фильтрация записей по условиям.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_main_compact.
+-- 1) Выбор источника данных: compcom_process_main_compact.
 -- 3) Применение фильтров WHERE для отбора релевантных строк.
 --
 -- Ожидаемые возвращаемые данные и формат:
@@ -26,5 +26,5 @@ SELECT
     process_name,
     var_fio,
     __time as start_date
-FROM process_main_compact
+FROM compcom_process_main_compact
 WHERE var_fio LIKE '%ИВАНОВ%'

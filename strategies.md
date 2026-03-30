@@ -28,7 +28,7 @@
 - structured-поля из ключевых вложенных объектов,
 - cold JSON-блобы для полноты.
 
-Datasource: `process_hybrid`.
+Datasource: `hybrid_process_hybrid`.
 
 ## Как работает парсинг
 
@@ -51,7 +51,7 @@ Datasource: `process_hybrid`.
 
 ## Формат хранения в Druid
 
-Одна строка в `process_hybrid` на одно BPM-сообщение.
+Одна строка в `hybrid_process_hybrid` на одно BPM-сообщение.
 
 Ключевые колонки:
 
@@ -88,8 +88,8 @@ Datasource: `process_hybrid`.
 
 `EAV` (Entity-Attribute-Value) = **два datasource**:
 
-- `process_events` — 1 запись на процесс (метаданные),
-- `process_variables` — N записей на процесс (переменные как пары path/value/type).
+- `eav_process_events` — 1 запись на процесс (метаданные),
+- `eav_process_variables` — N записей на процесс (переменные как пары path/value/type).
 
 ## Как работает парсинг
 
@@ -108,17 +108,17 @@ Datasource: `process_hybrid`.
 
 ## Формат хранения в Druid
 
-### `process_events`
+### `eav_process_events`
 
 - `process_id`, `__time`, `process_name`, `state`, `module_id`, `business_key`, `root_instance_id`, `parent_instance_id`, `version`, `end_date`, `error`, `node_instances_json`.
 
-### `process_variables`
+### `eav_process_variables`
 
 - `process_id`, `__time`, `var_path`, `var_value`, `var_type`.
 
 Кардинальность:
 
-- 1 строка в `process_events` + много строк в `process_variables` на каждое сообщение.
+- 1 строка в `eav_process_events` + много строк в `eav_process_variables` на каждое сообщение.
 
 Плюс: максимальная гибкость без миграций схемы при новых переменных.  
 Минус: тяжелее аналитика «по процессу целиком», часто нужен JOIN/self-JOIN.
@@ -132,9 +132,9 @@ Datasource: `process_hybrid`.
 - Найти вложенные атрибуты:
   - `WHERE var_path LIKE 'epkData.epkEntity.%'`
 - Собрать несколько атрибутов в одну строку:
-  - self-JOIN `process_variables` по `process_id` для `epkId`, `caseId`, `fio`, и т.д.
+  - self-JOIN `eav_process_variables` по `process_id` для `epkId`, `caseId`, `fio`, и т.д.
 - Связать метаданные процесса и переменные:
-  - JOIN `process_events` + `process_variables` по `process_id` (и при необходимости по `__time`).
+  - JOIN `eav_process_events` + `eav_process_variables` по `process_id` (и при необходимости по `__time`).
 
 Примеры в проекте: `query/eav/q01_select_events.sql`, `query/eav/q02_select_variables.sql`, `query/eav/q03_join_epkId.sql`, `query/eav/q04_join_caseId.sql`, `query/eav/q07_nested_epkData.sql`.
 
@@ -146,8 +146,8 @@ Datasource: `process_hybrid`.
 
 `Combined` = tier-подход с **двумя datasource**:
 
-- `process_main` — основная wide-строка на процесс (hot + structured + cold blob),
-- `process_variables_indexed` — индексированные warm-переменные (`var_category`, `var_path`, `var_value`, `var_type`).
+- `combined_process_main` — основная wide-строка на процесс (hot + structured + cold blob),
+- `combined_process_variables_indexed` — индексированные warm-переменные (`var_category`, `var_path`, `var_value`, `var_type`).
 
 Это компромисс между `hybrid` (быстро и просто) и `eav` (гибко).
 
@@ -164,22 +164,22 @@ Datasource: `process_hybrid`.
   - для каждой категории из `tier2WarmCategories` (`epkData`, `staticData`, `tracingHeaders`, `startAttributes`, `inputCC`, `inputDC`) извлекает объект;
   - сплющивает через `VariableFlattener`;
   - фильтрует пути по конфигурации категории, включая wildcard `[*]`;
-  - создает запись в `process_variables_indexed`;
+  - создает запись в `combined_process_variables_indexed`;
   - **ограничение по количеству**: при заданном `maxWarmVariables` (конфиг `parser.warmVariablesLimit`) сохраняется не более N записей warm-переменных на сообщение.
-    Фактическая нормализация в коде (`ParserConfig.effectiveWarmVariablesLimit()`):
+  Фактическая нормализация в коде (`ParserConfig.effectiveWarmVariablesLimit()`):
     - `< 10` -> лимит отключается (`null`),
     - `10..1010` -> используется как есть,
     - `> 1010` -> обрезается до `1010`.
 
 ## Формат хранения в Druid
 
-### `process_main`
+### `combined_process_main`
 
 - Метаданные процесса + hot/structured колонки.
 - JSON: `node_instances_json`, `var_blob_json`.
 - 1 строка на сообщение.
 
-### `process_variables_indexed`
+### `combined_process_variables_indexed`
 
 - `process_id`, `__time`, `var_category`, `var_path`, `var_value`, `var_type`.
 - N строк на сообщение только по warm-категориям/разрешенным путям.
@@ -191,10 +191,10 @@ Datasource: `process_hybrid`.
 
 Типовые паттерны:
 
-- Hot-поиск в `process_main`:
+- Hot-поиск в `combined_process_main`:
   - `WHERE var_epkId = '...'`
   - `WHERE var_caseId = '...'`
-- Warm-поиск в `process_variables_indexed`:
+- Warm-поиск в `combined_process_variables_indexed`:
   - `WHERE var_category = 'epkData' AND var_path = 'epkEntity.ucpId'`
 - Объединение main + indexed:
   - JOIN по `process_id` (и при необходимости по времени).
@@ -211,8 +211,8 @@ Datasource: `process_hybrid`.
 
 `Compcom` = тот же tier-подход, что и `combined`, но **без сохранения cold blob в Druid**:
 
-- `process_main_compact` — основная wide-строка на процесс (hot + structured), **без колонки `var_blob_json`**;
-- `process_variables_indexed` — те же индексированные warm-переменные, что и у `combined`.
+- `compcom_process_main_compact` — основная wide-строка на процесс (hot + structured), **без колонки `var_blob_json`**;
+- `compcom_process_variables_indexed` — те же индексированные warm-переменные, что и у `combined`.
 
 Используется, когда холодные переменные не нужны в Druid (экономия места и упрощение схемы).
 
@@ -225,12 +225,12 @@ Datasource: `process_hybrid`.
 
 ## Формат хранения в Druid
 
-### `process_main_compact`
+### `compcom_process_main_compact`
 
 - Метаданные процесса + hot/structured колонки + `node_instances_json`.
 - **Нет** колонки `var_blob_json`.
 
-### `process_variables_indexed`
+### `compcom_process_variables_indexed`
 
 - Совпадает со стратегией combined: `process_id`, `__time`, `var_category`, `var_path`, `var_value`, `var_type`.
 
@@ -245,7 +245,7 @@ Datasource: `process_hybrid`.
 
 `Default` = «плоская» wide‑таблица: **один datasource, все поля сообщения как отдельные колонки**.
 
-- Datasource: `process_default`.
+- Datasource: `default_process_default`.
 - Поля верхнего уровня (`id`, `process_id`, `process_name`, `state`, `start_date` и т.п.) хранятся в `snake_case`.
 - Все переменные процесса пишутся как колонки c префиксом `variables.` и путём через точку:
   - `variables.caseId`
@@ -307,12 +307,13 @@ Datasource: `process_hybrid`.
 
 ## Быстрое сравнение
 
-| Стратегия  | Datasource                                           | Записей на 1 процесс | Сильная сторона                    | Ограничение                      |
-| ---------- | ---------------------------------------------------- | -------------------- | ---------------------------------- | -------------------------------- |
-| `hybrid`   | `process_hybrid`                                     | 1                    | Простые и быстрые запросы без JOIN | Частично wide/NULL-heavy         |
-| `eav`      | `process_events`, `process_variables`                | 1 + N                | Максимальная гибкость схемы        | Сложные JOIN/self-JOIN           |
-| `combined` | `process_main`, `process_variables_indexed`          | 1 + N(warm)          | Баланс скорости и гибкости + cold | 2 datasource, cold blob в Druid  |
-| `compcom`  | `process_main_compact`, `process_variables_indexed`  | 1 + N(warm)          | Как combined без cold blob         | 2 datasource, нет cold в Druid   |
-| `default`  | `process_default`                                    | 1                    | Максимально простой мэппинг полей  | Очень wide‑таблица, динамическая |
+
+| Стратегия  | Datasource                                          | Записей на 1 процесс | Сильная сторона                    | Ограничение                      |
+| ---------- | --------------------------------------------------- | -------------------- | ---------------------------------- | -------------------------------- |
+| `hybrid`   | `hybrid_process_hybrid`                                               | 1                    | Простые и быстрые запросы без JOIN | Частично wide/NULL-heavy         |
+| `eav`      | `eav_process_events`, `eav_process_variables`                         | 1 + N                | Максимальная гибкость схемы        | Сложные JOIN/self-JOIN           |
+| `combined` | `combined_process_main`, `combined_process_variables_indexed`         | 1 + N(warm)          | Баланс скорости и гибкости + cold  | 2 datasource, cold blob в Druid  |
+| `compcom`  | `compcom_process_main_compact`, `compcom_process_variables_indexed`   | 1 + N(warm)          | Как combined без cold blob         | 2 datasource, нет cold в Druid   |
+| `default`  | `default_process_default`                                             | 1                    | Максимально простой мэппинг полей  | Очень wide‑таблица, динамическая |
 
 

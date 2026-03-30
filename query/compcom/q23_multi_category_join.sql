@@ -3,12 +3,12 @@
 -- Файл: `compcom/q23_multi_category_join.sql`.
 -- Стратегия: Compcom (Compact combined, no cold blob).
 -- Модель стратегии: горячие поля в основной записи + индексируемые переменные, без cold blob.
--- Типовые таблицы стратегии: обычно `process_main_compact` и (при необходимости) `process_variables_indexed`.
--- При parser.warmVariablesLimit (10..1010) число записей в process_variables_indexed на процесс может быть ограничено.
+-- Типовые таблицы стратегии: обычно `compcom_process_main_compact` и (при необходимости) `compcom_process_variables_indexed`.
+-- При parser.warmVariablesLimit (10..1010) число записей в compcom_process_variables_indexed на процесс может быть ограничено.
 -- Назначение данного запроса: сопоставление данных между наборами/атрибутами.
 --
 -- Логика выполнения запроса:
--- 1) Выбор источника данных: process_main_compact.
+-- 1) Выбор источника данных: compcom_process_main_compact.
 -- 2) Объединение наборов через JOIN для связывания контекста процесса и/или переменных.
 -- 7) Ограничение объёма выдачи через LIMIT.
 --
@@ -27,12 +27,12 @@ SELECT
     pm.process_name,
     epk.var_value as epk_data,
     st.var_value as static_data
-FROM process_main_compact pm
-LEFT JOIN process_variables_indexed epk 
+FROM compcom_process_main_compact pm
+LEFT JOIN compcom_process_variables_indexed epk 
     ON pm.process_id = epk.process_id 
     AND epk.var_category = 'epkData' 
     AND epk.var_path = 'epkEntity.ucpId'
-LEFT JOIN process_variables_indexed st 
+LEFT JOIN compcom_process_variables_indexed st 
     ON pm.process_id = st.process_id 
     AND st.var_category = 'staticData' 
     AND st.var_path = 'clientEpkId'

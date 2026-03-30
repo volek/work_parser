@@ -1,4 +1,5 @@
 import org.apache.commons.compress.archivers.zip.ZipFile
+import org.gradle.internal.os.OperatingSystem
 
 buildscript {
     repositories {
@@ -165,4 +166,41 @@ tasks.register("verifyLinuxHostBundleScriptModes") {
             )
         }
     }
+}
+
+val pythonBinProvider = providers.environmentVariable("PYTHON_BIN").orElse(
+    if (OperatingSystem.current().isWindows) "python" else "python3"
+)
+
+tasks.register<Exec>("generateQueries") {
+    group = "query"
+    description = "Generates SQL queries for all strategies from scripts/query-manifest.json"
+    workingDir = projectDir
+    commandLine(
+        pythonBinProvider.get(),
+        "scripts/generate_queries.py"
+    )
+}
+
+tasks.register<Exec>("generateCompcomQueries") {
+    group = "query"
+    description = "Generates compcom SQL queries from combined rules in scripts/query-manifest.json"
+    workingDir = projectDir
+    commandLine(
+        pythonBinProvider.get(),
+        "scripts/generate_queries.py",
+        "--strategy",
+        "compcom"
+    )
+}
+
+tasks.register<Exec>("verifyQueryManifest") {
+    group = "verification"
+    description = "Checks that query/* matches manifest generation rules (no file writes)"
+    workingDir = projectDir
+    commandLine(
+        pythonBinProvider.get(),
+        "scripts/generate_queries.py",
+        "--check"
+    )
 }
