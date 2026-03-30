@@ -1,4 +1,4 @@
-# Стратегии хранения и выборок в Druid: `combined`, `compcom`, `eav`, `hybrid`
+# Стратегии хранения и выборок в Druid: `hybrid`, `eav`, `combined`, `compcom`, `default`
 
 Документ описывает **фактическую реализованную логику** в коде проекта: как сообщения парсятся, как сериализуются в записи для Apache Druid, и как по ним выполняются выборки.
 
@@ -11,7 +11,10 @@
 5. При `--ingest` `DruidClient.ingest(...)` отправляет inline `index_parallel` task на Overlord:
   - `__time` используется как timestamp-колонка (формат `millis`)
   - остальные поля становятся dimensions
-  - данные передаются как NDJSON.
+  - данные передаются как NDJSON;
+  - перед отправкой записи режутся на безопасные батчи с учетом:
+    - `druid.batchSize` (максимум записей в батче),
+    - `druid.maxInlineBytes` (максимальный размер inline NDJSON payload).
 
 ---
 
@@ -162,7 +165,11 @@ Datasource: `process_hybrid`.
   - сплющивает через `VariableFlattener`;
   - фильтрует пути по конфигурации категории, включая wildcard `[*]`;
   - создает запись в `process_variables_indexed`;
-  - **ограничение по количеству**: при заданном `maxWarmVariables` (конфиг `parser.warmVariablesLimit`) сохраняется не более N записей warm-переменных на сообщение. Вариативность: от 10 до 1010 с шагом 100 (10, 110, 210, …, 1010) для тестов объёма индексированных переменных.
+  - **ограничение по количеству**: при заданном `maxWarmVariables` (конфиг `parser.warmVariablesLimit`) сохраняется не более N записей warm-переменных на сообщение.
+    Фактическая нормализация в коде (`ParserConfig.effectiveWarmVariablesLimit()`):
+    - `< 10` -> лимит отключается (`null`),
+    - `10..1010` -> используется как есть,
+    - `> 1010` -> обрезается до `1010`.
 
 ## Формат хранения в Druid
 
@@ -214,7 +221,7 @@ Datasource: `process_hybrid`.
 `CompcomStrategy.transform(message)` делает:
 
 1. `createMainRecord(...)` — как в combined, но cold-данные не собираются; в запись не попадает `var_blob_json` (в Druid этот столбец отсутствует).
-2. `createWarmVariableRecords(...)` — так же, как в combined, с поддержкой лимита `maxWarmVariables` (конфиг `parser.warmVariablesLimit`, 10..1010 шаг 100).
+2. `createWarmVariableRecords(...)` — так же, как в combined, с поддержкой лимита `maxWarmVariables` (конфиг `parser.warmVariablesLimit`, см. правила нормализации выше).
 
 ## Формат хранения в Druid
 
@@ -284,7 +291,17 @@ Datasource: `process_hybrid`.
 Для `hybrid` это корректно (один datasource).  
 Для `eav`, `combined` и `compcom` записи обоих типов формируются и отправляются через `transformBatch(...)` с раздельным `ingest` по каждому datasource (в коде это уже реализовано).
 
-Лимит warm-переменных для `combined` и `compcom` задаётся в конфиге: `parser.warmVariablesLimit` (10..1010, шаг 100). Без значения — сохраняются все сформированные warm-записи.
+Технические детали ingest в `DruidClient`:
+
+- task type: `index_parallel`;
+- input source: `inline` (NDJSON в поле `data`);
+- timestamp: `timestampSpec.column = "__time"`, `format = "millis"`;
+- dimensions формируются из ключей первой записи батча (кроме `__time`);
+- тип dimensions определяется эвристикой `inferDruidType`: `Long/Int -> long`, `Double/Float -> double`, иначе `string`.
+
+Лимит warm-переменных для `combined` и `compcom` задаётся в конфиге: `parser.warmVariablesLimit`.
+Нормализация фактически такая: `<10` отключает лимит, `10..1010` оставляет значение, `>1010` обрезает до `1010`.
+Без значения — сохраняются все сформированные warm-записи.
 
 ---
 
