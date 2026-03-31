@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# Полный цикл на Linux-хосте под Java 17 (без Docker): как run-all-strategies.ps1
+# Полный цикл на Linux-хосте под Java 17 (без Docker)
 # =============================================================================
 # Запуск из корня проекта (рядом с build.gradle.kts, query/, distribution/config.yaml):
 #   chmod +x scripts/run-all-strategies.sh

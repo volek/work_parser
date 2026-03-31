@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Linux-host wrapper around Gradle execution.
+# Priority:
+#  1) project wrapper (./gradlew) when wrapper jar is present
+#  2) system gradle binary as fallback
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+WRAPPER_JAR="$ROOT_DIR/gradle/wrapper/gradle-wrapper.jar"
+
+if [[ -x "$ROOT_DIR/gradlew" && -f "$WRAPPER_JAR" ]]; then
+  exec "$ROOT_DIR/gradlew" "$@"
+fi
+
+if command -v gradle >/dev/null 2>&1; then
+  echo "WARNING: gradle-wrapper.jar not found, using system 'gradle'." >&2
+  echo "To restore wrapper, run: gradle wrapper --gradle-version 8.10.2" >&2
+  exec gradle "$@"
+fi
+
+echo "ERROR: Neither usable './gradlew' wrapper nor system 'gradle' found." >&2
+echo "Install Gradle or restore gradle-wrapper.jar in gradle/wrapper/." >&2
+exit 1

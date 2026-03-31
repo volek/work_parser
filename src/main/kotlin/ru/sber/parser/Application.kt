@@ -54,7 +54,7 @@ fun main(args: Array<String>) = runBlocking {
         
         // ==========================================
         // КОМАНДА: generate
-        // Генерация тестовых JSON-сообщений (в т.ч. при запуске в Docker)
+        // Генерация тестовых JSON-сообщений
         // ==========================================
         "generate" -> {
             val positionalArgs = args.filter { !it.startsWith("--") }
@@ -664,9 +664,9 @@ fun main(args: Array<String>) = runBlocking {
                   query-suite <strategy>          Run all SQL files in query/<strategy> with metrics
                   help                            Show this help
                 
-                Examples (Docker):
-                  docker compose run --rm bpm-parser generate
-                  docker compose run --rm bpm-parser generate messages 500
+                Examples:
+                  java -jar build/libs/bpm-druid-parser-1.0.0.jar generate
+                  java -jar build/libs/bpm-druid-parser-1.0.0.jar generate messages 500
                 
                 Strategies:
                   hybrid   - Flat columns + JSON blobs (single table)

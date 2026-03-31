@@ -185,10 +185,7 @@ internal data class DruidFileConfig(
 /**
  * Конфигурация подключения к Apache Druid.
  * 
- * Поддерживает несколько режимов подключения:
- * - Standalone Druid на localhost
- * - Druid в отдельном Docker контейнере
- * - Удалённый Druid кластер
+ * Поддерживает подключение к локальному или удалённому Druid по URL.
  * 
  * Приоритет значений: ENV > config.yaml > defaults
  */
@@ -329,41 +326,6 @@ data class DruidConfig(
             return config
         }
         
-        /**
-         * Создаёт конфигурацию для standalone Druid на localhost
-         */
-        fun forLocalStandalone(port: Int = 8888): DruidConfig {
-            return DruidConfig(
-                brokerUrl = "http://localhost:8082",
-                coordinatorUrl = "http://localhost:8081",
-                overlordUrl = "http://localhost:8081",
-                routerUrl = "http://localhost:$port"
-            )
-        }
-        
-        /**
-         * Создаёт конфигурацию для Druid в Docker (через host.docker.internal)
-         */
-        fun forDockerHost(): DruidConfig {
-            return DruidConfig(
-                brokerUrl = "http://host.docker.internal:8082",
-                coordinatorUrl = "http://host.docker.internal:8081",
-                overlordUrl = "http://host.docker.internal:8081",
-                routerUrl = "http://host.docker.internal:8888"
-            )
-        }
-        
-        /**
-         * Создаёт конфигурацию для Druid кластера в Docker Compose
-         */
-        fun forDockerCompose(): DruidConfig {
-            return DruidConfig(
-                brokerUrl = "http://druid-broker:8082",
-                coordinatorUrl = "http://druid-coordinator:8081",
-                overlordUrl = "http://druid-overlord:8090",
-                routerUrl = "http://druid-router:8888"
-            )
-        }
     }
     
     /**

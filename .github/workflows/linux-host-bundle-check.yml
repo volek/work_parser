@@ -1,4 +1,4 @@
-name: Linux Host Bundle Check
+name: Linux Host CI
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  verify-linux-host-bundle:
+  linux-host-checks:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,5 +21,14 @@ jobs:
           java-version: "17"
           cache: gradle
 
-      - name: Verify shell file modes in linux host ZIP
+      - name: Build and run tests
+        run: ./gradlew clean test jar
+
+      - name: Verify query manifest
+        run: ./gradlew verifyQueryManifest
+
+      - name: Verify linux host bundle script modes
         run: ./gradlew verifyLinuxHostBundleScriptModes
+
+      - name: Smoke test CLI help
+        run: java -jar build/libs/bpm-druid-parser-1.0.0.jar help

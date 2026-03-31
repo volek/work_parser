@@ -1,5 +1,4 @@
 import org.apache.commons.compress.archivers.zip.ZipFile
-import org.gradle.internal.os.OperatingSystem
 
 buildscript {
     repositories {
@@ -83,7 +82,7 @@ tasks.jar {
 /**
  * ZIP для переноса на Linux-хост: fat JAR, scripts/, query/, messages/, config.yaml,
  * DEPLOYMENT.md (корень архива), все *.md в дереве проекта в markdown/.
- * Собирать: ./gradlew linuxHostBundle или gradlew.bat linuxHostBundle
+ * Собирать: ./gradlew linuxHostBundle
  */
 tasks.register<Zip>("linuxHostBundle") {
     group = "distribution"
@@ -169,7 +168,7 @@ tasks.register("verifyLinuxHostBundleScriptModes") {
 }
 
 val pythonBinProvider = providers.environmentVariable("PYTHON_BIN").orElse(
-    if (OperatingSystem.current().isWindows) "python" else "python3"
+    "python3"
 )
 
 tasks.register<Exec>("generateQueries") {

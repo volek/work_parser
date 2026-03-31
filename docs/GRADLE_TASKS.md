@@ -84,18 +84,7 @@
 - `clean<TaskName>` - очистка выходных файлов конкретной задачи.
 - `build<ConfigurationName>` - сборка артефактов указанной configuration.
 
-## Примеры (чаще всего используемые)
-
-### Windows (PowerShell/cmd)
-
-```powershell
-.\gradlew.bat clean build
-.\gradlew.bat generateQueries
-.\gradlew.bat verifyQueryManifest
-.\gradlew.bat linuxHostBundle verifyLinuxHostBundleScriptModes
-```
-
-### Linux/macOS
+## Примеры (Linux host)
 
 ```bash
 ./gradlew clean build
@@ -108,7 +97,7 @@
 
 Для `generateQueries`, `generateCompcomQueries`, `verifyQueryManifest` можно задать бинарник через `PYTHON_BIN`.
 
-- По умолчанию: Windows -> `python`, Linux/macOS -> `python3`.
+- По умолчанию используется `python3`.
 - Пример:
 
 ```bash
