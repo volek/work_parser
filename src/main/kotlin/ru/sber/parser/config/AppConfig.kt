@@ -167,6 +167,19 @@ internal data class DruidFileConfig(
      * чтобы снизить вероятность сетевых обрывов/лимитов (e.g. Broken pipe).
      */
     val maxInlineBytes: Int? = null
+    ,
+    /**
+     * Включить ожидание финального статуса ingestion task после submit.
+     */
+    val awaitIngestionTasks: Boolean? = null,
+    /**
+     * Таймаут ожидания всех ingestion task одного datasource (мс).
+     */
+    val ingestionTaskTimeoutMs: Long? = null,
+    /**
+     * Интервал опроса статусов ingestion task (мс).
+     */
+    val ingestionTaskPollIntervalMs: Long? = null
 )
 
 /**
@@ -209,7 +222,19 @@ data class DruidConfig(
      * Максимальный размер inline-NDJSON payload в ingestion spec (в байтах).
      * Нужен для стабилизации submit в Overlord (избежать "Broken pipe" при больших запросах).
      */
-    val maxInlineBytes: Int = 4_000_000
+    val maxInlineBytes: Int = 4_000_000,
+    /**
+     * Ожидать финальный статус ingestion task после submit.
+     */
+    val awaitIngestionTasks: Boolean = true,
+    /**
+     * Таймаут ожидания всех ingestion task одного datasource (мс).
+     */
+    val ingestionTaskTimeoutMs: Long = 1_800_000,
+    /**
+     * Интервал опроса статусов ingestion task (мс).
+     */
+    val ingestionTaskPollIntervalMs: Long = 2_000
 ) {
     companion object {
         private val logger = LoggerFactory.getLogger(DruidConfig::class.java)
@@ -272,7 +297,19 @@ data class DruidConfig(
                     ?: false,
                 maxInlineBytes = System.getenv("DRUID_MAX_INLINE_BYTES")?.toIntOrNull()
                     ?: fileConfig?.maxInlineBytes
-                    ?: 4_000_000
+                    ?: 4_000_000,
+                awaitIngestionTasks = System.getenv("DRUID_AWAIT_INGESTION_TASKS")
+                    ?.trim()
+                    ?.lowercase()
+                    ?.let { it == "true" || it == "1" || it == "yes" }
+                    ?: fileConfig?.awaitIngestionTasks
+                    ?: true,
+                ingestionTaskTimeoutMs = System.getenv("DRUID_INGESTION_TASK_TIMEOUT_MS")?.toLongOrNull()
+                    ?: fileConfig?.ingestionTaskTimeoutMs
+                    ?: 1_800_000,
+                ingestionTaskPollIntervalMs = System.getenv("DRUID_INGESTION_TASK_POLL_INTERVAL_MS")?.toLongOrNull()
+                    ?: fileConfig?.ingestionTaskPollIntervalMs
+                    ?: 2_000
             )
             
             logger.info("Druid configuration loaded:")
@@ -285,6 +322,9 @@ data class DruidConfig(
             logger.info("  TLS trustStore configured: ${!config.trustStorePath.isNullOrBlank()}")
             logger.info("  TLS insecureSkipTlsVerify: ${config.insecureSkipTlsVerify}")
             logger.info("  Ingest max inline bytes: ${config.maxInlineBytes}")
+            logger.info("  Await ingestion tasks: ${config.awaitIngestionTasks}")
+            logger.info("  Ingestion task timeout ms: ${config.ingestionTaskTimeoutMs}")
+            logger.info("  Ingestion task poll interval ms: ${config.ingestionTaskPollIntervalMs}")
             
             return config
         }

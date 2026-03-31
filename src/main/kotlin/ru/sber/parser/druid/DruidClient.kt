@@ -18,6 +18,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
 import org.slf4j.LoggerFactory
+import kotlinx.coroutines.delay
 import ru.sber.parser.config.DruidConfig
 import java.io.Closeable
 import java.io.FileInputStream
@@ -339,6 +340,7 @@ class DruidClient(private val config: DruidConfig) : Closeable {
         var minBatchTotalNs = Long.MAX_VALUE
         // Метрика: максимальное время отправки одного батча.
         var maxBatchTotalNs = 0L
+        val submittedTaskIds = mutableListOf<String>()
 
         batches.forEachIndexed { index, batch ->
             logger.debug("Processing batch ${index + 1}/${batches.size} with ${batch.size} records")
@@ -350,6 +352,7 @@ class DruidClient(private val config: DruidConfig) : Closeable {
             sumResponseDecodeNs += submissionMetrics.responseDecodeNs
             minBatchTotalNs = kotlin.math.min(minBatchTotalNs, submissionMetrics.totalNs)
             maxBatchTotalNs = kotlin.math.max(maxBatchTotalNs, submissionMetrics.totalNs)
+            submissionMetrics.taskId?.let { submittedTaskIds.add(it) }
 
             // Структурированный TEMP_PERF-лог по каждому батчу ingestion.
             logger.info(
@@ -406,6 +409,70 @@ class DruidClient(private val config: DruidConfig) : Closeable {
         )
 
         logger.info("Successfully submitted ${batches.size} ingestion batches for dataSource: $dataSource")
+
+        if (config.awaitIngestionTasks && submittedTaskIds.isNotEmpty()) {
+            awaitIngestionTasksCompletion(dataSource, submittedTaskIds)
+        }
+    }
+
+    private suspend fun awaitIngestionTasksCompletion(dataSource: String, taskIds: List<String>) {
+        val timeoutMs = config.ingestionTaskTimeoutMs.coerceAtLeast(1_000L)
+        val pollMs = config.ingestionTaskPollIntervalMs.coerceAtLeast(200L)
+        val startedNs = System.nanoTime()
+        val pending = taskIds.toMutableSet()
+
+        logger.info(
+            "Awaiting ingestion tasks completion: dataSource={}, tasks={}, timeout_ms={}, poll_ms={}",
+            dataSource,
+            taskIds.size,
+            timeoutMs,
+            pollMs
+        )
+
+        while (pending.isNotEmpty()) {
+            val elapsedMs = (System.nanoTime() - startedNs) / 1_000_000
+            if (elapsedMs > timeoutMs) {
+                throw DruidException(
+                    "Ingestion tasks timeout for dataSource '$dataSource': pending=${pending.size}/${taskIds.size}"
+                )
+            }
+
+            val completedInIteration = mutableListOf<String>()
+            for (taskId in pending) {
+                val status = getTaskStatus(taskId)
+                when {
+                    status.isSuccess() -> completedInIteration.add(taskId)
+                    status.isFailed() -> {
+                        throw DruidException(
+                            "Ingestion task failed for dataSource '$dataSource': taskId=$taskId, error=${status.errorMsg ?: "unknown"}"
+                        )
+                    }
+                }
+            }
+            completedInIteration.forEach { pending.remove(it) }
+
+            logger.info(
+                "TEMP_PERF|component=druid.ingest|operation=await_tasks_progress|data_source={}|tasks_total={}|tasks_pending={}|tasks_completed={}|tasks_failed={}|elapsed_ms={}",
+                dataSource,
+                taskIds.size,
+                pending.size,
+                taskIds.size - pending.size,
+                0,
+                elapsedMs
+            )
+
+            if (pending.isNotEmpty()) {
+                delay(pollMs)
+            }
+        }
+
+        val totalMs = (System.nanoTime() - startedNs) / 1_000_000.0
+        logger.info(
+            "TEMP_PERF|component=druid.ingest|operation=await_tasks_done|data_source={}|tasks_total={}|elapsed_ms={}",
+            dataSource,
+            taskIds.size,
+            totalMs
+        )
     }
     
     /**

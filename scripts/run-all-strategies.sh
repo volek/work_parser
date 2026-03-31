@@ -206,11 +206,13 @@ CONFIG_COORD="$(read_config_coordinator_url "$CONFIG_FILE")"
 COORD="${COORDINATOR_URL:-${DRUID_COORDINATOR_URL:-${CONFIG_COORD:-}}}"
 if [[ -n "$COORD" ]]; then
   echo "=== Очистка datasource'ов в Druid (Coordinator: $COORD) ==="
-  COORDINATOR_URL="$COORD" "$ROOT/scripts/clean-druid-remote.sh" || {
-    echo "Предупреждение: clean-druid-remote.sh завершился с ошибкой, продолжаем." >&2
-  }
+  if ! COORDINATOR_URL="$COORD" "$ROOT/scripts/clean-druid-remote.sh"; then
+    echo "Ошибка: clean-druid-remote.sh завершился с ошибкой. Останавливаем pipeline (fail-fast)." >&2
+    exit 1
+  fi
 else
-  echo "Пропуск очистки Druid: не заданы COORDINATOR_URL / DRUID_COORDINATOR_URL и не найден druid.coordinatorUrl в config.yaml."
+  echo "Ошибка: не заданы COORDINATOR_URL / DRUID_COORDINATOR_URL и не найден druid.coordinatorUrl в config.yaml. Останавливаем pipeline (fail-fast)." >&2
+  exit 1
 fi
 
 if [[ -f "$CONFIG_FILE" ]]; then

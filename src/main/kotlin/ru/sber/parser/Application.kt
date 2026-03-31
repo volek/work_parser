@@ -334,6 +334,7 @@ fun main(args: Array<String>) = runBlocking {
                                 dsIngestNs / 1_000_000.0
                             )
                             logger.info("Ingested records to Druid datasource: ${strategy.dataSourceName}")
+                            verifyExpectedDatasources(client, listOf(strategy.dataSourceName))
                         } else {
                             // Метрика: старт формирования множественных datasource через transformBatch().
                             val splitByDsStartNs = System.nanoTime()
@@ -365,6 +366,9 @@ fun main(args: Array<String>) = runBlocking {
                                 )
                                 logger.info("Ingested ${dsRecords.size} records to Druid datasource: $dataSource")
                             }
+
+                            val expected = (listOf(strategy.dataSourceName) + strategy.additionalDataSources).distinct()
+                            verifyExpectedDatasources(client, expected)
 
                             // Итоговая метрика: распределение записей по datasource (для Combined/Compcom/EAV).
                             try {
@@ -427,6 +431,7 @@ fun main(args: Array<String>) = runBlocking {
                 .filter { line: String -> !line.trim().startsWith("--") }
                 .joinToString("\n")
                 .trim()
+                .replace(Regex(";\\s*$"), "")
             // Метрика: длительность подготовки SQL перед отправкой в Druid.
             val sqlPrepareNs = System.nanoTime() - sqlPrepareStartNs
             // Метрика: размер SQL после очистки комментариев.
@@ -695,6 +700,7 @@ private fun readAndPrepareSql(file: File): PreparedSql {
         .filter { line: String -> !line.trim().startsWith("--") }
         .joinToString("\n")
         .trim()
+        .replace(Regex(";\\s*$"), "")
     return PreparedSql(
         sql = sql,
         rawChars = rawChars,
@@ -702,6 +708,21 @@ private fun readAndPrepareSql(file: File): PreparedSql {
         rawLines = rawLines,
         preparedLines = if (sql.isBlank()) 0 else sql.lines().size
     )
+}
+
+private suspend fun verifyExpectedDatasources(druid: DruidClient, expected: List<String>) {
+    if (expected.isEmpty()) return
+    val existing = druid.listDataSources().toSet()
+    val missing = expected.filterNot { existing.contains(it) }
+    logger.info(
+        "ANALYSIS|component=app.ingest|stage=verify_datasources|expected={}|existing_count={}|missing={}",
+        expected.joinToString(","),
+        existing.size,
+        if (missing.isEmpty()) "<none>" else missing.joinToString(",")
+    )
+    if (missing.isNotEmpty()) {
+        throw IllegalStateException("Missing Druid datasource(s) after ingest: ${missing.joinToString(", ")}")
+    }
 }
 
 private fun extractIntFlag(args: Array<String>, flag: String): Int? {
