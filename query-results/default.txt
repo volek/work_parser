@@ -1,0 +1,802 @@
+=== Strategy: default ===
+
+----- query/default/q01_select_all.sql -----
+19:44:54.491 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+19:44:54.527 [main] INFO  ru.sber.parser.config.AppConfig - Config resolution: PARSER_CONFIG_PATH=/home/portos/config.yaml, effective path=/home/portos/config.yaml
+19:44:54.529 [main] INFO  ru.sber.parser.config.AppConfig - Loading configuration from: /home/portos/config.yaml
+19:44:55.088 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+19:44:55.089 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088
+19:44:55.089 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088]
+19:44:55.089 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282
+19:44:55.089 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282]
+19:44:55.089 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281
+19:44:55.089 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281]
+19:44:55.089 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8290
+19:44:55.089 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URLs: [https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8290]
+19:44:55.090 [main] INFO  ru.sber.parser.config.DruidConfig -   Auth enabled: true
+19:44:55.090 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingest batch size: 1000
+19:44:55.090 [main] INFO  ru.sber.parser.config.DruidConfig -   TLS trustStore configured: true
+19:44:55.090 [main] INFO  ru.sber.parser.config.DruidConfig -   TLS insecureSkipTlsVerify: false
+19:44:55.090 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingest max inline bytes: 4000000
+19:44:55.090 [main] INFO  ru.sber.parser.config.DruidConfig -   Await ingestion tasks: true
+19:44:55.092 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingestion task timeout ms: 1800000
+19:44:55.092 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingestion task poll interval ms: 2000
+19:44:55.101 [main] INFO  ru.sber.parser.druid.DruidClient - JVM trustStore configured: path=/home/portos/druid-truststore.p12, type=PKCS12, passwordSet=true
+19:44:55.226 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore loaded: path=/home/portos/druid-truststore.p12, type=PKCS12, acceptedIssuers=3
+19:44:55.226 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[0]: subject='CN=Certificate Authority,O=SOLUTION.SBT', issuer='CN=Certificate Authority,O=SOLUTION.SBT'
+19:44:55.226 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[1]: subject='CN=secman-dzo.solution.sbt', issuer='CN=Certificate Authority,O=SOLUTION.SBT'
+19:44:55.226 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[2]: subject='CN=omlt-unimon.opsmon.sbt,O=OPSMON.SBT', issuer='CN=opsmon.sbt CA,O=OPSMON.SBT'
+19:44:55.288 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: SELECT *
+FROM default_process_default
+ORDER BY __time DESC
+LIMIT 100
+19:44:55.331 [main] INFO  io.ktor.client.HttpClient - REQUEST: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+19:44:55.524 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 400 Bad Request
+METHOD: HttpMethod(value=POST)
+FROM: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088/druid/v2/sql
+19:44:55.541 [main] INFO  ru.sber.parser.druid.DruidClient - TEMP_PERF|component=druid.query|operation=sql_request_failed|sql_chars=68|status=400|http_round_trip_ns=241470990|http_round_trip_ms=241.47099|total_ns=251529880|total_ms=251.52988|error_body_chars=266
+19:44:55.542 [main] ERROR ru.sber.parser.druid.DruidClient - Query failed: HTTP 400 ({"error":"druidException","errorCode":"invalidInput","persona":"USER","category":"INVALID_INPUT","errorMessage":"Object 'default_process_default' not found (line [2], column [6])","context":{"sourceType":"sql","line":"2","column":"6","endLine":"2","endColumn":"28"}})
+Exception in thread "main" ru.sber.parser.druid.DruidException: Query failed: HTTP 400
+	at ru.sber.parser.druid.DruidClient.query(DruidClient.kt:177)
+	at ru.sber.parser.druid.DruidClient$query$1.invokeSuspend(DruidClient.kt)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at ru.sber.parser.ApplicationKt$main$1.invokeSuspend(Application.kt:444)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at ru.sber.parser.ApplicationKt.main(Application.kt:45)
+
+----- query/default/q02_select_columns.sql -----
+19:44:56.011 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+19:44:56.046 [main] INFO  ru.sber.parser.config.AppConfig - Config resolution: PARSER_CONFIG_PATH=/home/portos/config.yaml, effective path=/home/portos/config.yaml
+19:44:56.047 [main] INFO  ru.sber.parser.config.AppConfig - Loading configuration from: /home/portos/config.yaml
+19:44:56.618 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+19:44:56.618 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088
+19:44:56.619 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088]
+19:44:56.619 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282
+19:44:56.619 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282]
+19:44:56.619 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281
+19:44:56.619 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281]
+19:44:56.619 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8290
+19:44:56.619 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URLs: [https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8290]
+19:44:56.619 [main] INFO  ru.sber.parser.config.DruidConfig -   Auth enabled: true
+19:44:56.620 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingest batch size: 1000
+19:44:56.620 [main] INFO  ru.sber.parser.config.DruidConfig -   TLS trustStore configured: true
+19:44:56.620 [main] INFO  ru.sber.parser.config.DruidConfig -   TLS insecureSkipTlsVerify: false
+19:44:56.620 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingest max inline bytes: 4000000
+19:44:56.620 [main] INFO  ru.sber.parser.config.DruidConfig -   Await ingestion tasks: true
+19:44:56.622 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingestion task timeout ms: 1800000
+19:44:56.622 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingestion task poll interval ms: 2000
+19:44:56.629 [main] INFO  ru.sber.parser.druid.DruidClient - JVM trustStore configured: path=/home/portos/druid-truststore.p12, type=PKCS12, passwordSet=true
+19:44:56.749 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore loaded: path=/home/portos/druid-truststore.p12, type=PKCS12, acceptedIssuers=3
+19:44:56.750 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[0]: subject='CN=Certificate Authority,O=SOLUTION.SBT', issuer='CN=Certificate Authority,O=SOLUTION.SBT'
+19:44:56.750 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[1]: subject='CN=secman-dzo.solution.sbt', issuer='CN=Certificate Authority,O=SOLUTION.SBT'
+19:44:56.750 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[2]: subject='CN=omlt-unimon.opsmon.sbt,O=OPSMON.SBT', issuer='CN=opsmon.sbt CA,O=OPSMON.SBT'
+19:44:56.813 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: SELECT
+    process_id,
+    process_name,
+    state,
+    __time,
+    module_id,
+    business_key
+FROM default_process_default
+ORDER BY __time DESC
+LIMIT 50
+19:44:56.855 [main] INFO  io.ktor.client.HttpClient - REQUEST: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+19:44:57.051 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 400 Bad Request
+METHOD: HttpMethod(value=POST)
+FROM: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088/druid/v2/sql
+19:44:57.066 [main] INFO  ru.sber.parser.druid.DruidClient - TEMP_PERF|component=druid.query|operation=sql_request_failed|sql_chars=154|status=400|http_round_trip_ns=243669191|http_round_trip_ms=243.669191|total_ns=251836419|total_ms=251.836419|error_body_chars=266
+19:44:57.067 [main] ERROR ru.sber.parser.druid.DruidClient - Query failed: HTTP 400 ({"error":"druidException","errorCode":"invalidInput","persona":"USER","category":"INVALID_INPUT","errorMessage":"Object 'default_process_default' not found (line [8], column [6])","context":{"sourceType":"sql","line":"8","column":"6","endLine":"8","endColumn":"28"}})
+Exception in thread "main" ru.sber.parser.druid.DruidException: Query failed: HTTP 400
+	at ru.sber.parser.druid.DruidClient.query(DruidClient.kt:177)
+	at ru.sber.parser.druid.DruidClient$query$1.invokeSuspend(DruidClient.kt)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at ru.sber.parser.ApplicationKt$main$1.invokeSuspend(Application.kt:444)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at ru.sber.parser.ApplicationKt.main(Application.kt:45)
+
+----- query/default/q03_last_24h.sql -----
+19:44:57.576 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+19:44:57.612 [main] INFO  ru.sber.parser.config.AppConfig - Config resolution: PARSER_CONFIG_PATH=/home/portos/config.yaml, effective path=/home/portos/config.yaml
+19:44:57.614 [main] INFO  ru.sber.parser.config.AppConfig - Loading configuration from: /home/portos/config.yaml
+19:44:58.185 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+19:44:58.185 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088
+19:44:58.186 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088]
+19:44:58.186 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282
+19:44:58.186 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282]
+19:44:58.186 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281
+19:44:58.186 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281]
+19:44:58.186 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8290
+19:44:58.186 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URLs: [https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8290]
+19:44:58.187 [main] INFO  ru.sber.parser.config.DruidConfig -   Auth enabled: true
+19:44:58.187 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingest batch size: 1000
+19:44:58.187 [main] INFO  ru.sber.parser.config.DruidConfig -   TLS trustStore configured: true
+19:44:58.187 [main] INFO  ru.sber.parser.config.DruidConfig -   TLS insecureSkipTlsVerify: false
+19:44:58.187 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingest max inline bytes: 4000000
+19:44:58.188 [main] INFO  ru.sber.parser.config.DruidConfig -   Await ingestion tasks: true
+19:44:58.189 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingestion task timeout ms: 1800000
+19:44:58.189 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingestion task poll interval ms: 2000
+19:44:58.196 [main] INFO  ru.sber.parser.druid.DruidClient - JVM trustStore configured: path=/home/portos/druid-truststore.p12, type=PKCS12, passwordSet=true
+19:44:58.327 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore loaded: path=/home/portos/druid-truststore.p12, type=PKCS12, acceptedIssuers=3
+19:44:58.328 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[0]: subject='CN=Certificate Authority,O=SOLUTION.SBT', issuer='CN=Certificate Authority,O=SOLUTION.SBT'
+19:44:58.328 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[1]: subject='CN=secman-dzo.solution.sbt', issuer='CN=Certificate Authority,O=SOLUTION.SBT'
+19:44:58.328 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[2]: subject='CN=omlt-unimon.opsmon.sbt,O=OPSMON.SBT', issuer='CN=opsmon.sbt CA,O=OPSMON.SBT'
+19:44:58.397 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: SELECT *
+FROM default_process_default
+WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '1' DAY
+ORDER BY __time DESC
+19:44:58.441 [main] INFO  io.ktor.client.HttpClient - REQUEST: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+19:44:58.656 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 400 Bad Request
+METHOD: HttpMethod(value=POST)
+FROM: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088/druid/v2/sql
+19:44:58.670 [main] INFO  ru.sber.parser.druid.DruidClient - TEMP_PERF|component=druid.query|operation=sql_request_failed|sql_chars=111|status=400|http_round_trip_ns=263402276|http_round_trip_ms=263.402276|total_ns=272109335|total_ms=272.109335|error_body_chars=266
+19:44:58.671 [main] ERROR ru.sber.parser.druid.DruidClient - Query failed: HTTP 400 ({"error":"druidException","errorCode":"invalidInput","persona":"USER","category":"INVALID_INPUT","errorMessage":"Object 'default_process_default' not found (line [2], column [6])","context":{"sourceType":"sql","line":"2","column":"6","endLine":"2","endColumn":"28"}})
+Exception in thread "main" ru.sber.parser.druid.DruidException: Query failed: HTTP 400
+	at ru.sber.parser.druid.DruidClient.query(DruidClient.kt:177)
+	at ru.sber.parser.druid.DruidClient$query$1.invokeSuspend(DruidClient.kt)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at ru.sber.parser.ApplicationKt$main$1.invokeSuspend(Application.kt:444)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at ru.sber.parser.ApplicationKt.main(Application.kt:45)
+
+----- query/default/q04_last_7_days.sql -----
+19:44:59.198 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+19:44:59.234 [main] INFO  ru.sber.parser.config.AppConfig - Config resolution: PARSER_CONFIG_PATH=/home/portos/config.yaml, effective path=/home/portos/config.yaml
+19:44:59.236 [main] INFO  ru.sber.parser.config.AppConfig - Loading configuration from: /home/portos/config.yaml
+19:44:59.805 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+19:44:59.806 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088
+19:44:59.806 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088]
+19:44:59.806 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282
+19:44:59.806 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282]
+19:44:59.806 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281
+19:44:59.806 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281]
+19:44:59.807 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8290
+19:44:59.807 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URLs: [https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8290]
+19:44:59.807 [main] INFO  ru.sber.parser.config.DruidConfig -   Auth enabled: true
+19:44:59.807 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingest batch size: 1000
+19:44:59.807 [main] INFO  ru.sber.parser.config.DruidConfig -   TLS trustStore configured: true
+19:44:59.807 [main] INFO  ru.sber.parser.config.DruidConfig -   TLS insecureSkipTlsVerify: false
+19:44:59.808 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingest max inline bytes: 4000000
+19:44:59.808 [main] INFO  ru.sber.parser.config.DruidConfig -   Await ingestion tasks: true
+19:44:59.810 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingestion task timeout ms: 1800000
+19:44:59.810 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingestion task poll interval ms: 2000
+19:44:59.817 [main] INFO  ru.sber.parser.druid.DruidClient - JVM trustStore configured: path=/home/portos/druid-truststore.p12, type=PKCS12, passwordSet=true
+19:44:59.937 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore loaded: path=/home/portos/druid-truststore.p12, type=PKCS12, acceptedIssuers=3
+19:44:59.937 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[0]: subject='CN=Certificate Authority,O=SOLUTION.SBT', issuer='CN=Certificate Authority,O=SOLUTION.SBT'
+19:44:59.938 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[1]: subject='CN=secman-dzo.solution.sbt', issuer='CN=Certificate Authority,O=SOLUTION.SBT'
+19:44:59.938 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[2]: subject='CN=omlt-unimon.opsmon.sbt,O=OPSMON.SBT', issuer='CN=opsmon.sbt CA,O=OPSMON.SBT'
+19:45:00.005 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: SELECT
+  process_id,
+  process_name,
+  state,
+  __time,
+  module_id
+FROM default_process_default
+WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '7' DAY
+ORDER BY __time DESC
+19:45:00.048 [main] INFO  io.ktor.client.HttpClient - REQUEST: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+19:45:00.251 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 400 Bad Request
+METHOD: HttpMethod(value=POST)
+FROM: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088/druid/v2/sql
+19:45:00.263 [main] INFO  ru.sber.parser.druid.DruidClient - TEMP_PERF|component=druid.query|operation=sql_request_failed|sql_chars=170|status=400|http_round_trip_ns=249244334|http_round_trip_ms=249.244334|total_ns=257251475|total_ms=257.251475|error_body_chars=266
+19:45:00.264 [main] ERROR ru.sber.parser.druid.DruidClient - Query failed: HTTP 400 ({"error":"druidException","errorCode":"invalidInput","persona":"USER","category":"INVALID_INPUT","errorMessage":"Object 'default_process_default' not found (line [7], column [6])","context":{"sourceType":"sql","line":"7","column":"6","endLine":"7","endColumn":"28"}})
+Exception in thread "main" ru.sber.parser.druid.DruidException: Query failed: HTTP 400
+	at ru.sber.parser.druid.DruidClient.query(DruidClient.kt:177)
+	at ru.sber.parser.druid.DruidClient$query$1.invokeSuspend(DruidClient.kt)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at ru.sber.parser.ApplicationKt$main$1.invokeSuspend(Application.kt:444)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at ru.sber.parser.ApplicationKt.main(Application.kt:45)
+
+----- query/default/q05_by_process_name.sql -----
+19:45:00.742 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+19:45:00.775 [main] INFO  ru.sber.parser.config.AppConfig - Config resolution: PARSER_CONFIG_PATH=/home/portos/config.yaml, effective path=/home/portos/config.yaml
+19:45:00.777 [main] INFO  ru.sber.parser.config.AppConfig - Loading configuration from: /home/portos/config.yaml
+19:45:01.342 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+19:45:01.343 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088
+19:45:01.343 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088]
+19:45:01.343 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282
+19:45:01.343 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282]
+19:45:01.343 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281
+19:45:01.344 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281]
+19:45:01.344 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8290
+19:45:01.344 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URLs: [https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8290]
+19:45:01.344 [main] INFO  ru.sber.parser.config.DruidConfig -   Auth enabled: true
+19:45:01.344 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingest batch size: 1000
+19:45:01.344 [main] INFO  ru.sber.parser.config.DruidConfig -   TLS trustStore configured: true
+19:45:01.344 [main] INFO  ru.sber.parser.config.DruidConfig -   TLS insecureSkipTlsVerify: false
+19:45:01.345 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingest max inline bytes: 4000000
+19:45:01.345 [main] INFO  ru.sber.parser.config.DruidConfig -   Await ingestion tasks: true
+19:45:01.346 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingestion task timeout ms: 1800000
+19:45:01.347 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingestion task poll interval ms: 2000
+19:45:01.354 [main] INFO  ru.sber.parser.druid.DruidClient - JVM trustStore configured: path=/home/portos/druid-truststore.p12, type=PKCS12, passwordSet=true
+19:45:01.481 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore loaded: path=/home/portos/druid-truststore.p12, type=PKCS12, acceptedIssuers=3
+19:45:01.481 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[0]: subject='CN=Certificate Authority,O=SOLUTION.SBT', issuer='CN=Certificate Authority,O=SOLUTION.SBT'
+19:45:01.481 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[1]: subject='CN=secman-dzo.solution.sbt', issuer='CN=Certificate Authority,O=SOLUTION.SBT'
+19:45:01.481 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[2]: subject='CN=omlt-unimon.opsmon.sbt,O=OPSMON.SBT', issuer='CN=opsmon.sbt CA,O=OPSMON.SBT'
+19:45:01.545 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: SELECT *
+FROM default_process_default
+WHERE process_name = 'uvskRemainderReturnCR-Service'
+ORDER BY __time DESC
+LIMIT 200
+19:45:01.588 [main] INFO  io.ktor.client.HttpClient - REQUEST: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+19:45:01.805 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 400 Bad Request
+METHOD: HttpMethod(value=POST)
+FROM: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088/druid/v2/sql
+19:45:01.821 [main] INFO  ru.sber.parser.druid.DruidClient - TEMP_PERF|component=druid.query|operation=sql_request_failed|sql_chars=121|status=400|http_round_trip_ns=265146407|http_round_trip_ms=265.146407|total_ns=274805618|total_ms=274.805618|error_body_chars=266
+19:45:01.822 [main] ERROR ru.sber.parser.druid.DruidClient - Query failed: HTTP 400 ({"error":"druidException","errorCode":"invalidInput","persona":"USER","category":"INVALID_INPUT","errorMessage":"Object 'default_process_default' not found (line [2], column [6])","context":{"sourceType":"sql","line":"2","column":"6","endLine":"2","endColumn":"28"}})
+Exception in thread "main" ru.sber.parser.druid.DruidException: Query failed: HTTP 400
+	at ru.sber.parser.druid.DruidClient.query(DruidClient.kt:177)
+	at ru.sber.parser.druid.DruidClient$query$1.invokeSuspend(DruidClient.kt)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at ru.sber.parser.ApplicationKt$main$1.invokeSuspend(Application.kt:444)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at ru.sber.parser.ApplicationKt.main(Application.kt:45)
+
+----- query/default/q06_by_state_running.sql -----
+19:45:02.312 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+19:45:02.348 [main] INFO  ru.sber.parser.config.AppConfig - Config resolution: PARSER_CONFIG_PATH=/home/portos/config.yaml, effective path=/home/portos/config.yaml
+19:45:02.350 [main] INFO  ru.sber.parser.config.AppConfig - Loading configuration from: /home/portos/config.yaml
+19:45:02.922 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+19:45:02.923 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088
+19:45:02.923 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088]
+19:45:02.923 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282
+19:45:02.924 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282]
+19:45:02.924 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281
+19:45:02.924 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281]
+19:45:02.924 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8290
+19:45:02.924 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URLs: [https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8290]
+19:45:02.924 [main] INFO  ru.sber.parser.config.DruidConfig -   Auth enabled: true
+19:45:02.924 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingest batch size: 1000
+19:45:02.925 [main] INFO  ru.sber.parser.config.DruidConfig -   TLS trustStore configured: true
+19:45:02.925 [main] INFO  ru.sber.parser.config.DruidConfig -   TLS insecureSkipTlsVerify: false
+19:45:02.925 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingest max inline bytes: 4000000
+19:45:02.925 [main] INFO  ru.sber.parser.config.DruidConfig -   Await ingestion tasks: true
+19:45:02.927 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingestion task timeout ms: 1800000
+19:45:02.927 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingestion task poll interval ms: 2000
+19:45:02.934 [main] INFO  ru.sber.parser.druid.DruidClient - JVM trustStore configured: path=/home/portos/druid-truststore.p12, type=PKCS12, passwordSet=true
+19:45:03.056 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore loaded: path=/home/portos/druid-truststore.p12, type=PKCS12, acceptedIssuers=3
+19:45:03.057 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[0]: subject='CN=Certificate Authority,O=SOLUTION.SBT', issuer='CN=Certificate Authority,O=SOLUTION.SBT'
+19:45:03.057 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[1]: subject='CN=secman-dzo.solution.sbt', issuer='CN=Certificate Authority,O=SOLUTION.SBT'
+19:45:03.057 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[2]: subject='CN=omlt-unimon.opsmon.sbt,O=OPSMON.SBT', issuer='CN=opsmon.sbt CA,O=OPSMON.SBT'
+19:45:03.125 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: SELECT
+  process_id,
+  process_name,
+  state,
+  __time
+FROM default_process_default
+WHERE state = 1
+ORDER BY __time DESC
+LIMIT 200
+19:45:03.168 [main] INFO  io.ktor.client.HttpClient - REQUEST: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+19:45:03.393 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 400 Bad Request
+METHOD: HttpMethod(value=POST)
+FROM: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088/druid/v2/sql
+19:45:03.407 [main] INFO  ru.sber.parser.druid.DruidClient - TEMP_PERF|component=druid.query|operation=sql_request_failed|sql_chars=130|status=400|http_round_trip_ns=271962578|http_round_trip_ms=271.962578|total_ns=280748897|total_ms=280.748897|error_body_chars=266
+19:45:03.408 [main] ERROR ru.sber.parser.druid.DruidClient - Query failed: HTTP 400 ({"error":"druidException","errorCode":"invalidInput","persona":"USER","category":"INVALID_INPUT","errorMessage":"Object 'default_process_default' not found (line [6], column [6])","context":{"sourceType":"sql","line":"6","column":"6","endLine":"6","endColumn":"28"}})
+Exception in thread "main" ru.sber.parser.druid.DruidException: Query failed: HTTP 400
+	at ru.sber.parser.druid.DruidClient.query(DruidClient.kt:177)
+	at ru.sber.parser.druid.DruidClient$query$1.invokeSuspend(DruidClient.kt)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at ru.sber.parser.ApplicationKt$main$1.invokeSuspend(Application.kt:444)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at ru.sber.parser.ApplicationKt.main(Application.kt:45)
+
+----- query/default/q07_by_state_failed.sql -----
+19:45:03.897 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+19:45:03.935 [main] INFO  ru.sber.parser.config.AppConfig - Config resolution: PARSER_CONFIG_PATH=/home/portos/config.yaml, effective path=/home/portos/config.yaml
+19:45:03.937 [main] INFO  ru.sber.parser.config.AppConfig - Loading configuration from: /home/portos/config.yaml
+19:45:04.526 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+19:45:04.526 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088
+19:45:04.527 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088]
+19:45:04.527 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282
+19:45:04.527 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282]
+19:45:04.527 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281
+19:45:04.527 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281]
+19:45:04.527 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8290
+19:45:04.527 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URLs: [https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8290]
+19:45:04.527 [main] INFO  ru.sber.parser.config.DruidConfig -   Auth enabled: true
+19:45:04.528 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingest batch size: 1000
+19:45:04.528 [main] INFO  ru.sber.parser.config.DruidConfig -   TLS trustStore configured: true
+19:45:04.528 [main] INFO  ru.sber.parser.config.DruidConfig -   TLS insecureSkipTlsVerify: false
+19:45:04.528 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingest max inline bytes: 4000000
+19:45:04.528 [main] INFO  ru.sber.parser.config.DruidConfig -   Await ingestion tasks: true
+19:45:04.530 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingestion task timeout ms: 1800000
+19:45:04.530 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingestion task poll interval ms: 2000
+19:45:04.537 [main] INFO  ru.sber.parser.druid.DruidClient - JVM trustStore configured: path=/home/portos/druid-truststore.p12, type=PKCS12, passwordSet=true
+19:45:04.678 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore loaded: path=/home/portos/druid-truststore.p12, type=PKCS12, acceptedIssuers=3
+19:45:04.678 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[0]: subject='CN=Certificate Authority,O=SOLUTION.SBT', issuer='CN=Certificate Authority,O=SOLUTION.SBT'
+19:45:04.678 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[1]: subject='CN=secman-dzo.solution.sbt', issuer='CN=Certificate Authority,O=SOLUTION.SBT'
+19:45:04.679 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[2]: subject='CN=omlt-unimon.opsmon.sbt,O=OPSMON.SBT', issuer='CN=opsmon.sbt CA,O=OPSMON.SBT'
+19:45:04.763 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: SELECT
+  process_id,
+  process_name,
+  state,
+  error,
+  __time
+FROM default_process_default
+WHERE state = 2
+ORDER BY __time DESC
+LIMIT 200
+19:45:04.819 [main] INFO  io.ktor.client.HttpClient - REQUEST: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+19:45:05.026 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 400 Bad Request
+METHOD: HttpMethod(value=POST)
+FROM: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088/druid/v2/sql
+19:45:05.040 [main] INFO  ru.sber.parser.druid.DruidClient - TEMP_PERF|component=druid.query|operation=sql_request_failed|sql_chars=139|status=400|http_round_trip_ns=266754504|http_round_trip_ms=266.754504|total_ns=275726514|total_ms=275.726514|error_body_chars=266
+19:45:05.041 [main] ERROR ru.sber.parser.druid.DruidClient - Query failed: HTTP 400 ({"error":"druidException","errorCode":"invalidInput","persona":"USER","category":"INVALID_INPUT","errorMessage":"Object 'default_process_default' not found (line [7], column [6])","context":{"sourceType":"sql","line":"7","column":"6","endLine":"7","endColumn":"28"}})
+Exception in thread "main" ru.sber.parser.druid.DruidException: Query failed: HTTP 400
+	at ru.sber.parser.druid.DruidClient.query(DruidClient.kt:177)
+	at ru.sber.parser.druid.DruidClient$query$1.invokeSuspend(DruidClient.kt)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at ru.sber.parser.ApplicationKt$main$1.invokeSuspend(Application.kt:444)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at ru.sber.parser.ApplicationKt.main(Application.kt:45)
+
+----- query/default/q08_by_module.sql -----
+19:45:05.549 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+19:45:05.585 [main] INFO  ru.sber.parser.config.AppConfig - Config resolution: PARSER_CONFIG_PATH=/home/portos/config.yaml, effective path=/home/portos/config.yaml
+19:45:05.587 [main] INFO  ru.sber.parser.config.AppConfig - Loading configuration from: /home/portos/config.yaml
+19:45:06.151 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+19:45:06.152 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088
+19:45:06.152 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088]
+19:45:06.153 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282
+19:45:06.153 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282]
+19:45:06.153 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281
+19:45:06.153 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281]
+19:45:06.153 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8290
+19:45:06.153 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URLs: [https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8290]
+19:45:06.154 [main] INFO  ru.sber.parser.config.DruidConfig -   Auth enabled: true
+19:45:06.154 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingest batch size: 1000
+19:45:06.154 [main] INFO  ru.sber.parser.config.DruidConfig -   TLS trustStore configured: true
+19:45:06.154 [main] INFO  ru.sber.parser.config.DruidConfig -   TLS insecureSkipTlsVerify: false
+19:45:06.155 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingest max inline bytes: 4000000
+19:45:06.155 [main] INFO  ru.sber.parser.config.DruidConfig -   Await ingestion tasks: true
+19:45:06.157 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingestion task timeout ms: 1800000
+19:45:06.157 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingestion task poll interval ms: 2000
+19:45:06.164 [main] INFO  ru.sber.parser.druid.DruidClient - JVM trustStore configured: path=/home/portos/druid-truststore.p12, type=PKCS12, passwordSet=true
+19:45:06.283 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore loaded: path=/home/portos/druid-truststore.p12, type=PKCS12, acceptedIssuers=3
+19:45:06.283 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[0]: subject='CN=Certificate Authority,O=SOLUTION.SBT', issuer='CN=Certificate Authority,O=SOLUTION.SBT'
+19:45:06.283 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[1]: subject='CN=secman-dzo.solution.sbt', issuer='CN=Certificate Authority,O=SOLUTION.SBT'
+19:45:06.283 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[2]: subject='CN=omlt-unimon.opsmon.sbt,O=OPSMON.SBT', issuer='CN=opsmon.sbt CA,O=OPSMON.SBT'
+19:45:06.352 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: SELECT
+  process_id,
+  process_name,
+  module_id,
+  state,
+  __time
+FROM default_process_default
+WHERE module_id = 'psi-fl-5g'
+ORDER BY __time DESC
+LIMIT 200
+19:45:06.392 [main] INFO  io.ktor.client.HttpClient - REQUEST: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+19:45:06.606 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 400 Bad Request
+METHOD: HttpMethod(value=POST)
+FROM: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088/druid/v2/sql
+19:45:06.620 [main] INFO  ru.sber.parser.druid.DruidClient - TEMP_PERF|component=druid.query|operation=sql_request_failed|sql_chars=157|status=400|http_round_trip_ns=258015647|http_round_trip_ms=258.015647|total_ns=267732917|total_ms=267.732917|error_body_chars=266
+19:45:06.621 [main] ERROR ru.sber.parser.druid.DruidClient - Query failed: HTTP 400 ({"error":"druidException","errorCode":"invalidInput","persona":"USER","category":"INVALID_INPUT","errorMessage":"Object 'default_process_default' not found (line [7], column [6])","context":{"sourceType":"sql","line":"7","column":"6","endLine":"7","endColumn":"28"}})
+Exception in thread "main" ru.sber.parser.druid.DruidException: Query failed: HTTP 400
+	at ru.sber.parser.druid.DruidClient.query(DruidClient.kt:177)
+	at ru.sber.parser.druid.DruidClient$query$1.invokeSuspend(DruidClient.kt)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at ru.sber.parser.ApplicationKt$main$1.invokeSuspend(Application.kt:444)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at ru.sber.parser.ApplicationKt.main(Application.kt:45)
+
+----- query/default/q09_by_business_key.sql -----
+19:45:07.117 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+19:45:07.155 [main] INFO  ru.sber.parser.config.AppConfig - Config resolution: PARSER_CONFIG_PATH=/home/portos/config.yaml, effective path=/home/portos/config.yaml
+19:45:07.157 [main] INFO  ru.sber.parser.config.AppConfig - Loading configuration from: /home/portos/config.yaml
+19:45:07.742 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+19:45:07.743 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088
+19:45:07.743 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088]
+19:45:07.743 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282
+19:45:07.743 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282]
+19:45:07.743 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281
+19:45:07.743 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281]
+19:45:07.743 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8290
+19:45:07.743 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URLs: [https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8290]
+19:45:07.744 [main] INFO  ru.sber.parser.config.DruidConfig -   Auth enabled: true
+19:45:07.744 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingest batch size: 1000
+19:45:07.744 [main] INFO  ru.sber.parser.config.DruidConfig -   TLS trustStore configured: true
+19:45:07.744 [main] INFO  ru.sber.parser.config.DruidConfig -   TLS insecureSkipTlsVerify: false
+19:45:07.744 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingest max inline bytes: 4000000
+19:45:07.744 [main] INFO  ru.sber.parser.config.DruidConfig -   Await ingestion tasks: true
+19:45:07.746 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingestion task timeout ms: 1800000
+19:45:07.746 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingestion task poll interval ms: 2000
+19:45:07.753 [main] INFO  ru.sber.parser.druid.DruidClient - JVM trustStore configured: path=/home/portos/druid-truststore.p12, type=PKCS12, passwordSet=true
+19:45:07.881 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore loaded: path=/home/portos/druid-truststore.p12, type=PKCS12, acceptedIssuers=3
+19:45:07.881 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[0]: subject='CN=Certificate Authority,O=SOLUTION.SBT', issuer='CN=Certificate Authority,O=SOLUTION.SBT'
+19:45:07.881 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[1]: subject='CN=secman-dzo.solution.sbt', issuer='CN=Certificate Authority,O=SOLUTION.SBT'
+19:45:07.881 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[2]: subject='CN=omlt-unimon.opsmon.sbt,O=OPSMON.SBT', issuer='CN=opsmon.sbt CA,O=OPSMON.SBT'
+19:45:07.948 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: SELECT
+  process_id,
+  process_name,
+  business_key,
+  state,
+  __time
+FROM default_process_default
+WHERE business_key IS NOT NULL
+ORDER BY __time DESC
+LIMIT 200
+19:45:07.991 [main] INFO  io.ktor.client.HttpClient - REQUEST: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+19:45:08.197 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 400 Bad Request
+METHOD: HttpMethod(value=POST)
+FROM: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088/druid/v2/sql
+19:45:08.211 [main] INFO  ru.sber.parser.druid.DruidClient - TEMP_PERF|component=druid.query|operation=sql_request_failed|sql_chars=161|status=400|http_round_trip_ns=253405043|http_round_trip_ms=253.405043|total_ns=262677129|total_ms=262.677129|error_body_chars=266
+19:45:08.213 [main] ERROR ru.sber.parser.druid.DruidClient - Query failed: HTTP 400 ({"error":"druidException","errorCode":"invalidInput","persona":"USER","category":"INVALID_INPUT","errorMessage":"Object 'default_process_default' not found (line [7], column [6])","context":{"sourceType":"sql","line":"7","column":"6","endLine":"7","endColumn":"28"}})
+Exception in thread "main" ru.sber.parser.druid.DruidException: Query failed: HTTP 400
+	at ru.sber.parser.druid.DruidClient.query(DruidClient.kt:177)
+	at ru.sber.parser.druid.DruidClient$query$1.invokeSuspend(DruidClient.kt)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at ru.sber.parser.ApplicationKt$main$1.invokeSuspend(Application.kt:444)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at ru.sber.parser.ApplicationKt.main(Application.kt:45)
+
+----- query/default/q10_by_caseId_like.sql -----
+19:45:08.717 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+19:45:08.754 [main] INFO  ru.sber.parser.config.AppConfig - Config resolution: PARSER_CONFIG_PATH=/home/portos/config.yaml, effective path=/home/portos/config.yaml
+19:45:08.756 [main] INFO  ru.sber.parser.config.AppConfig - Loading configuration from: /home/portos/config.yaml
+19:45:09.399 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+19:45:09.399 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088
+19:45:09.399 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088]
+19:45:09.399 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282
+19:45:09.400 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282]
+19:45:09.400 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281
+19:45:09.400 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281]
+19:45:09.400 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8290
+19:45:09.400 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URLs: [https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8290]
+19:45:09.400 [main] INFO  ru.sber.parser.config.DruidConfig -   Auth enabled: true
+19:45:09.400 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingest batch size: 1000
+19:45:09.401 [main] INFO  ru.sber.parser.config.DruidConfig -   TLS trustStore configured: true
+19:45:09.401 [main] INFO  ru.sber.parser.config.DruidConfig -   TLS insecureSkipTlsVerify: false
+19:45:09.401 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingest max inline bytes: 4000000
+19:45:09.401 [main] INFO  ru.sber.parser.config.DruidConfig -   Await ingestion tasks: true
+19:45:09.403 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingestion task timeout ms: 1800000
+19:45:09.403 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingestion task poll interval ms: 2000
+19:45:09.411 [main] INFO  ru.sber.parser.druid.DruidClient - JVM trustStore configured: path=/home/portos/druid-truststore.p12, type=PKCS12, passwordSet=true
+19:45:09.547 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore loaded: path=/home/portos/druid-truststore.p12, type=PKCS12, acceptedIssuers=3
+19:45:09.547 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[0]: subject='CN=Certificate Authority,O=SOLUTION.SBT', issuer='CN=Certificate Authority,O=SOLUTION.SBT'
+19:45:09.547 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[1]: subject='CN=secman-dzo.solution.sbt', issuer='CN=Certificate Authority,O=SOLUTION.SBT'
+19:45:09.547 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[2]: subject='CN=omlt-unimon.opsmon.sbt,O=OPSMON.SBT', issuer='CN=opsmon.sbt CA,O=OPSMON.SBT'
+19:45:09.620 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: SELECT
+  process_id,
+  process_name,
+  var_caseId,
+  __time
+FROM default_process_default
+WHERE var_caseId LIKE '____-____-%'
+ORDER BY __time DESC
+LIMIT 200
+19:45:09.666 [main] INFO  io.ktor.client.HttpClient - REQUEST: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+19:45:09.859 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 400 Bad Request
+METHOD: HttpMethod(value=POST)
+FROM: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088/druid/v2/sql
+19:45:09.873 [main] INFO  ru.sber.parser.druid.DruidClient - TEMP_PERF|component=druid.query|operation=sql_request_failed|sql_chars=155|status=400|http_round_trip_ns=244034981|http_round_trip_ms=244.034981|total_ns=252935647|total_ms=252.935647|error_body_chars=266
+19:45:09.875 [main] ERROR ru.sber.parser.druid.DruidClient - Query failed: HTTP 400 ({"error":"druidException","errorCode":"invalidInput","persona":"USER","category":"INVALID_INPUT","errorMessage":"Object 'default_process_default' not found (line [6], column [6])","context":{"sourceType":"sql","line":"6","column":"6","endLine":"6","endColumn":"28"}})
+Exception in thread "main" ru.sber.parser.druid.DruidException: Query failed: HTTP 400
+	at ru.sber.parser.druid.DruidClient.query(DruidClient.kt:177)
+	at ru.sber.parser.druid.DruidClient$query$1.invokeSuspend(DruidClient.kt)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at ru.sber.parser.ApplicationKt$main$1.invokeSuspend(Application.kt:444)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at ru.sber.parser.ApplicationKt.main(Application.kt:45)
+
+----- query/default/q11_by_epkId_range.sql -----
+19:45:10.365 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+19:45:10.400 [main] INFO  ru.sber.parser.config.AppConfig - Config resolution: PARSER_CONFIG_PATH=/home/portos/config.yaml, effective path=/home/portos/config.yaml
+19:45:10.401 [main] INFO  ru.sber.parser.config.AppConfig - Loading configuration from: /home/portos/config.yaml
+19:45:10.968 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+19:45:10.968 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088
+19:45:10.969 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088]
+19:45:10.969 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282
+19:45:10.969 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282]
+19:45:10.969 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281
+19:45:10.969 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281]
+19:45:10.969 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8290
+19:45:10.969 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URLs: [https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8290]
+19:45:10.969 [main] INFO  ru.sber.parser.config.DruidConfig -   Auth enabled: true
+19:45:10.970 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingest batch size: 1000
+19:45:10.970 [main] INFO  ru.sber.parser.config.DruidConfig -   TLS trustStore configured: true
+19:45:10.970 [main] INFO  ru.sber.parser.config.DruidConfig -   TLS insecureSkipTlsVerify: false
+19:45:10.970 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingest max inline bytes: 4000000
+19:45:10.970 [main] INFO  ru.sber.parser.config.DruidConfig -   Await ingestion tasks: true
+19:45:10.972 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingestion task timeout ms: 1800000
+19:45:10.972 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingestion task poll interval ms: 2000
+19:45:10.979 [main] INFO  ru.sber.parser.druid.DruidClient - JVM trustStore configured: path=/home/portos/druid-truststore.p12, type=PKCS12, passwordSet=true
+19:45:11.099 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore loaded: path=/home/portos/druid-truststore.p12, type=PKCS12, acceptedIssuers=3
+19:45:11.100 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[0]: subject='CN=Certificate Authority,O=SOLUTION.SBT', issuer='CN=Certificate Authority,O=SOLUTION.SBT'
+19:45:11.100 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[1]: subject='CN=secman-dzo.solution.sbt', issuer='CN=Certificate Authority,O=SOLUTION.SBT'
+19:45:11.100 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[2]: subject='CN=omlt-unimon.opsmon.sbt,O=OPSMON.SBT', issuer='CN=opsmon.sbt CA,O=OPSMON.SBT'
+19:45:11.163 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: SELECT
+  process_id,
+  process_name,
+  var_epkId,
+  __time
+FROM default_process_default
+WHERE CAST(var_epkId AS BIGINT) BETWEEN 1000000000000000000 AND 1999999999999999999
+ORDER BY __time DESC
+LIMIT 2
+19:45:11.206 [main] INFO  io.ktor.client.HttpClient - REQUEST: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+19:45:11.409 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 400 Bad Request
+METHOD: HttpMethod(value=POST)
+FROM: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088/druid/v2/sql
+19:45:11.424 [main] INFO  ru.sber.parser.druid.DruidClient - TEMP_PERF|component=druid.query|operation=sql_request_failed|sql_chars=202|status=400|http_round_trip_ns=251351123|http_round_trip_ms=251.351123|total_ns=259776871|total_ms=259.776871|error_body_chars=266
+19:45:11.426 [main] ERROR ru.sber.parser.druid.DruidClient - Query failed: HTTP 400 ({"error":"druidException","errorCode":"invalidInput","persona":"USER","category":"INVALID_INPUT","errorMessage":"Object 'default_process_default' not found (line [6], column [6])","context":{"sourceType":"sql","line":"6","column":"6","endLine":"6","endColumn":"28"}})
+Exception in thread "main" ru.sber.parser.druid.DruidException: Query failed: HTTP 400
+	at ru.sber.parser.druid.DruidClient.query(DruidClient.kt:177)
+	at ru.sber.parser.druid.DruidClient$query$1.invokeSuspend(DruidClient.kt)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at ru.sber.parser.ApplicationKt$main$1.invokeSuspend(Application.kt:444)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at ru.sber.parser.ApplicationKt.main(Application.kt:45)
+
+----- query/default/q12_by_ucpId_not_null.sql -----
+19:45:11.916 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+19:45:11.951 [main] INFO  ru.sber.parser.config.AppConfig - Config resolution: PARSER_CONFIG_PATH=/home/portos/config.yaml, effective path=/home/portos/config.yaml
+19:45:11.953 [main] INFO  ru.sber.parser.config.AppConfig - Loading configuration from: /home/portos/config.yaml
+19:45:12.518 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+19:45:12.518 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088
+19:45:12.518 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088]
+19:45:12.518 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282
+19:45:12.519 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282]
+19:45:12.519 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281
+19:45:12.519 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281]
+19:45:12.519 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8290
+19:45:12.519 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URLs: [https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8290]
+19:45:12.519 [main] INFO  ru.sber.parser.config.DruidConfig -   Auth enabled: true
+19:45:12.519 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingest batch size: 1000
+19:45:12.519 [main] INFO  ru.sber.parser.config.DruidConfig -   TLS trustStore configured: true
+19:45:12.520 [main] INFO  ru.sber.parser.config.DruidConfig -   TLS insecureSkipTlsVerify: false
+19:45:12.520 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingest max inline bytes: 4000000
+19:45:12.520 [main] INFO  ru.sber.parser.config.DruidConfig -   Await ingestion tasks: true
+19:45:12.521 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingestion task timeout ms: 1800000
+19:45:12.522 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingestion task poll interval ms: 2000
+19:45:12.529 [main] INFO  ru.sber.parser.druid.DruidClient - JVM trustStore configured: path=/home/portos/druid-truststore.p12, type=PKCS12, passwordSet=true
+19:45:12.659 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore loaded: path=/home/portos/druid-truststore.p12, type=PKCS12, acceptedIssuers=3
+19:45:12.660 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[0]: subject='CN=Certificate Authority,O=SOLUTION.SBT', issuer='CN=Certificate Authority,O=SOLUTION.SBT'
+19:45:12.660 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[1]: subject='CN=secman-dzo.solution.sbt', issuer='CN=Certificate Authority,O=SOLUTION.SBT'
+19:45:12.660 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[2]: subject='CN=omlt-unimon.opsmon.sbt,O=OPSMON.SBT', issuer='CN=opsmon.sbt CA,O=OPSMON.SBT'
+19:45:12.724 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: SELECT
+  process_id,
+  process_name,
+  var_ucpId,
+  __time
+FROM default_process_default
+WHERE var_ucpId IS NOT NULL
+ORDER BY __time DESC
+LIMIT 200
+19:45:12.768 [main] INFO  io.ktor.client.HttpClient - REQUEST: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+19:45:12.967 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 400 Bad Request
+METHOD: HttpMethod(value=POST)
+FROM: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088/druid/v2/sql
+19:45:12.981 [main] INFO  ru.sber.parser.druid.DruidClient - TEMP_PERF|component=druid.query|operation=sql_request_failed|sql_chars=146|status=400|http_round_trip_ns=247000025|http_round_trip_ms=247.000025|total_ns=255124426|total_ms=255.124426|error_body_chars=266
+19:45:12.982 [main] ERROR ru.sber.parser.druid.DruidClient - Query failed: HTTP 400 ({"error":"druidException","errorCode":"invalidInput","persona":"USER","category":"INVALID_INPUT","errorMessage":"Object 'default_process_default' not found (line [6], column [6])","context":{"sourceType":"sql","line":"6","column":"6","endLine":"6","endColumn":"28"}})
+Exception in thread "main" ru.sber.parser.druid.DruidException: Query failed: HTTP 400
+	at ru.sber.parser.druid.DruidClient.query(DruidClient.kt:177)
+	at ru.sber.parser.druid.DruidClient$query$1.invokeSuspend(DruidClient.kt)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at ru.sber.parser.ApplicationKt$main$1.invokeSuspend(Application.kt:444)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at ru.sber.parser.ApplicationKt.main(Application.kt:45)
+
+----- query/default/q13_array_columns.sql -----
+19:45:13.490 [main] INFO  Application - BPM Message Parser for Apache Druid starting...
+19:45:13.526 [main] INFO  ru.sber.parser.config.AppConfig - Config resolution: PARSER_CONFIG_PATH=/home/portos/config.yaml, effective path=/home/portos/config.yaml
+19:45:13.527 [main] INFO  ru.sber.parser.config.AppConfig - Loading configuration from: /home/portos/config.yaml
+19:45:14.109 [main] INFO  ru.sber.parser.config.DruidConfig - Druid configuration loaded:
+19:45:14.109 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088
+19:45:14.109 [main] INFO  ru.sber.parser.config.DruidConfig -   Router URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088]
+19:45:14.110 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282
+19:45:14.110 [main] INFO  ru.sber.parser.config.DruidConfig -   Broker URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282]
+19:45:14.110 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URL: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281
+19:45:14.110 [main] INFO  ru.sber.parser.config.DruidConfig -   Coordinator URLs: [https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281]
+19:45:14.110 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URL: https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8290
+19:45:14.110 [main] INFO  ru.sber.parser.config.DruidConfig -   Overlord URLs: [https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8290]
+19:45:14.110 [main] INFO  ru.sber.parser.config.DruidConfig -   Auth enabled: true
+19:45:14.110 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingest batch size: 1000
+19:45:14.111 [main] INFO  ru.sber.parser.config.DruidConfig -   TLS trustStore configured: true
+19:45:14.111 [main] INFO  ru.sber.parser.config.DruidConfig -   TLS insecureSkipTlsVerify: false
+19:45:14.111 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingest max inline bytes: 4000000
+19:45:14.111 [main] INFO  ru.sber.parser.config.DruidConfig -   Await ingestion tasks: true
+19:45:14.112 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingestion task timeout ms: 1800000
+19:45:14.113 [main] INFO  ru.sber.parser.config.DruidConfig -   Ingestion task poll interval ms: 2000
+19:45:14.121 [main] INFO  ru.sber.parser.druid.DruidClient - JVM trustStore configured: path=/home/portos/druid-truststore.p12, type=PKCS12, passwordSet=true
+19:45:14.247 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore loaded: path=/home/portos/druid-truststore.p12, type=PKCS12, acceptedIssuers=3
+19:45:14.247 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[0]: subject='CN=Certificate Authority,O=SOLUTION.SBT', issuer='CN=Certificate Authority,O=SOLUTION.SBT'
+19:45:14.247 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[1]: subject='CN=secman-dzo.solution.sbt', issuer='CN=Certificate Authority,O=SOLUTION.SBT'
+19:45:14.247 [main] INFO  ru.sber.parser.druid.DruidClient - TLS trustStore acceptedIssuer[2]: subject='CN=omlt-unimon.opsmon.sbt,O=OPSMON.SBT', issuer='CN=opsmon.sbt CA,O=OPSMON.SBT'
+19:45:14.311 [main] DEBUG ru.sber.parser.druid.DruidClient - Executing query: SELECT
+  COLUMN_NAME,
+  DATA_TYPE
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'default_process_default'
+  AND COLUMN_NAME LIKE '%[%'
+ORDER BY COLUMN_NAME
+LIMIT 500
+19:45:14.353 [main] INFO  io.ktor.client.HttpClient - REQUEST: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088/druid/v2/sql
+METHOD: HttpMethod(value=POST)
+19:45:14.573 [main] INFO  io.ktor.client.HttpClient - RESPONSE: 200 OK
+METHOD: HttpMethod(value=POST)
+FROM: https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088/druid/v2/sql
+19:45:14.591 [main] INFO  ru.sber.parser.druid.DruidClient - TEMP_PERF|component=druid.query|operation=sql_request|status=200|sql_chars=170|rows_count=0|http_round_trip_ns=265749073|http_round_trip_ms=265.749073|body_read_ns=10132591|body_read_ms=10.132591|json_decode_ns=3318691|json_decode_ms=3.318691|total_ns=279206132|total_ms=279.206132|avg_per_row_ms=0.0|response_body_chars=3
+19:45:14.592 [main] INFO  Application - TEMP_PERF|component=app.query|operation=query_summary|query_file=query/default/q13_array_columns.sql|raw_sql_chars=926|prepared_sql_chars=170|raw_sql_lines=24|prepared_sql_lines=8|read_ns=2872500|read_ms=2.8725|prepare_ns=2316429|prepare_ms=2.316429|druid_exec_ns=281647681|druid_exec_ms=281.647681|print_ns=6126|print_ms=0.006126|rows_count=0|query_command_total_ns=478160548|query_command_total_ms=478.160548|avg_per_row_ms=0.0
+19:45:14.593 [main] INFO  Application - Query returned 0 rows
