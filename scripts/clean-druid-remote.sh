@@ -56,6 +56,44 @@ read_config_coordinator_url() {
   ' "$cfg"
 }
 
+read_config_druid_auth() {
+  local cfg="$1"
+  [[ -f "$cfg" ]] || return 0
+
+  awk '
+    BEGIN {
+      in_druid=0
+      user=""
+      pass=""
+    }
+    /^[[:space:]]*druid:[[:space:]]*$/ { in_druid=1; next }
+    in_druid && /^[^[:space:]]/ { in_druid=0 }
+    in_druid && /^[[:space:]]*username:[[:space:]]*/ {
+      line=$0
+      sub(/^[[:space:]]*username:[[:space:]]*/, "", line)
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", line)
+      if (line ~ /^".*"$/ || line ~ /^'\''.*'\''$/) {
+        line=substr(line, 2, length(line)-2)
+      }
+      user=line
+      next
+    }
+    in_druid && /^[[:space:]]*password:[[:space:]]*/ {
+      line=$0
+      sub(/^[[:space:]]*password:[[:space:]]*/, "", line)
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", line)
+      if (line ~ /^".*"$/ || line ~ /^'\''.*'\''$/) {
+        line=substr(line, 2, length(line)-2)
+      }
+      pass=line
+      next
+    }
+    END {
+      print user "\t" pass
+    }
+  ' "$cfg"
+}
+
 CONFIG_COORD="$(read_config_coordinator_url "$CONFIG_FILE")"
 COORDINATOR_URL="${COORDINATOR_URL:-${DRUID_COORDINATOR_URL:-${1:-${CONFIG_COORD:-}}}}"
 if [[ -z "$COORDINATOR_URL" ]]; then
@@ -69,6 +107,16 @@ fi
 
 # Убираем trailing slash
 COORDINATOR_URL="${COORDINATOR_URL%/}"
+
+CONFIG_AUTH_RAW="$(read_config_druid_auth "$CONFIG_FILE")"
+CONFIG_USERNAME="${CONFIG_AUTH_RAW%%$'\t'*}"
+if [[ "$CONFIG_AUTH_RAW" == *$'\t'* ]]; then
+  CONFIG_PASSWORD="${CONFIG_AUTH_RAW#*$'\t'}"
+else
+  CONFIG_PASSWORD=""
+fi
+DRUID_USERNAME="${DRUID_USERNAME:-${CONFIG_USERNAME:-}}"
+DRUID_PASSWORD="${DRUID_PASSWORD:-${CONFIG_PASSWORD:-}}"
 
 DATASOURCES=(
   hybrid_process_hybrid
@@ -111,6 +159,10 @@ elif [[ "$INSECURE_TLS_RAW" == "auto" ]] && [[ "$COORDINATOR_URL" == https://* ]
   # Для curl truststore JVM не используется, поэтому для https без CA включаем fallback.
   CURL_COMMON_OPTS+=(-k)
   log "WARNING: HTTPS без DRUID_CA_CERT_PATH: включен insecure TLS fallback (-k)."
+fi
+
+if [[ -n "$DRUID_USERNAME" ]]; then
+  CURL_COMMON_OPTS+=(-u "${DRUID_USERNAME}:${DRUID_PASSWORD}")
 fi
 
 LAST_HTTP_CODE="000"
@@ -193,7 +245,7 @@ get_segment_count() {
 }
 
 total_ds="${#DATASOURCES[@]}"
-present_before="$(count_present_datasources)"
+present_before=0
 marked_ok=0
 marked_not_found=0
 mark_errors=0
@@ -207,7 +259,22 @@ log "Druid Coordinator: $COORDINATOR_URL"
 log "Datasources to delete ($total_ds): ${DATASOURCES[*]}"
 log "Polling timeout: ${TIMEOUT_SECONDS}s, interval: ${POLL_SECONDS}s"
 log "Curl timeouts: connect=${CONNECT_TIMEOUT_SECONDS}s, read=${READ_TIMEOUT_SECONDS}s"
+if [[ -n "$DRUID_USERNAME" ]]; then
+  log "Auth: basic"
+else
+  log "Auth: none"
+fi
 log "Log file: $LOG_FILE"
+
+druid_request "GET" "$COORDINATOR_URL/druid/coordinator/v1/datasources" || true
+if [[ "$LAST_HTTP_CODE" == "401" || "$LAST_HTTP_CODE" == "403" ]]; then
+  log "ERROR: Authorization failed for coordinator API (http=$LAST_HTTP_CODE)."
+  log "Set DRUID_USERNAME/DRUID_PASSWORD or druid.username/password in config.yaml."
+  [[ -n "$LAST_BODY" ]] && log "response body: $LAST_BODY"
+  exit 1
+fi
+
+present_before="$(count_present_datasources)"
 log "Initially present datasources from target list: $present_before/$total_ds"
 log ""
 
