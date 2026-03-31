@@ -19,7 +19,6 @@
 #   PARSER_JAR      — путь к fat JAR (по умолчанию build/libs/bpm-druid-parser-1.0.0.jar)
 #   JAVA_CMD        — бинарник JVM (по умолчанию java)
 #   JAVA_OPTS       — опции JVM, напр. "-Xms256m -Xmx512m"
-#   COORDINATOR_URL или DRUID_COORDINATOR_URL — для очистки datasource'ов через scripts/clean-druid-remote.sh
 #
 # Требуется: Java 17+, собранный JAR (./gradlew jar), доступный Druid при --ingest и query.
 # =============================================================================
@@ -51,7 +50,7 @@ usage() {
       --skip-generate      Пропустить этап generate messages
   -h, --help              Эта справка
 
-Переменные: PARSER_JAR, JAVA_CMD, JAVA_OPTS, COORDINATOR_URL / DRUID_COORDINATOR_URL
+Переменные: PARSER_JAR, JAVA_CMD, JAVA_OPTS
 EOF
 }
 
@@ -154,26 +153,6 @@ normalize_bool() {
   [[ "$v" == "true" || "$v" == "1" || "$v" == "yes" ]]
 }
 
-read_config_coordinator_url() {
-  local cfg="$1"
-  [[ -f "$cfg" ]] || return 0
-
-  awk '
-    /^[[:space:]]*druid:[[:space:]]*$/ { in_druid=1; next }
-    in_druid && /^[^[:space:]]/ { in_druid=0 }
-    in_druid && /^[[:space:]]*coordinatorUrl:[[:space:]]*/ {
-      line=$0
-      sub(/^[[:space:]]*coordinatorUrl:[[:space:]]*/, "", line)
-      gsub(/^[[:space:]]+|[[:space:]]+$/, "", line)
-      if (line ~ /^".*"$/ || line ~ /^'\''.*'\''$/) {
-        line=substr(line, 2, length(line)-2)
-      }
-      print line
-      exit
-    }
-  ' "$cfg"
-}
-
 echo "=== Очистка артефактов: logs, query-results, messages ==="
 mkdir -p "$LOGS_DIR" "$OUT_DIR" "$MESSAGES_DIR"
 rm -rf "${LOGS_DIR:?}/"* 2>/dev/null || true
@@ -200,19 +179,6 @@ set -e
 if [[ "$manifest_rc" -ne 0 ]]; then
   echo "Ошибка: проверка SQL по manifest завершилась с кодом $manifest_rc. См. $LOGS_DIR/query_manifest_check.log" >&2
   exit "$manifest_rc"
-fi
-
-CONFIG_COORD="$(read_config_coordinator_url "$CONFIG_FILE")"
-COORD="${COORDINATOR_URL:-${DRUID_COORDINATOR_URL:-${CONFIG_COORD:-}}}"
-if [[ -n "$COORD" ]]; then
-  echo "=== Очистка datasource'ов в Druid (Coordinator: $COORD) ==="
-  if ! COORDINATOR_URL="$COORD" "$ROOT/scripts/clean-druid-remote.sh"; then
-    echo "Ошибка: clean-druid-remote.sh завершился с ошибкой. Останавливаем pipeline (fail-fast)." >&2
-    exit 1
-  fi
-else
-  echo "Ошибка: не заданы COORDINATOR_URL / DRUID_COORDINATOR_URL и не найден druid.coordinatorUrl в config.yaml. Останавливаем pipeline (fail-fast)." >&2
-  exit 1
 fi
 
 if [[ -f "$CONFIG_FILE" ]]; then
