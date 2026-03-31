@@ -18,6 +18,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
 import org.slf4j.LoggerFactory
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import ru.sber.parser.config.DruidConfig
 import java.io.Closeable
@@ -1024,7 +1025,7 @@ class DruidClient(private val config: DruidConfig) : Closeable {
         request: suspend (baseUrl: String) -> HttpResponse
     ): HttpResponse {
         val rounds = if (pool.urls.size > 1) 2 else 1
-        var lastIoError: java.io.IOException? = null
+        var lastNetworkError: Exception? = null
         var lastResponse: HttpResponse? = null
 
         repeat(rounds) { round ->
@@ -1047,16 +1048,18 @@ class DruidClient(private val config: DruidConfig) : Closeable {
                         round + 1,
                         rounds
                     )
-                } catch (e: java.io.IOException) {
-                    lastIoError = e
+                } catch (e: Exception) {
+                    if (e is CancellationException) throw e
+                    lastNetworkError = e
                     logger.warn(
-                        "Druid {} endpoint I/O error for path {} (host {} of {}, round {} of {}): {}",
+                        "Druid {} endpoint network error for path {} (host {} of {}, round {} of {}): {} ({})",
                         pool.name,
                         path,
                         index + 1,
                         candidates.size,
                         round + 1,
                         rounds,
+                        e.javaClass.simpleName,
                         e.message
                     )
                 }
@@ -1067,7 +1070,10 @@ class DruidClient(private val config: DruidConfig) : Closeable {
         }
 
         if (lastResponse != null) return lastResponse as HttpResponse
-        throw lastIoError ?: java.io.IOException("No Druid ${pool.name} endpoints available for path: $path")
+        throw java.io.IOException(
+            "No Druid ${pool.name} endpoints available for path: $path",
+            lastNetworkError
+        )
     }
 }
 
