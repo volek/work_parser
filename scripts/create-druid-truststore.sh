@@ -27,6 +27,13 @@ PASS="${4:-changeit}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 CERT_DIR="${DRUID_CERT_DIR:-$ROOT/distribution/cert}"
+LOG_DIR="$ROOT/logs"
+LOG_FILE="${DRUID_TRUSTSTORE_LOG_FILE:-$LOG_DIR/truststore-create.log}"
+
+mkdir -p "$LOG_DIR"
+touch "$LOG_FILE"
+# Дублируем весь stdout/stderr в консоль и файл лога.
+exec > >(tee -a "$LOG_FILE") 2>&1
 
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
@@ -34,6 +41,11 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 # Режим доверительной сборки:
 # (можно переопределить переменной окружения DRUID_TRUSTSTORE_MODE)
 MODE="${DRUID_TRUSTSTORE_MODE:-local+chain}"
+
+echo "=== $(date '+%Y-%m-%d %H:%M:%S') create-druid-truststore start ==="
+echo "Log file: $LOG_FILE"
+echo "ROOT=$ROOT"
+echo "HOST=$HOST PORT=$PORT STORE=$STORE MODE=$MODE CERT_DIR=$CERT_DIR"
 
 #
 # 1) Проверяем наличие локальных сертификатов в distribution/cert
@@ -128,6 +140,10 @@ if "$want_local" && (( ${#cert_files[@]} > 0 )); then
   done
 fi
 
+if "$want_local" && (( ${#cert_files[@]} == 0 )); then
+  echo "ПРЕДУПРЕЖДЕНИЕ: режим local включён, но локальные сертификаты не найдены в ${CERT_DIR}."
+fi
+
 # 3) Импорт цепочки сертификатов (если включено)
 if "$want_chain"; then
   CHAIN_RAW_FILE="${TMP_DIR}/chain.txt"
@@ -188,11 +204,12 @@ if "$want_chain"; then
       echo "  импортирован: ${alias_name} -> ${subject}"
     done
   else
-    echo "ОШИБКА: из TLS-цепочки ${HOST}:${PORT} не удалось извлечь сертификаты. openssl_rc=${s_client_rc} raw_file=${CHAIN_RAW_FILE}" >&2
     if [[ "$MODE" == "chain" || "$MODE" == "auto" ]]; then
+      echo "ОШИБКА: из TLS-цепочки ${HOST}:${PORT} не удалось извлечь сертификаты. openssl_rc=${s_client_rc} raw_file=${CHAIN_RAW_FILE}" >&2
       exit 1
     else
-      echo "Продолжаем без chain (режим=$MODE)." >&2
+      echo "ПРЕДУПРЕЖДЕНИЕ: из TLS-цепочки ${HOST}:${PORT} не удалось извлечь сертификаты. openssl_rc=${s_client_rc}."
+      echo "ПРЕДУПРЕЖДЕНИЕ: продолжаем без chain (режим=$MODE), так как локальные сертификаты уже импортированы."
     fi
   fi
 fi
@@ -211,4 +228,6 @@ cat <<EOF
 
 После этого запускайте приложение как обычно (например: ./gradlew run).
 EOF
+
+echo "=== $(date '+%Y-%m-%d %H:%M:%S') create-druid-truststore done ==="
 
