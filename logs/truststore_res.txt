@@ -1,0 +1,36 @@
+=== Truststore сборка: MODE=local+chain (local=true, chain=true) ===
+[1/x] Импорт локальных сертификатов из /home/portos/distribution/cert в truststore druid-truststore.p12 ...
+[local] local cert files count=2
+[local] extracted cert parts count=3
+  импортирован: druid-local-1 -> O = OPSMON.SBT, CN = omlt-unimon.opsmon.sbt
+  импортирован: druid-local-2 -> O = SOLUTION.SBT, CN = Certificate Authority
+  импортирован: druid-local-3 -> CN = secman-dzo.solution.sbt
+[2/x] Получение цепочки сертификатов с omltd-abyss-sdp2-druid-10.opsmon.sbt:8290 ...
+[chain] openssl s_client rc=1
+[chain] openssl s_client stderr (first 20 lines) from /tmp/tmp.fWwKOiQV75/s_client.err:
+140095602157376:error:0200206F:system library:connect:Connection refused:crypto/bio/b_sock2.c:110:
+140095602157376:error:2008A067:BIO routines:BIO_connect:connect error:crypto/bio/b_sock2.c:111:
+connect:errno=111
+[3/x] Извлечение PEM-сертификатов из chain...
+[chain] extracted cert pem files count=0
+[x] Проверка содержимого truststore ...
+Keystore type: PKCS12
+Keystore provider: SUN
+
+Your keystore contains 3 entries
+
+druid-local-1, Mar 31, 2026, trustedCertEntry, 
+Certificate fingerprint (SHA-256): 53:87:F7:5C:06:3A:4A:39:E0:1A:D7:DC:05:DF:A8:84:AF:15:97:4F:55:42:11:F8:47:B6:3E:AF:B7:6A:1D:07
+druid-local-2, Mar 31, 2026, trustedCertEntry, 
+Certificate fingerprint (SHA-256): 40:83:EF:26:BE:C9:FF:D6:91:0A:58:35:01:30:A0:FD:27:59:15:A3:66:FB:FB:E5:44:4F:BB:31:16:E9:67:07
+druid-local-3, Mar 31, 2026, trustedCertEntry, 
+Certificate fingerprint (SHA-256): 0B:8E:E5:5B:E9:4C:85:3B:8C:F0:A3:EC:40:CB:73:58:93:6B:8B:9D:B7:17:F6:05:7E:B8:C9:57:71:4A:49:DC
+
+Готово.
+Перед запуском парсера задайте переменные окружения:
+
+  export DRUID_TRUST_STORE_PATH="/home/portos/druid-truststore.p12"
+  export DRUID_TRUST_STORE_PASSWORD="changeit"
+  export DRUID_TRUST_STORE_TYPE="PKCS12"
+
+После этого запускайте приложение как обычно (например: ./gradlew run).
