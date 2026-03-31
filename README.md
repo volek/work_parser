@@ -71,9 +71,13 @@ java -jar build/libs/bpm-druid-parser-1.0.0.jar query query/hybrid/q01_select_al
 Основные ENV:
 
 - `DRUID_BROKER_URL`
+- `DRUID_BROKER_URLS` (список через запятую)
 - `DRUID_COORDINATOR_URL`
+- `DRUID_COORDINATOR_URLS` (список через запятую)
 - `DRUID_OVERLORD_URL`
+- `DRUID_OVERLORD_URLS` (список через запятую)
 - `DRUID_ROUTER_URL`
+- `DRUID_ROUTER_URLS` (список через запятую)
 - `DRUID_CONNECT_TIMEOUT`
 - `DRUID_READ_TIMEOUT`
 - `DRUID_BATCH_SIZE`

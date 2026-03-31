@@ -137,9 +137,13 @@ data class ParserConfig(
 
 internal data class DruidFileConfig(
     val brokerUrl: String? = null,
+    val brokerUrls: List<String>? = null,
     val coordinatorUrl: String? = null,
+    val coordinatorUrls: List<String>? = null,
     val overlordUrl: String? = null,
+    val overlordUrls: List<String>? = null,
     val routerUrl: String? = null,
+    val routerUrls: List<String>? = null,
     val username: String? = null,
     val password: String? = null,
     val connectTimeout: Long? = null,
@@ -191,9 +195,13 @@ internal data class DruidFileConfig(
  */
 data class DruidConfig(
     val brokerUrl: String = "http://localhost:8082",
+    val brokerUrls: List<String> = listOf("http://localhost:8082"),
     val coordinatorUrl: String = "http://localhost:8081",
+    val coordinatorUrls: List<String> = listOf("http://localhost:8081"),
     val overlordUrl: String = "http://localhost:8081",
+    val overlordUrls: List<String> = listOf("http://localhost:8081"),
     val routerUrl: String = "http://localhost:8888",
+    val routerUrls: List<String> = listOf("http://localhost:8888"),
     val username: String? = null,
     val password: String? = null,
     val connectTimeout: Long = 30000,
@@ -241,6 +249,56 @@ data class DruidConfig(
             if (value.isBlank()) return fallback
             return if (value.contains("://")) value else "http://$value"
         }
+
+        private fun normalizeUrls(raw: List<String>?): List<String> {
+            return raw.orEmpty()
+                .map { it.trim() }
+                .filter { it.isNotBlank() }
+                .map { value -> if (value.contains("://")) value else "http://$value" }
+                .distinct()
+        }
+
+        private fun parseUrlListFromEnv(envName: String): List<String> {
+            val raw = System.getenv(envName)?.trim().orEmpty()
+            if (raw.isBlank()) return emptyList()
+            return raw
+                .split(",")
+                .map { it.trim() }
+                .filter { it.isNotBlank() }
+        }
+
+        private fun resolveUrlSet(
+            singleFromEnv: String?,
+            listFromEnv: List<String>,
+            singleFromFile: String?,
+            listFromFile: List<String>?,
+            fallback: String
+        ): Pair<String, List<String>> {
+            val envSingleNormalized = singleFromEnv?.trim().takeUnless { it.isNullOrBlank() }
+                ?.let { normalizeUrl(it, fallback) }
+            if (envSingleNormalized != null) {
+                return envSingleNormalized to listOf(envSingleNormalized)
+            }
+
+            val envListNormalized = normalizeUrls(listFromEnv)
+            if (envListNormalized.isNotEmpty()) {
+                return envListNormalized.first() to envListNormalized
+            }
+
+            val fileListNormalized = normalizeUrls(listFromFile)
+            if (fileListNormalized.isNotEmpty()) {
+                return fileListNormalized.first() to fileListNormalized
+            }
+
+            val fileSingleNormalized = singleFromFile?.trim().takeUnless { it.isNullOrBlank() }
+                ?.let { normalizeUrl(it, fallback) }
+            if (fileSingleNormalized != null) {
+                return fileSingleNormalized to listOf(fileSingleNormalized)
+            }
+
+            val normalizedFallback = normalizeUrl(null, fallback)
+            return normalizedFallback to listOf(normalizedFallback)
+        }
         
         /**
          * Создаёт конфигурацию только из переменных окружения
@@ -251,23 +309,44 @@ data class DruidConfig(
          * Создаёт конфигурацию с приоритетом: ENV > fileConfig > defaults
          */
         internal fun fromEnvironmentWithFallback(fileConfig: DruidFileConfig?): DruidConfig {
+            val (brokerUrl, brokerUrls) = resolveUrlSet(
+                singleFromEnv = System.getenv("DRUID_BROKER_URL"),
+                listFromEnv = parseUrlListFromEnv("DRUID_BROKER_URLS"),
+                singleFromFile = fileConfig?.brokerUrl,
+                listFromFile = fileConfig?.brokerUrls,
+                fallback = "http://localhost:8082"
+            )
+            val (coordinatorUrl, coordinatorUrls) = resolveUrlSet(
+                singleFromEnv = System.getenv("DRUID_COORDINATOR_URL"),
+                listFromEnv = parseUrlListFromEnv("DRUID_COORDINATOR_URLS"),
+                singleFromFile = fileConfig?.coordinatorUrl,
+                listFromFile = fileConfig?.coordinatorUrls,
+                fallback = "http://localhost:8081"
+            )
+            val (overlordUrl, overlordUrls) = resolveUrlSet(
+                singleFromEnv = System.getenv("DRUID_OVERLORD_URL"),
+                listFromEnv = parseUrlListFromEnv("DRUID_OVERLORD_URLS"),
+                singleFromFile = fileConfig?.overlordUrl,
+                listFromFile = fileConfig?.overlordUrls,
+                fallback = "http://localhost:8081"
+            )
+            val (routerUrl, routerUrls) = resolveUrlSet(
+                singleFromEnv = System.getenv("DRUID_ROUTER_URL"),
+                listFromEnv = parseUrlListFromEnv("DRUID_ROUTER_URLS"),
+                singleFromFile = fileConfig?.routerUrl,
+                listFromFile = fileConfig?.routerUrls,
+                fallback = "http://localhost:8888"
+            )
+
             val config = DruidConfig(
-                brokerUrl = normalizeUrl(
-                    System.getenv("DRUID_BROKER_URL") ?: fileConfig?.brokerUrl,
-                    "http://localhost:8082"
-                ),
-                coordinatorUrl = normalizeUrl(
-                    System.getenv("DRUID_COORDINATOR_URL") ?: fileConfig?.coordinatorUrl,
-                    "http://localhost:8081"
-                ),
-                overlordUrl = normalizeUrl(
-                    System.getenv("DRUID_OVERLORD_URL") ?: fileConfig?.overlordUrl,
-                    "http://localhost:8081"
-                ),
-                routerUrl = normalizeUrl(
-                    System.getenv("DRUID_ROUTER_URL") ?: fileConfig?.routerUrl,
-                    "http://localhost:8888"
-                ),
+                brokerUrl = brokerUrl,
+                brokerUrls = brokerUrls,
+                coordinatorUrl = coordinatorUrl,
+                coordinatorUrls = coordinatorUrls,
+                overlordUrl = overlordUrl,
+                overlordUrls = overlordUrls,
+                routerUrl = routerUrl,
+                routerUrls = routerUrls,
                 username = System.getenv("DRUID_USERNAME") ?: fileConfig?.username,
                 password = System.getenv("DRUID_PASSWORD") ?: fileConfig?.password,
                 connectTimeout = System.getenv("DRUID_CONNECT_TIMEOUT")?.toLongOrNull() 
@@ -311,9 +390,13 @@ data class DruidConfig(
             
             logger.info("Druid configuration loaded:")
             logger.info("  Router URL: ${config.routerUrl}")
+            logger.info("  Router URLs: ${config.routerUrls}")
             logger.info("  Broker URL: ${config.brokerUrl}")
+            logger.info("  Broker URLs: ${config.brokerUrls}")
             logger.info("  Coordinator URL: ${config.coordinatorUrl}")
+            logger.info("  Coordinator URLs: ${config.coordinatorUrls}")
             logger.info("  Overlord URL: ${config.overlordUrl}")
+            logger.info("  Overlord URLs: ${config.overlordUrls}")
             logger.info("  Auth enabled: ${!config.username.isNullOrBlank()}")
             logger.info("  Ingest batch size: ${config.batchSize}")
             logger.info("  TLS trustStore configured: ${!config.trustStorePath.isNullOrBlank()}")

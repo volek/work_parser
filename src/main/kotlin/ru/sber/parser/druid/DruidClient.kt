@@ -27,6 +27,7 @@ import java.security.KeyStore
 import java.security.MessageDigest
 import java.security.cert.CertificateException
 import java.security.cert.X509Certificate
+import java.util.concurrent.atomic.AtomicInteger
 import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
 
@@ -82,6 +83,9 @@ class DruidClient(private val config: DruidConfig) : Closeable {
         configureJvmTrustStore(config)
     }
     private val tlsTrustManager: X509TrustManager? = createTrustManager(config)
+    private val routerEndpoints = EndpointPool("router", config.routerUrls)
+    private val overlordEndpoints = EndpointPool("overlord", config.overlordUrls)
+    private val coordinatorEndpoints = EndpointPool("coordinator", config.coordinatorUrls)
     
     /** Jackson ObjectMapper для сериализации/десериализации JSON */
     private val objectMapper: ObjectMapper = jacksonObjectMapper()
@@ -214,8 +218,13 @@ class DruidClient(private val config: DruidConfig) : Closeable {
         val totalStartNs = System.nanoTime()
 
         val httpStartNs = System.nanoTime()
-        val response: HttpResponse = httpClient.post("${config.routerUrl}/druid/v2/sql") {
-            setBody(mapOf("query" to sql))
+        val response: HttpResponse = requestWithFailover(
+            pool = routerEndpoints,
+            path = "/druid/v2/sql"
+        ) { baseUrl ->
+            httpClient.post("$baseUrl/druid/v2/sql") {
+                setBody(mapOf("query" to sql))
+            }
         }
         val httpRoundTripNs = System.nanoTime() - httpStartNs
 
@@ -499,8 +508,13 @@ class DruidClient(private val config: DruidConfig) : Closeable {
         val response: HttpResponse
         val httpRoundTripNs: Long
         try {
-            response = httpClient.post("${config.overlordUrl}/druid/indexer/v1/task") {
-                setBody(ingestionSpec)
+            response = requestWithFailover(
+                pool = overlordEndpoints,
+                path = "/druid/indexer/v1/task"
+            ) { baseUrl ->
+                httpClient.post("$baseUrl/druid/indexer/v1/task") {
+                    setBody(ingestionSpec)
+                }
             }
             // Метрика: длительность сетевого round-trip отправки task.
             httpRoundTripNs = System.nanoTime() - httpStartNs
@@ -697,8 +711,13 @@ class DruidClient(private val config: DruidConfig) : Closeable {
     suspend fun createDataSource(spec: IngestionSpec) {
         logger.info("Creating dataSource with spec: ${spec.dataSource}")
         
-        val response: HttpResponse = httpClient.post("${config.overlordUrl}/druid/indexer/v1/task") {
-            setBody(spec.toMap())
+        val response: HttpResponse = requestWithFailover(
+            pool = overlordEndpoints,
+            path = "/druid/indexer/v1/task"
+        ) { baseUrl ->
+            httpClient.post("$baseUrl/druid/indexer/v1/task") {
+                setBody(spec.toMap())
+            }
         }
         
         if (!response.status.isSuccess()) {
@@ -727,7 +746,12 @@ class DruidClient(private val config: DruidConfig) : Closeable {
      * @throws DruidException при ошибке запроса
      */
     suspend fun getTaskStatus(taskId: String): TaskStatus {
-        val response: HttpResponse = httpClient.get("${config.overlordUrl}/druid/indexer/v1/task/$taskId/status")
+        val response: HttpResponse = requestWithFailover(
+            pool = overlordEndpoints,
+            path = "/druid/indexer/v1/task/$taskId/status"
+        ) { baseUrl ->
+            httpClient.get("$baseUrl/druid/indexer/v1/task/$taskId/status")
+        }
         
         if (!response.status.isSuccess()) {
             throw DruidException("Failed to get task status", response.bodyAsText())
@@ -753,7 +777,12 @@ class DruidClient(private val config: DruidConfig) : Closeable {
      * @throws DruidException при ошибке запроса
      */
     suspend fun listDataSources(): List<String> {
-        val response: HttpResponse = httpClient.get("${config.coordinatorUrl}/druid/coordinator/v1/datasources")
+        val response: HttpResponse = requestWithFailover(
+            pool = coordinatorEndpoints,
+            path = "/druid/coordinator/v1/datasources"
+        ) { baseUrl ->
+            httpClient.get("$baseUrl/druid/coordinator/v1/datasources")
+        }
         
         if (!response.status.isSuccess()) {
             throw DruidException("Failed to list datasources", response.bodyAsText())
@@ -774,7 +803,12 @@ class DruidClient(private val config: DruidConfig) : Closeable {
     suspend fun deleteDataSource(dataSource: String) {
         logger.warn("Deleting dataSource: $dataSource")
         
-        val response: HttpResponse = httpClient.delete("${config.coordinatorUrl}/druid/coordinator/v1/datasources/$dataSource")
+        val response: HttpResponse = requestWithFailover(
+            pool = coordinatorEndpoints,
+            path = "/druid/coordinator/v1/datasources/$dataSource"
+        ) { baseUrl ->
+            httpClient.delete("$baseUrl/druid/coordinator/v1/datasources/$dataSource")
+        }
         
         if (!response.status.isSuccess()) {
             throw DruidException("Failed to delete dataSource", response.bodyAsText())
@@ -967,6 +1001,74 @@ class DruidClient(private val config: DruidConfig) : Closeable {
         val responseDecodeNs: Long,
         val totalNs: Long
     )
+
+    private data class EndpointPool(
+        val name: String,
+        val urls: List<String>
+    ) {
+        private val rrIndex = AtomicInteger(0)
+
+        init {
+            require(urls.isNotEmpty()) { "Endpoint list for '$name' is empty" }
+        }
+
+        fun cycleStartingFromCurrent(): List<String> {
+            val start = Math.floorMod(rrIndex.getAndIncrement(), urls.size)
+            return List(urls.size) { offset -> urls[(start + offset) % urls.size] }
+        }
+    }
+
+    private suspend fun requestWithFailover(
+        pool: EndpointPool,
+        path: String,
+        request: suspend (baseUrl: String) -> HttpResponse
+    ): HttpResponse {
+        val rounds = if (pool.urls.size > 1) 2 else 1
+        var lastIoError: java.io.IOException? = null
+        var lastResponse: HttpResponse? = null
+
+        repeat(rounds) { round ->
+            val candidates = pool.cycleStartingFromCurrent()
+            for ((index, baseUrl) in candidates.withIndex()) {
+                try {
+                    val response = request(baseUrl)
+                    val retriable = response.status.value == 429 || response.status.value in 500..599
+                    if (!retriable) {
+                        return response
+                    }
+                    lastResponse = response
+                    logger.warn(
+                        "Druid {} endpoint returned retriable status {} for path {} (host {} of {}, round {} of {})",
+                        pool.name,
+                        response.status.value,
+                        path,
+                        index + 1,
+                        candidates.size,
+                        round + 1,
+                        rounds
+                    )
+                } catch (e: java.io.IOException) {
+                    lastIoError = e
+                    logger.warn(
+                        "Druid {} endpoint I/O error for path {} (host {} of {}, round {} of {}): {}",
+                        pool.name,
+                        path,
+                        index + 1,
+                        candidates.size,
+                        round + 1,
+                        rounds,
+                        e.message
+                    )
+                }
+            }
+            if (round + 1 < rounds) {
+                delay(200L * (round + 1))
+            }
+        }
+
+        if (lastResponse != null) return lastResponse as HttpResponse
+        throw lastIoError ?: java.io.IOException("No Druid ${pool.name} endpoints available for path: $path")
+    }
 }
 
 /**
