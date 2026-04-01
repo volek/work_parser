@@ -67,3 +67,8 @@ druid:
   # ---------------------------------------------------------------------------
   # Размер пакета для ingestion
   batchSize: 1000
+  # Повторные попытки batch при ошибке назначения task в Overlord
+  # (Failed to assign this task)
+  ingestionAssignRetryCount: 3
+  # Пауза между retry (мс)
+  ingestionAssignRetryDelayMs: 2000

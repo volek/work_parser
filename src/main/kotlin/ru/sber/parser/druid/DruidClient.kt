@@ -350,19 +350,22 @@ class DruidClient(private val config: DruidConfig) : Closeable {
         var minBatchTotalNs = Long.MAX_VALUE
         // Метрика: максимальное время отправки одного батча.
         var maxBatchTotalNs = 0L
-        val submittedTaskIds = mutableListOf<String>()
-
         batches.forEachIndexed { index, batch ->
             logger.debug("Processing batch ${index + 1}/${batches.size} with ${batch.size} records")
-            // Метрика: время отправки конкретного батча в Overlord.
-            val submissionMetrics = submitIngestionTask(dataSource, batch)
+            // Метрика: время отправки конкретного батча в Overlord с retry
+            // при временной невозможности назначить задачу в кластере.
+            val submissionMetrics = submitBatchWithAssignRetry(
+                dataSource = dataSource,
+                batch = batch,
+                batchIndex = index + 1,
+                batchCount = batches.size
+            )
             // Агрегируем временные метрики по всем батчам для итогового анализа.
             sumSpecBuildNs += submissionMetrics.specBuildNs
             sumHttpRoundTripNs += submissionMetrics.httpRoundTripNs
             sumResponseDecodeNs += submissionMetrics.responseDecodeNs
             minBatchTotalNs = kotlin.math.min(minBatchTotalNs, submissionMetrics.totalNs)
             maxBatchTotalNs = kotlin.math.max(maxBatchTotalNs, submissionMetrics.totalNs)
-            submissionMetrics.taskId?.let { submittedTaskIds.add(it) }
 
             // Структурированный TEMP_PERF-лог по каждому батчу ingestion.
             logger.info(
@@ -419,9 +422,47 @@ class DruidClient(private val config: DruidConfig) : Closeable {
         )
 
         logger.info("Successfully submitted ${batches.size} ingestion batches for dataSource: $dataSource")
+    }
 
-        if (config.awaitIngestionTasks && submittedTaskIds.isNotEmpty()) {
-            awaitIngestionTasksCompletion(dataSource, submittedTaskIds)
+    private suspend fun submitBatchWithAssignRetry(
+        dataSource: String,
+        batch: List<Map<String, Any?>>,
+        batchIndex: Int,
+        batchCount: Int
+    ): IngestionTaskSubmissionMetrics {
+        val retryCount = config.ingestionAssignRetryCount.coerceAtLeast(0)
+        val retryDelayMs = config.ingestionAssignRetryDelayMs.coerceAtLeast(100L)
+        var attempt = 0
+
+        while (true) {
+            attempt += 1
+            val submissionMetrics = submitIngestionTask(dataSource, batch)
+            val taskId = submissionMetrics.taskId
+
+            if (config.awaitIngestionTasks && !taskId.isNullOrBlank()) {
+                try {
+                    awaitIngestionTasksCompletion(dataSource, listOf(taskId))
+                } catch (e: DruidException) {
+                    val message = e.message.orEmpty()
+                    val assignFailed = message.contains("Failed to assign this task", ignoreCase = true)
+                    val canRetry = assignFailed && attempt <= retryCount
+                    if (canRetry) {
+                        logger.warn(
+                            "Retrying ingestion batch due to task assignment failure: dataSource={}, batch={}/{}, attempt={}/{}, delay_ms={}",
+                            dataSource,
+                            batchIndex,
+                            batchCount,
+                            attempt,
+                            retryCount + 1,
+                            retryDelayMs
+                        )
+                        delay(retryDelayMs)
+                        continue
+                    }
+                    throw e
+                }
+            }
+            return submissionMetrics
         }
     }
 

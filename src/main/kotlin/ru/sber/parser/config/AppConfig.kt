@@ -183,7 +183,16 @@ internal data class DruidFileConfig(
     /**
      * Интервал опроса статусов ingestion task (мс).
      */
-    val ingestionTaskPollIntervalMs: Long? = null
+    val ingestionTaskPollIntervalMs: Long? = null,
+    /**
+     * Количество повторных попыток для batch при ошибке назначения task
+     * (Failed to assign this task).
+     */
+    val ingestionAssignRetryCount: Int? = null,
+    /**
+     * Задержка между retry при ошибке назначения task (мс).
+     */
+    val ingestionAssignRetryDelayMs: Long? = null
 )
 
 /**
@@ -239,7 +248,16 @@ data class DruidConfig(
     /**
      * Интервал опроса статусов ingestion task (мс).
      */
-    val ingestionTaskPollIntervalMs: Long = 2_000
+    val ingestionTaskPollIntervalMs: Long = 2_000,
+    /**
+     * Количество повторных попыток для batch при ошибке назначения task
+     * (Failed to assign this task).
+     */
+    val ingestionAssignRetryCount: Int = 3,
+    /**
+     * Задержка между retry при ошибке назначения task (мс).
+     */
+    val ingestionAssignRetryDelayMs: Long = 2_000
 ) {
     companion object {
         private val logger = LoggerFactory.getLogger(DruidConfig::class.java)
@@ -385,6 +403,12 @@ data class DruidConfig(
                     ?: 1_800_000,
                 ingestionTaskPollIntervalMs = System.getenv("DRUID_INGESTION_TASK_POLL_INTERVAL_MS")?.toLongOrNull()
                     ?: fileConfig?.ingestionTaskPollIntervalMs
+                    ?: 2_000,
+                ingestionAssignRetryCount = System.getenv("DRUID_INGESTION_ASSIGN_RETRY_COUNT")?.toIntOrNull()
+                    ?: fileConfig?.ingestionAssignRetryCount
+                    ?: 3,
+                ingestionAssignRetryDelayMs = System.getenv("DRUID_INGESTION_ASSIGN_RETRY_DELAY_MS")?.toLongOrNull()
+                    ?: fileConfig?.ingestionAssignRetryDelayMs
                     ?: 2_000
             )
             
@@ -405,6 +429,8 @@ data class DruidConfig(
             logger.info("  Await ingestion tasks: ${config.awaitIngestionTasks}")
             logger.info("  Ingestion task timeout ms: ${config.ingestionTaskTimeoutMs}")
             logger.info("  Ingestion task poll interval ms: ${config.ingestionTaskPollIntervalMs}")
+            logger.info("  Ingestion assign retry count: ${config.ingestionAssignRetryCount}")
+            logger.info("  Ingestion assign retry delay ms: ${config.ingestionAssignRetryDelayMs}")
             
             return config
         }
