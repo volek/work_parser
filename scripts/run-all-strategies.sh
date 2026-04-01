@@ -246,10 +246,12 @@ else
 fi
 
 STRATEGIES=(combined compcom eav hybrid default)
+declare -A INGEST_OK
 
 echo "=== Парсинг и загрузка в Druid по стратегиям ==="
 set +e
 for s in "${STRATEGIES[@]}"; do
+  INGEST_OK["$s"]=1
   variants=('')
   case "$s" in
     combined|compcom)
@@ -275,6 +277,7 @@ for s in "${STRATEGIES[@]}"; do
     run_jar parse "$s" messages --ingest 2>&1 | tee "$logf"
     rc="${PIPESTATUS[0]}"
     if [[ "$rc" -ne 0 ]]; then
+      INGEST_OK["$s"]=0
       echo "Предупреждение: ingest для $s${suffix:+ ($warm)} завершился с кодом $rc. Лог: $logf" >&2
     fi
   done
@@ -284,6 +287,10 @@ set -e
 
 echo "=== Выполнение всех SQL по стратегиям → $OUT_DIR ==="
 for s in "${STRATEGIES[@]}"; do
+  if [[ "${INGEST_OK[$s]:-1}" -ne 1 ]]; then
+    echo "Пропуск query для $s: ingest завершился с ошибкой (см. logs/${s}_ingest*.log)"
+    continue
+  fi
   qp="$ROOT/query/$s"
   if [[ ! -d "$qp" ]]; then
     echo "Пропуск запросов для $s: нет каталога $qp"

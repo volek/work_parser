@@ -554,9 +554,7 @@ class DruidClient(private val config: DruidConfig) : Closeable {
                 pool = overlordEndpoints,
                 path = "/druid/indexer/v1/task"
             ) { baseUrl ->
-                httpClient.post("$baseUrl/druid/indexer/v1/task") {
-                    setBody(ingestionSpec)
-                }
+                postIndexerTaskWithRedirect(baseUrl, ingestionSpec)
             }
             // Метрика: длительность сетевого round-trip отправки task.
             httpRoundTripNs = System.nanoTime() - httpStartNs
@@ -757,9 +755,7 @@ class DruidClient(private val config: DruidConfig) : Closeable {
             pool = overlordEndpoints,
             path = "/druid/indexer/v1/task"
         ) { baseUrl ->
-            httpClient.post("$baseUrl/druid/indexer/v1/task") {
-                setBody(spec.toMap())
-            }
+            postIndexerTaskWithRedirect(baseUrl, spec.toMap())
         }
         
         if (!response.status.isSuccess()) {
@@ -770,6 +766,42 @@ class DruidClient(private val config: DruidConfig) : Closeable {
         
         val result: Map<String, Any?> = objectMapper.readValue(response.bodyAsText())
         logger.info("DataSource creation task submitted: ${result["task"]}")
+    }
+
+    private suspend fun postIndexerTaskWithRedirect(baseUrl: String, body: Any): HttpResponse {
+        val requestUrl = "$baseUrl/druid/indexer/v1/task"
+        val initialResponse = httpClient.post(requestUrl) {
+            setBody(body)
+        }
+        if (initialResponse.status == HttpStatusCode.TemporaryRedirect || initialResponse.status == HttpStatusCode.PermanentRedirect) {
+            val location = initialResponse.headers[HttpHeaders.Location]
+            if (!location.isNullOrBlank()) {
+                val redirectedUrl = resolveRedirectUrl(requestUrl, location)
+                logger.warn(
+                    "Druid overlord redirected {} -> {} (status {})",
+                    requestUrl,
+                    redirectedUrl,
+                    initialResponse.status.value
+                )
+                return httpClient.post(redirectedUrl) {
+                    setBody(body)
+                }
+            }
+            logger.warn(
+                "Druid overlord returned redirect status {} for {} without Location header",
+                initialResponse.status.value,
+                requestUrl
+            )
+        }
+        return initialResponse
+    }
+
+    private fun resolveRedirectUrl(baseUrl: String, location: String): String {
+        return try {
+            URI(baseUrl).resolve(location).toString()
+        } catch (_: Exception) {
+            location
+        }
     }
     
     /**
