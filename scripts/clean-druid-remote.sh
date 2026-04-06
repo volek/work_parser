@@ -14,6 +14,10 @@
 #   Default:  default_process_default
 #
 # Требуется URL Coordinator (порт 8081), не Router (8888).
+#
+# Ожидание удаления: батчевый опрос списка datasource'ов (быстрее, чем ждать
+# каждый по очереди). Лимит времени: DRUID_CLEANUP_BATCH_TIMEOUT_SECONDS или
+# TIMEOUT_SECONDS * число ожидаемых ds.
 # =============================================================================
 
 set -euo pipefail
@@ -138,6 +142,14 @@ CA_CERT_PATH="${DRUID_CA_CERT_PATH:-}"
 INSECURE_TLS_RAW="${DRUID_INSECURE_SKIP_TLS_VERIFY:-auto}"
 START_TS="$(date +%s)"
 
+# Переиспользуемые файлы вместо mktemp на каждый запрос (заметно ускоряет).
+CLEANUP_BODY_FILE="${TMPDIR:-/tmp}/druid_clean_body.$$"
+CLEANUP_ERR_FILE="${TMPDIR:-/tmp}/druid_clean_err.$$"
+cleanup_temp_files() {
+  rm -f "$CLEANUP_BODY_FILE" "$CLEANUP_ERR_FILE"
+}
+trap cleanup_temp_files EXIT
+
 CURL_COMMON_OPTS=(
   --silent
   --show-error
@@ -174,17 +186,15 @@ LAST_ERROR=""
 druid_request() {
   local method="$1"
   local url="$2"
-  local body_file err_file out curl_ec
-  body_file="$(mktemp)"
-  err_file="$(mktemp)"
+  local out curl_ec
+  : >"$CLEANUP_ERR_FILE"
   set +e
-  out="$(curl "${CURL_COMMON_OPTS[@]}" -X "$method" -o "$body_file" -w "%{http_code}|%{time_total}" "$url" 2>"$err_file")"
+  out="$(curl "${CURL_COMMON_OPTS[@]}" -X "$method" -o "$CLEANUP_BODY_FILE" -w "%{http_code}|%{time_total}" "$url" 2>"$CLEANUP_ERR_FILE")"
   curl_ec=$?
   set -e
 
-  LAST_BODY="$(<"$body_file")"
-  LAST_ERROR="$(<"$err_file")"
-  rm -f "$body_file" "$err_file"
+  LAST_BODY="$(<"$CLEANUP_BODY_FILE")"
+  LAST_ERROR="$(<"$CLEANUP_ERR_FILE")"
 
   LAST_HTTP_CODE="${out%%|*}"
   LAST_DURATION="${out##*|}"
@@ -195,39 +205,98 @@ druid_request() {
   return 0
 }
 
-wait_until_gone() {
-  local ds="$1"
-  local start_ts now elapsed checks
+# Сколько имён из DATASOURCES присутствует в JSON-массиве LAST_BODY (ответ GET /datasources).
+count_targets_in_list_body() {
+  local list_json="$1"
+  shift
+  DRUID_LIST_JSON="$list_json" python3 - "$@" <<'PY'
+import json, os, sys
+# argv: [python, -, ds1, ds2, ...]
+want = set(sys.argv[2:])
+data = json.loads(os.environ["DRUID_LIST_JSON"])
+names = data if isinstance(data, list) else []
+print(sum(1 for n in names if n in want))
+PY
+}
+
+# Оставшиеся из pending, которые ещё есть в JSON списка coordinator.
+filter_still_present() {
+  local list_json="$1"
+  shift
+  printf '%s\n' "$@" | DRUID_LIST_JSON="$list_json" python3 -c '
+import json, os, sys
+pending = [l.strip() for l in sys.stdin if l.strip()]
+data = json.loads(os.environ["DRUID_LIST_JSON"])
+have = set(data if isinstance(data, list) else [])
+for p in pending:
+    if p in have:
+        print(p)
+'
+}
+
+# При неуспешном завершении wait_batch_until_gone: какие ds ещё в кластере.
+LAST_BATCH_STILL_PENDING=()
+
+wait_batch_until_gone() {
+  local -a pending=("$@")
+  local n start_ts checks elapsed batch_timeout now still
+  LAST_BATCH_STILL_PENDING=()
+  n=${#pending[@]}
+  (( n == 0 )) && return 0
+
+  if [[ -n "${DRUID_CLEANUP_BATCH_TIMEOUT_SECONDS:-}" ]]; then
+    batch_timeout="$DRUID_CLEANUP_BATCH_TIMEOUT_SECONDS"
+  else
+    batch_timeout=$((TIMEOUT_SECONDS * n))
+  fi
+  (( batch_timeout < TIMEOUT_SECONDS )) && batch_timeout=$TIMEOUT_SECONDS
+
   start_ts="$(date +%s)"
   checks=0
+  log "  Ожидание исчезновения ${n} datasource(s), таймаут батча ${batch_timeout}s, шаг ${POLL_SECONDS}s..."
 
-  while true; do
+  while ((${#pending[@]} > 0)); do
     checks=$((checks + 1))
-    druid_request "GET" "$COORDINATOR_URL/druid/coordinator/v1/datasources/$ds" || true
-    if [[ "$LAST_HTTP_CODE" == "404" ]]; then
-      log "    Confirmed removed: $ds (checks=$checks)"
+    druid_request "GET" "$COORDINATOR_URL/druid/coordinator/v1/datasources" || true
+    if [[ "$LAST_HTTP_CODE" != "200" ]]; then
+      now="$(date +%s)"
+      elapsed=$((now - start_ts))
+      if (( elapsed >= batch_timeout )); then
+        log "    Таймаут: не удалось получить список datasource'ов за ${batch_timeout}s (last_http=$LAST_HTTP_CODE)"
+        LAST_BATCH_STILL_PENDING=("${pending[@]}")
+        return 1
+      fi
+      log "    Предупреждение: список datasource'ов недоступен (http=$LAST_HTTP_CODE), повтор через ${POLL_SECONDS}s..."
+      sleep "$POLL_SECONDS"
+      continue
+    fi
+
+    mapfile -t still < <(filter_still_present "$LAST_BODY" "${pending[@]}")
+    if ((${#still[@]} == 0)); then
+      log "    Подтверждено удаление всех ${n} datasource(s) (опросов=$checks)"
       return 0
     fi
+    pending=("${still[@]}")
 
     now="$(date +%s)"
     elapsed=$((now - start_ts))
-    if (( elapsed >= TIMEOUT_SECONDS )); then
-      log "    Timeout waiting removal (${TIMEOUT_SECONDS}s): $ds (last_http=$LAST_HTTP_CODE curl_ec=$LAST_CURL_EXIT checks=$checks)"
+    if (( elapsed >= batch_timeout )); then
+      log "    Таймаут ожидания (${batch_timeout}s), ещё присутствуют: ${pending[*]} (опросов=$checks)"
+      LAST_BATCH_STILL_PENDING=("${pending[@]}")
       return 1
     fi
     sleep "$POLL_SECONDS"
   done
+  return 0
 }
 
 count_present_datasources() {
-  local present=0 ds
-  for ds in "${DATASOURCES[@]}"; do
-    druid_request "GET" "$COORDINATOR_URL/druid/coordinator/v1/datasources/$ds" || true
-    if [[ "$LAST_HTTP_CODE" == "200" ]]; then
-      present=$((present + 1))
-    fi
-  done
-  echo "$present"
+  druid_request "GET" "$COORDINATOR_URL/druid/coordinator/v1/datasources" || true
+  if [[ "$LAST_HTTP_CODE" != "200" ]]; then
+    echo "0"
+    return 0
+  fi
+  count_targets_in_list_body "$LAST_BODY" "${DATASOURCES[@]}"
 }
 
 get_segment_count() {
@@ -257,7 +326,7 @@ remove_timeouts=0
 
 log "Druid Coordinator: $COORDINATOR_URL"
 log "Datasources to delete ($total_ds): ${DATASOURCES[*]}"
-log "Polling timeout: ${TIMEOUT_SECONDS}s, interval: ${POLL_SECONDS}s"
+log "Таймаут на один ds (эталон): ${TIMEOUT_SECONDS}s; батч: DRUID_CLEANUP_BATCH_TIMEOUT_SECONDS или ${TIMEOUT_SECONDS}×N ожидаемых ds"
 log "Curl timeouts: connect=${CONNECT_TIMEOUT_SECONDS}s, read=${READ_TIMEOUT_SECONDS}s"
 if [[ -n "$DRUID_USERNAME" ]]; then
   log "Auth: basic"
@@ -277,6 +346,8 @@ fi
 present_before="$(count_present_datasources)"
 log "Initially present datasources from target list: $present_before/$total_ds"
 log ""
+
+declare -a PENDING_WAIT=()
 
 for ds in "${DATASOURCES[@]}"; do
   seg_before="$(get_segment_count "$ds")"
@@ -314,13 +385,21 @@ for ds in "${DATASOURCES[@]}"; do
     continue
   fi
 
-  if ! wait_until_gone "$ds"; then
-    remove_timeouts=$((remove_timeouts + 1))
-    log "    WARNING: datasource still present after timeout: $ds"
-  else
-    confirmed_removed=$((confirmed_removed + 1))
-  fi
+  PENDING_WAIT+=("$ds")
 done
+
+if ((${#PENDING_WAIT[@]} > 0)); then
+  n_wait=${#PENDING_WAIT[@]}
+  if ! wait_batch_until_gone "${PENDING_WAIT[@]}"; then
+    remove_timeouts=${#LAST_BATCH_STILL_PENDING[@]}
+    confirmed_removed=$((n_wait - remove_timeouts))
+    log "  WARNING: таймаут батча; ещё в кластере: ${LAST_BATCH_STILL_PENDING[*]:-нет}"
+  else
+    confirmed_removed=$n_wait
+  fi
+else
+  log "Нет datasource'ов для ожидания удаления (kill не выполнялся успешно ни для одного)."
+fi
 
 present_after="$(count_present_datasources)"
 end_ts="$(date +%s)"
