@@ -1,0 +1,90 @@
+[2026-04-07 16:53:11] WARNING: HTTPS без DRUID_CA_CERT_PATH: включен insecure TLS fallback (-k).
+[2026-04-07 16:53:11] Druid Coordinator: https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8281
+[2026-04-07 16:53:11] Datasources to delete (8): hybrid_process_hybrid eav_process_events eav_process_variables combined_process_main combined_process_variables_indexed compcom_process_main_compact compcom_process_variables_indexed default_process_default
+[2026-04-07 16:53:11] Таймаут на один ds (эталон): 180s; батч: DRUID_CLEANUP_BATCH_TIMEOUT_SECONDS или 180×N ожидаемых ds
+[2026-04-07 16:53:11] Curl timeouts: connect=10s, read=60s
+[2026-04-07 16:53:11] Auth: basic
+[2026-04-07 16:53:11] Log file: /home/portos/logs/clean_druid_remote.log
+[2026-04-07 16:53:11] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:12] Initially present datasources from target list: [2026-04-07 16:53:12] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+7/8
+[2026-04-07 16:53:12] 
+[2026-04-07 16:53:12] Datasource: hybrid_process_hybrid | segments_before=[2026-04-07 16:53:12] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+2
+[2026-04-07 16:53:12] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:12]   Marked unused: hybrid_process_hybrid (http=200 curl_ec=0 t=0.048474s redirects=1)
+[2026-04-07 16:53:12] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:12]     Kill requested: hybrid_process_hybrid (http=200 curl_ec=0 t=0.097333s redirects=1)
+[2026-04-07 16:53:12] Datasource: eav_process_events | segments_before=[2026-04-07 16:53:12] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+2
+[2026-04-07 16:53:12] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:12]   Marked unused: eav_process_events (http=200 curl_ec=0 t=0.043704s redirects=1)
+[2026-04-07 16:53:12] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:12]     Kill requested: eav_process_events (http=200 curl_ec=0 t=0.054286s redirects=1)
+[2026-04-07 16:53:12] Datasource: eav_process_variables | segments_before=[2026-04-07 16:53:12] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+2
+[2026-04-07 16:53:13] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:13]   Marked unused: eav_process_variables (http=200 curl_ec=0 t=0.047262s redirects=1)
+[2026-04-07 16:53:13] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:13]     Kill requested: eav_process_variables (http=200 curl_ec=0 t=0.054543s redirects=1)
+[2026-04-07 16:53:13] Datasource: combined_process_main | segments_before=[2026-04-07 16:53:13] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+2
+[2026-04-07 16:53:13] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:13]   Marked unused: combined_process_main (http=200 curl_ec=0 t=0.048119s redirects=1)
+[2026-04-07 16:53:13] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:13]     Kill requested: combined_process_main (http=200 curl_ec=0 t=0.050272s redirects=1)
+[2026-04-07 16:53:13] Datasource: combined_process_variables_indexed | segments_before=[2026-04-07 16:53:13] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+2
+[2026-04-07 16:53:13] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:13]   Marked unused: combined_process_variables_indexed (http=200 curl_ec=0 t=0.042767s redirects=1)
+[2026-04-07 16:53:13] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:13]     Kill requested: combined_process_variables_indexed (http=200 curl_ec=0 t=0.049806s redirects=1)
+[2026-04-07 16:53:13] Datasource: compcom_process_main_compact | segments_before=[2026-04-07 16:53:13] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+2
+[2026-04-07 16:53:14] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:14]   Marked unused: compcom_process_main_compact (http=200 curl_ec=0 t=0.039812s redirects=1)
+[2026-04-07 16:53:14] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:14]     Kill requested: compcom_process_main_compact (http=200 curl_ec=0 t=0.048438s redirects=1)
+[2026-04-07 16:53:14] Datasource: compcom_process_variables_indexed | segments_before=[2026-04-07 16:53:14] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+2
+[2026-04-07 16:53:14] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:14]   Marked unused: compcom_process_variables_indexed (http=200 curl_ec=0 t=0.041479s redirects=1)
+[2026-04-07 16:53:14] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:14]     Kill requested: compcom_process_variables_indexed (http=200 curl_ec=0 t=0.047865s redirects=1)
+[2026-04-07 16:53:14] Datasource: default_process_default | segments_before=[2026-04-07 16:53:14] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+2
+[2026-04-07 16:53:14] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:14]   Marked unused: default_process_default (http=200 curl_ec=0 t=0.041022s redirects=1)
+[2026-04-07 16:53:14] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:14]     Kill requested: default_process_default (http=200 curl_ec=0 t=0.050839s redirects=1)
+[2026-04-07 16:53:14]   Ожидание исчезновения 8 datasource(s), таймаут батча 1440s, шаг 3s...
+[2026-04-07 16:53:14] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:18] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:21] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:24] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:27] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:30] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:33] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:36] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:39] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:42] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:46] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:49] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:52] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+[2026-04-07 16:53:52]     Подтверждено удаление всех 8 datasource(s) (опросов=13)
+[2026-04-07 16:53:52] 
+[2026-04-07 16:53:52] Remaining datasources after cleanup (full list from coordinator):
+[2026-04-07 16:53:52] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+["abyss.flink-metrics-sdp2"]
+[2026-04-07 16:53:52] 
+[2026-04-07 16:53:52] Cleanup metrics:
+[2026-04-07 16:53:52]   datasource_total=8
+[2026-04-07 16:53:52]   datasource_present_before=[2026-04-07 16:53:12] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+7
+[2026-04-07 16:53:52]   datasource_present_after=[2026-04-07 16:53:52] WARNING: Auto-enabled --location-trusted after 401 on redirected request.
+0
+[2026-04-07 16:53:52]   mark_ok=8 mark_not_found=0 mark_errors=0
+[2026-04-07 16:53:52]   kill_ok=8 kill_not_found=0 kill_errors=0
+[2026-04-07 16:53:52]   confirmed_removed=8 remove_timeouts=0
+[2026-04-07 16:53:52]   elapsed_seconds=41
+[2026-04-07 16:53:52] Done.
