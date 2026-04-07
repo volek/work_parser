@@ -67,6 +67,9 @@ druid:
   # ---------------------------------------------------------------------------
   # Размер пакета для ingestion
   batchSize: 1000
+  # Максимальный размер inline payload в bytes.
+  # Должен оставаться заметно ниже 512KiB из-за лимита ZooKeeper znode у Overlord.
+  maxInlineBytes: 256000
   # Повторные попытки batch при ошибке назначения task в Overlord
   # (Failed to assign this task)
   ingestionAssignRetryCount: 3

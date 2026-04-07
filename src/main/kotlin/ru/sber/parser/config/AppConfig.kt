@@ -234,9 +234,10 @@ data class DruidConfig(
     val insecureSkipTlsVerify: Boolean = false,
     /**
      * Максимальный размер inline-NDJSON payload в ingestion spec (в байтах).
-     * Нужен для стабилизации submit в Overlord (избежать "Broken pipe" при больших запросах).
+     * Значение по умолчанию сознательно ниже лимита znode в ZooKeeper (~512 KiB),
+     * чтобы снизить риск ошибок "Length of raw bytes for znode ... too large".
      */
-    val maxInlineBytes: Int = 4_000_000,
+    val maxInlineBytes: Int = 256_000,
     /**
      * Ожидать финальный статус ingestion task после submit.
      */
@@ -391,7 +392,7 @@ data class DruidConfig(
                     ?: false,
                 maxInlineBytes = System.getenv("DRUID_MAX_INLINE_BYTES")?.toIntOrNull()
                     ?: fileConfig?.maxInlineBytes
-                    ?: 4_000_000,
+                    ?: 256_000,
                 awaitIngestionTasks = System.getenv("DRUID_AWAIT_INGESTION_TASKS")
                     ?.trim()
                     ?.lowercase()

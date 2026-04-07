@@ -91,6 +91,11 @@ class DruidClient(private val config: DruidConfig) : Closeable {
     /** Jackson ObjectMapper для сериализации/десериализации JSON */
     private val objectMapper: ObjectMapper = jacksonObjectMapper()
         .registerModule(JavaTimeModule())
+
+    private companion object {
+        // ZK hard-limit is 524288 bytes; keep a small buffer for metadata/serialization differences.
+        private const val MAX_SAFE_TASK_SPEC_BYTES = 500_000
+    }
     
     /**
      * Ktor HTTP-клиент с настройками для Druid.
@@ -544,6 +549,14 @@ class DruidClient(private val config: DruidConfig) : Closeable {
         val ingestionSpec = createBatchIngestionSpec(dataSource, records)
         // Метрика: длительность подготовки ingestion spec.
         val specBuildNs = System.nanoTime() - specBuildStartNs
+        val ingestionSpecBytes = objectMapper.writeValueAsBytes(ingestionSpec).size
+        if (ingestionSpecBytes > MAX_SAFE_TASK_SPEC_BYTES) {
+            throw DruidException(
+                "Ingestion task spec is too large for ZooKeeper: dataSource='$dataSource', " +
+                    "spec_bytes=$ingestionSpecBytes, safe_limit=$MAX_SAFE_TASK_SPEC_BYTES. " +
+                    "Reduce DRUID_MAX_INLINE_BYTES/batch size or use non-inline inputSource."
+            )
+        }
 
         // Метрика: старт таймера HTTP POST на Overlord.
         val httpStartNs = System.nanoTime()
@@ -625,7 +638,15 @@ class DruidClient(private val config: DruidConfig) : Closeable {
         if (records.isEmpty()) return emptyList()
 
         val maxRecords = config.batchSize.coerceAtLeast(1)
-        val maxBytes = config.maxInlineBytes.coerceAtLeast(10_000)
+        val configuredMaxBytes = config.maxInlineBytes.coerceAtLeast(10_000)
+        val maxBytes = kotlin.math.min(configuredMaxBytes, 256_000)
+        if (configuredMaxBytes > maxBytes) {
+            logger.warn(
+                "Configured maxInlineBytes={} is too high for stable ZooKeeper task announce; using safety cap={} bytes",
+                configuredMaxBytes,
+                maxBytes
+            )
+        }
 
         val result = ArrayList<List<Map<String, Any?>>>(kotlin.math.max(1, records.size / maxRecords))
         val current = ArrayList<Map<String, Any?>>(kotlin.math.min(maxRecords, records.size))
@@ -1143,8 +1164,9 @@ class DruidClient(private val config: DruidConfig) : Closeable {
         }
 
         if (lastResponse != null) return lastResponse as HttpResponse
+        val causeSuffix = lastNetworkError?.let { "${it.javaClass.simpleName}: ${it.message}" } ?: "unknown"
         throw java.io.IOException(
-            "No Druid ${pool.name} endpoints available for path: $path",
+            "No Druid ${pool.name} endpoints available for path: $path (last_error=$causeSuffix)",
             lastNetworkError
         )
     }
