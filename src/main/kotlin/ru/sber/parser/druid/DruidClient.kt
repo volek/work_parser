@@ -28,7 +28,6 @@ import java.security.KeyStore
 import java.security.MessageDigest
 import java.security.cert.CertificateException
 import java.security.cert.X509Certificate
-import java.util.concurrent.atomic.AtomicInteger
 import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
 
@@ -1101,16 +1100,11 @@ class DruidClient(private val config: DruidConfig) : Closeable {
         val name: String,
         val urls: List<String>
     ) {
-        private val rrIndex = AtomicInteger(0)
-
         init {
             require(urls.isNotEmpty()) { "Endpoint list for '$name' is empty" }
         }
 
-        fun cycleStartingFromCurrent(): List<String> {
-            val start = Math.floorMod(rrIndex.getAndIncrement(), urls.size)
-            return List(urls.size) { offset -> urls[(start + offset) % urls.size] }
-        }
+        fun orderedCandidates(): List<String> = urls
     }
 
     private suspend fun requestWithFailover(
@@ -1123,7 +1117,8 @@ class DruidClient(private val config: DruidConfig) : Closeable {
         var lastResponse: HttpResponse? = null
 
         repeat(rounds) { round ->
-            val candidates = pool.cycleStartingFromCurrent()
+            // Primary-first failover: always try hosts in config order (e.g. 09 -> 10).
+            val candidates = pool.orderedCandidates()
             for ((index, baseUrl) in candidates.withIndex()) {
                 try {
                     val response = request(baseUrl)

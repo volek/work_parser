@@ -14,29 +14,28 @@ druid:
   # URL-адреса компонентов Druid
   # ---------------------------------------------------------------------------
   # Broker - для SQL запросов
-  brokerUrl: "https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282"
-  # Альтернатива: список broker-хостов (round-robin + failover/retry)
-  # brokerUrls:
-  #  - "https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8282"
-  #  - "https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282"
+  # Порядок важен: сначала primary (09), затем fallback (10)
+  brokerUrls:
+    - "https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8282"
+    - "https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8282"
   
   # Coordinator - управление сегментами
-  coordinatorUrl: "https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281"
-  #coordinatorUrls:
-  #  - "https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8281"
-  #  - "https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281"
+  # Порядок важен: сначала primary (09), затем fallback (10)
+  coordinatorUrls:
+    - "https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8281"
+    - "https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8281"
   
   # Overlord - управление задачами индексации (часто 8081, в standalone по умолчанию 8090)
-  overlordUrl: "https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8290"
-  # overlordUrls:
-  #  - "https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8290"
-  #  - "https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8290"
+  # Порядок важен: сначала primary (09), затем fallback (10)
+  overlordUrls:
+    - "https://omltd-abyss-sdp2-druid-09.opsmon.sbt:8290"
+    - "https://omltd-abyss-sdp2-druid-10.opsmon.sbt:8290"
   
   # Router - унифицированная точка входа (Web Console)
-  routerUrl: "https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088"
-  # routerUrls:
-  #  - "https://omltd-abyss-sdp2-druid-09.opsmon.sbt:9088"
-  #  - "https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088"
+  # Порядок важен: сначала primary (09), затем fallback (10)
+  routerUrls:
+    - "https://omltd-abyss-sdp2-druid-09.opsmon.sbt:9088"
+    - "https://omltd-abyss-sdp2-druid-10.opsmon.sbt:9088"
   
     # ---------------------------------------------------------------------------
   # Basic auth (если Druid/прокси требует логин/пароль)
