@@ -169,9 +169,16 @@ trap cleanup_temp_files EXIT
 CURL_COMMON_OPTS=(
   --silent
   --show-error
+  --location
+  --max-redirs "${DRUID_CLEANUP_MAX_REDIRECTS:-10}"
   --connect-timeout "$CONNECT_TIMEOUT_SECONDS"
   --max-time "$READ_TIMEOUT_SECONDS"
 )
+
+if normalize_bool "${DRUID_CLEANUP_LOCATION_TRUSTED:-false}"; then
+  # Allow forwarding credentials on redirects to another host when explicitly enabled.
+  CURL_COMMON_OPTS+=(--location-trusted)
+fi
 
 if [[ -n "$CA_CERT_PATH" ]]; then
   if [[ -f "$CA_CERT_PATH" ]]; then
@@ -196,6 +203,8 @@ fi
 LAST_HTTP_CODE="000"
 LAST_CURL_EXIT=0
 LAST_DURATION="0.000"
+LAST_REDIRECTS="0"
+LAST_EFFECTIVE_URL=""
 LAST_BODY=""
 LAST_ERROR=""
 
@@ -205,7 +214,7 @@ druid_request() {
   local out curl_ec
   : >"$CLEANUP_ERR_FILE"
   set +e
-  out="$(curl "${CURL_COMMON_OPTS[@]}" -X "$method" -o "$CLEANUP_BODY_FILE" -w "%{http_code}|%{time_total}" "$url" 2>"$CLEANUP_ERR_FILE")"
+  out="$(curl "${CURL_COMMON_OPTS[@]}" -X "$method" -o "$CLEANUP_BODY_FILE" -w "%{http_code}|%{time_total}|%{num_redirects}|%{url_effective}" "$url" 2>"$CLEANUP_ERR_FILE")"
   curl_ec=$?
   set -e
 
@@ -213,7 +222,12 @@ druid_request() {
   LAST_ERROR="$(<"$CLEANUP_ERR_FILE")"
 
   LAST_HTTP_CODE="${out%%|*}"
-  LAST_DURATION="${out##*|}"
+  local rest
+  rest="${out#*|}"
+  LAST_DURATION="${rest%%|*}"
+  rest="${rest#*|}"
+  LAST_REDIRECTS="${rest%%|*}"
+  LAST_EFFECTIVE_URL="${rest#*|}"
   LAST_CURL_EXIT="$curl_ec"
   if [[ "$curl_ec" -ne 0 && "$LAST_HTTP_CODE" == "000" ]]; then
     return 1
@@ -373,13 +387,14 @@ for ds in "${DATASOURCES[@]}"; do
   mark_code="$LAST_HTTP_CODE"
   if [[ "$mark_code" == "200" ]]; then
     marked_ok=$((marked_ok + 1))
-    log "  Marked unused: $ds (http=$mark_code curl_ec=$LAST_CURL_EXIT t=${LAST_DURATION}s)"
+    log "  Marked unused: $ds (http=$mark_code curl_ec=$LAST_CURL_EXIT t=${LAST_DURATION}s redirects=$LAST_REDIRECTS)"
   elif [[ "$mark_code" == "404" ]]; then
     marked_not_found=$((marked_not_found + 1))
-    log "  Skip mark (not found): $ds (http=$mark_code t=${LAST_DURATION}s)"
+    log "  Skip mark (not found): $ds (http=$mark_code t=${LAST_DURATION}s redirects=$LAST_REDIRECTS)"
   else
     mark_errors=$((mark_errors + 1))
-    log "  Mark unused error: $ds (http=$mark_code curl_ec=$LAST_CURL_EXIT t=${LAST_DURATION}s)"
+    log "  Mark unused error: $ds (http=$mark_code curl_ec=$LAST_CURL_EXIT t=${LAST_DURATION}s redirects=$LAST_REDIRECTS)"
+    [[ -n "$LAST_EFFECTIVE_URL" ]] && log "  effective_url: $LAST_EFFECTIVE_URL"
     [[ -n "$LAST_ERROR" ]] && log "  curl stderr: $LAST_ERROR"
     [[ -n "$LAST_BODY" ]] && log "  response body: $LAST_BODY"
     continue
@@ -389,13 +404,14 @@ for ds in "${DATASOURCES[@]}"; do
   kill_code="$LAST_HTTP_CODE"
   if [[ "$kill_code" == "200" ]]; then
     kill_ok=$((kill_ok + 1))
-    log "    Kill requested: $ds (http=$kill_code curl_ec=$LAST_CURL_EXIT t=${LAST_DURATION}s)"
+    log "    Kill requested: $ds (http=$kill_code curl_ec=$LAST_CURL_EXIT t=${LAST_DURATION}s redirects=$LAST_REDIRECTS)"
   elif [[ "$kill_code" == "404" ]]; then
     kill_not_found=$((kill_not_found + 1))
-    log "    Skip kill (not found): $ds (http=$kill_code t=${LAST_DURATION}s)"
+    log "    Skip kill (not found): $ds (http=$kill_code t=${LAST_DURATION}s redirects=$LAST_REDIRECTS)"
   else
     kill_errors=$((kill_errors + 1))
-    log "    Kill error: $ds (http=$kill_code curl_ec=$LAST_CURL_EXIT t=${LAST_DURATION}s)"
+    log "    Kill error: $ds (http=$kill_code curl_ec=$LAST_CURL_EXIT t=${LAST_DURATION}s redirects=$LAST_REDIRECTS)"
+    [[ -n "$LAST_EFFECTIVE_URL" ]] && log "    effective_url: $LAST_EFFECTIVE_URL"
     [[ -n "$LAST_ERROR" ]] && log "    curl stderr: $LAST_ERROR"
     [[ -n "$LAST_BODY" ]] && log "    response body: $LAST_BODY"
     continue
