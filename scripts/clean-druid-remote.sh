@@ -175,9 +175,12 @@ CURL_COMMON_OPTS=(
   --max-time "$READ_TIMEOUT_SECONDS"
 )
 
-if normalize_bool "${DRUID_CLEANUP_LOCATION_TRUSTED:-false}"; then
+LOCATION_TRUSTED_MODE_RAW="${DRUID_CLEANUP_LOCATION_TRUSTED:-auto}"
+LOCATION_TRUSTED_ENABLED=0
+if normalize_bool "$LOCATION_TRUSTED_MODE_RAW"; then
   # Allow forwarding credentials on redirects to another host when explicitly enabled.
   CURL_COMMON_OPTS+=(--location-trusted)
+  LOCATION_TRUSTED_ENABLED=1
 fi
 
 if [[ -n "$CA_CERT_PATH" ]]; then
@@ -212,9 +215,10 @@ druid_request() {
   local method="$1"
   local url="$2"
   local out curl_ec
+  local -a curl_opts=("${CURL_COMMON_OPTS[@]}")
   : >"$CLEANUP_ERR_FILE"
   set +e
-  out="$(curl "${CURL_COMMON_OPTS[@]}" -X "$method" -o "$CLEANUP_BODY_FILE" -w "%{http_code}|%{time_total}|%{num_redirects}|%{url_effective}" "$url" 2>"$CLEANUP_ERR_FILE")"
+  out="$(curl "${curl_opts[@]}" -X "$method" -o "$CLEANUP_BODY_FILE" -w "%{http_code}|%{time_total}|%{num_redirects}|%{url_effective}" "$url" 2>"$CLEANUP_ERR_FILE")"
   curl_ec=$?
   set -e
 
@@ -229,6 +233,31 @@ druid_request() {
   LAST_REDIRECTS="${rest%%|*}"
   LAST_EFFECTIVE_URL="${rest#*|}"
   LAST_CURL_EXIT="$curl_ec"
+
+  # In auto mode retry once with --location-trusted when auth is lost on redirect.
+  if [[ "$LOCATION_TRUSTED_MODE_RAW" == "auto" ]] \
+    && [[ "$LOCATION_TRUSTED_ENABLED" -eq 0 ]] \
+    && [[ -n "$DRUID_USERNAME" ]] \
+    && [[ "$LAST_HTTP_CODE" == "401" ]] \
+    && [[ "${LAST_REDIRECTS:-0}" =~ ^[0-9]+$ ]] \
+    && (( LAST_REDIRECTS > 0 )); then
+    set +e
+    out="$(curl "${curl_opts[@]}" --location-trusted -X "$method" -o "$CLEANUP_BODY_FILE" -w "%{http_code}|%{time_total}|%{num_redirects}|%{url_effective}" "$url" 2>"$CLEANUP_ERR_FILE")"
+    curl_ec=$?
+    set -e
+
+    LAST_BODY="$(<"$CLEANUP_BODY_FILE")"
+    LAST_ERROR="$(<"$CLEANUP_ERR_FILE")"
+    LAST_HTTP_CODE="${out%%|*}"
+    rest="${out#*|}"
+    LAST_DURATION="${rest%%|*}"
+    rest="${rest#*|}"
+    LAST_REDIRECTS="${rest%%|*}"
+    LAST_EFFECTIVE_URL="${rest#*|}"
+    LAST_CURL_EXIT="$curl_ec"
+    log "WARNING: Auto-enabled --location-trusted after 401 on redirected request."
+  fi
+
   if [[ "$curl_ec" -ne 0 && "$LAST_HTTP_CODE" == "000" ]]; then
     return 1
   fi
