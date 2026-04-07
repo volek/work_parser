@@ -47,6 +47,7 @@ read_config_coordinator_url() {
   awk '
     /^[[:space:]]*druid:[[:space:]]*$/ { in_druid=1; next }
     in_druid && /^[^[:space:]]/ { in_druid=0 }
+    # Legacy/single-value key
     in_druid && /^[[:space:]]*coordinatorUrl:[[:space:]]*/ {
       line=$0
       sub(/^[[:space:]]*coordinatorUrl:[[:space:]]*/, "", line)
@@ -57,6 +58,21 @@ read_config_coordinator_url() {
       print line
       exit
     }
+    # Current config uses list key: coordinatorUrls:
+    in_druid && /^[[:space:]]*coordinatorUrls:[[:space:]]*$/ { in_coord_list=1; next }
+    in_coord_list && /^[[:space:]]*-[[:space:]]*/ {
+      line=$0
+      sub(/^[[:space:]]*-[[:space:]]*/, "", line)
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", line)
+      if (line ~ /^".*"$/ || line ~ /^'\''.*'\''$/) {
+        line=substr(line, 2, length(line)-2)
+      }
+      print line
+      exit
+    }
+    # Any new top-level key or sibling key under druid ends list parsing.
+    in_coord_list && /^[^[:space:]]/ { in_coord_list=0 }
+    in_coord_list && /^[[:space:]]*[a-zA-Z0-9_]+:[[:space:]]*/ { in_coord_list=0 }
   ' "$cfg"
 }
 
