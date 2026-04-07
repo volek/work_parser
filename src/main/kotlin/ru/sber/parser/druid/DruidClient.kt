@@ -28,6 +28,7 @@ import java.security.KeyStore
 import java.security.MessageDigest
 import java.security.cert.CertificateException
 import java.security.cert.X509Certificate
+import java.util.concurrent.atomic.AtomicInteger
 import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
 
@@ -91,6 +92,13 @@ class DruidClient(private val config: DruidConfig) : Closeable {
     private val objectMapper: ObjectMapper = jacksonObjectMapper()
         .registerModule(JavaTimeModule())
 
+    private val basicAuthHeader: String? = config.username
+        ?.takeIf { it.isNotBlank() }
+        ?.let { user ->
+            val credentials = "$user:${config.password.orEmpty()}"
+            "Basic " + java.util.Base64.getEncoder().encodeToString(credentials.toByteArray(Charsets.UTF_8))
+        }
+
     private companion object {
         // ZK hard-limit is 524288 bytes; keep a small buffer for metadata/serialization differences.
         private const val MAX_SAFE_TASK_SPEC_BYTES = 500_000
@@ -153,6 +161,7 @@ class DruidClient(private val config: DruidConfig) : Closeable {
         }
         defaultRequest {
             contentType(ContentType.Application.Json)
+            basicAuthHeader?.let { header(HttpHeaders.Authorization, it) }
         }
     }
     
@@ -803,6 +812,7 @@ class DruidClient(private val config: DruidConfig) : Closeable {
                     redirectedUrl,
                     initialResponse.status.value
                 )
+                overlordEndpoints.markPreferredByUrl(redirectedUrl)
                 return httpClient.post(redirectedUrl) {
                     setBody(body)
                 }
@@ -1100,11 +1110,34 @@ class DruidClient(private val config: DruidConfig) : Closeable {
         val name: String,
         val urls: List<String>
     ) {
+        private val preferredIndex = AtomicInteger(0)
+
         init {
             require(urls.isNotEmpty()) { "Endpoint list for '$name' is empty" }
         }
 
-        fun orderedCandidates(): List<String> = urls
+        fun orderedCandidates(): List<String> {
+            if (urls.size <= 1) return urls
+            val start = preferredIndex.get().coerceIn(0, urls.lastIndex)
+            return (0 until urls.size).map { urls[(start + it) % urls.size] }
+        }
+
+        fun markPreferred(baseUrl: String) {
+            val idx = urls.indexOfFirst { normalizeBaseUrl(it) == normalizeBaseUrl(baseUrl) }
+            if (idx >= 0) preferredIndex.set(idx)
+        }
+
+        fun markPreferredByUrl(url: String) {
+            val host = runCatching { URI(url).host }.getOrNull()?.lowercase() ?: return
+            val matched = urls.firstOrNull { candidate ->
+                runCatching { URI(candidate).host }
+                    .getOrNull()
+                    ?.lowercase() == host
+            } ?: return
+            markPreferred(matched)
+        }
+
+        private fun normalizeBaseUrl(url: String): String = url.trimEnd('/').lowercase()
     }
 
     private suspend fun requestWithFailover(
@@ -1122,6 +1155,12 @@ class DruidClient(private val config: DruidConfig) : Closeable {
             for ((index, baseUrl) in candidates.withIndex()) {
                 try {
                     val response = request(baseUrl)
+                    val finalUrl = runCatching { response.request.url.toString() }.getOrNull()
+                    if (!finalUrl.isNullOrBlank()) {
+                        pool.markPreferredByUrl(finalUrl)
+                    } else {
+                        pool.markPreferred(baseUrl)
+                    }
                     val retriable = response.status.value == 429 || response.status.value in 500..599
                     if (!retriable) {
                         return response

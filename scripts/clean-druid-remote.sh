@@ -47,6 +47,7 @@ read_config_coordinator_url() {
   awk '
     /^[[:space:]]*druid:[[:space:]]*$/ { in_druid=1; next }
     in_druid && /^[^[:space:]]/ { in_druid=0 }
+    # Legacy/single-value key
     in_druid && /^[[:space:]]*coordinatorUrl:[[:space:]]*/ {
       line=$0
       sub(/^[[:space:]]*coordinatorUrl:[[:space:]]*/, "", line)
@@ -57,6 +58,21 @@ read_config_coordinator_url() {
       print line
       exit
     }
+    # Current config uses list key: coordinatorUrls:
+    in_druid && /^[[:space:]]*coordinatorUrls:[[:space:]]*$/ { in_coord_list=1; next }
+    in_coord_list && /^[[:space:]]*-[[:space:]]*/ {
+      line=$0
+      sub(/^[[:space:]]*-[[:space:]]*/, "", line)
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", line)
+      if (line ~ /^".*"$/ || line ~ /^'\''.*'\''$/) {
+        line=substr(line, 2, length(line)-2)
+      }
+      print line
+      exit
+    }
+    # Any new top-level key or sibling key under druid ends list parsing.
+    in_coord_list && /^[^[:space:]]/ { in_coord_list=0 }
+    in_coord_list && /^[[:space:]]*[a-zA-Z0-9_]+:[[:space:]]*/ { in_coord_list=0 }
   ' "$cfg"
 }
 
@@ -153,9 +169,19 @@ trap cleanup_temp_files EXIT
 CURL_COMMON_OPTS=(
   --silent
   --show-error
+  --location
+  --max-redirs "${DRUID_CLEANUP_MAX_REDIRECTS:-10}"
   --connect-timeout "$CONNECT_TIMEOUT_SECONDS"
   --max-time "$READ_TIMEOUT_SECONDS"
 )
+
+LOCATION_TRUSTED_MODE_RAW="${DRUID_CLEANUP_LOCATION_TRUSTED:-auto}"
+LOCATION_TRUSTED_ENABLED=0
+if normalize_bool "$LOCATION_TRUSTED_MODE_RAW"; then
+  # Allow forwarding credentials on redirects to another host when explicitly enabled.
+  CURL_COMMON_OPTS+=(--location-trusted)
+  LOCATION_TRUSTED_ENABLED=1
+fi
 
 if [[ -n "$CA_CERT_PATH" ]]; then
   if [[ -f "$CA_CERT_PATH" ]]; then
@@ -180,6 +206,8 @@ fi
 LAST_HTTP_CODE="000"
 LAST_CURL_EXIT=0
 LAST_DURATION="0.000"
+LAST_REDIRECTS="0"
+LAST_EFFECTIVE_URL=""
 LAST_BODY=""
 LAST_ERROR=""
 
@@ -187,9 +215,10 @@ druid_request() {
   local method="$1"
   local url="$2"
   local out curl_ec
+  local -a curl_opts=("${CURL_COMMON_OPTS[@]}")
   : >"$CLEANUP_ERR_FILE"
   set +e
-  out="$(curl "${CURL_COMMON_OPTS[@]}" -X "$method" -o "$CLEANUP_BODY_FILE" -w "%{http_code}|%{time_total}" "$url" 2>"$CLEANUP_ERR_FILE")"
+  out="$(curl "${curl_opts[@]}" -X "$method" -o "$CLEANUP_BODY_FILE" -w "%{http_code}|%{time_total}|%{num_redirects}|%{url_effective}" "$url" 2>"$CLEANUP_ERR_FILE")"
   curl_ec=$?
   set -e
 
@@ -197,8 +226,38 @@ druid_request() {
   LAST_ERROR="$(<"$CLEANUP_ERR_FILE")"
 
   LAST_HTTP_CODE="${out%%|*}"
-  LAST_DURATION="${out##*|}"
+  local rest
+  rest="${out#*|}"
+  LAST_DURATION="${rest%%|*}"
+  rest="${rest#*|}"
+  LAST_REDIRECTS="${rest%%|*}"
+  LAST_EFFECTIVE_URL="${rest#*|}"
   LAST_CURL_EXIT="$curl_ec"
+
+  # In auto mode retry once with --location-trusted when auth is lost on redirect.
+  if [[ "$LOCATION_TRUSTED_MODE_RAW" == "auto" ]] \
+    && [[ "$LOCATION_TRUSTED_ENABLED" -eq 0 ]] \
+    && [[ -n "$DRUID_USERNAME" ]] \
+    && [[ "$LAST_HTTP_CODE" == "401" ]] \
+    && [[ "${LAST_REDIRECTS:-0}" =~ ^[0-9]+$ ]] \
+    && (( LAST_REDIRECTS > 0 )); then
+    set +e
+    out="$(curl "${curl_opts[@]}" --location-trusted -X "$method" -o "$CLEANUP_BODY_FILE" -w "%{http_code}|%{time_total}|%{num_redirects}|%{url_effective}" "$url" 2>"$CLEANUP_ERR_FILE")"
+    curl_ec=$?
+    set -e
+
+    LAST_BODY="$(<"$CLEANUP_BODY_FILE")"
+    LAST_ERROR="$(<"$CLEANUP_ERR_FILE")"
+    LAST_HTTP_CODE="${out%%|*}"
+    rest="${out#*|}"
+    LAST_DURATION="${rest%%|*}"
+    rest="${rest#*|}"
+    LAST_REDIRECTS="${rest%%|*}"
+    LAST_EFFECTIVE_URL="${rest#*|}"
+    LAST_CURL_EXIT="$curl_ec"
+    log "WARNING: Auto-enabled --location-trusted after 401 on redirected request."
+  fi
+
   if [[ "$curl_ec" -ne 0 && "$LAST_HTTP_CODE" == "000" ]]; then
     return 1
   fi
@@ -357,13 +416,14 @@ for ds in "${DATASOURCES[@]}"; do
   mark_code="$LAST_HTTP_CODE"
   if [[ "$mark_code" == "200" ]]; then
     marked_ok=$((marked_ok + 1))
-    log "  Marked unused: $ds (http=$mark_code curl_ec=$LAST_CURL_EXIT t=${LAST_DURATION}s)"
+    log "  Marked unused: $ds (http=$mark_code curl_ec=$LAST_CURL_EXIT t=${LAST_DURATION}s redirects=$LAST_REDIRECTS)"
   elif [[ "$mark_code" == "404" ]]; then
     marked_not_found=$((marked_not_found + 1))
-    log "  Skip mark (not found): $ds (http=$mark_code t=${LAST_DURATION}s)"
+    log "  Skip mark (not found): $ds (http=$mark_code t=${LAST_DURATION}s redirects=$LAST_REDIRECTS)"
   else
     mark_errors=$((mark_errors + 1))
-    log "  Mark unused error: $ds (http=$mark_code curl_ec=$LAST_CURL_EXIT t=${LAST_DURATION}s)"
+    log "  Mark unused error: $ds (http=$mark_code curl_ec=$LAST_CURL_EXIT t=${LAST_DURATION}s redirects=$LAST_REDIRECTS)"
+    [[ -n "$LAST_EFFECTIVE_URL" ]] && log "  effective_url: $LAST_EFFECTIVE_URL"
     [[ -n "$LAST_ERROR" ]] && log "  curl stderr: $LAST_ERROR"
     [[ -n "$LAST_BODY" ]] && log "  response body: $LAST_BODY"
     continue
@@ -373,13 +433,14 @@ for ds in "${DATASOURCES[@]}"; do
   kill_code="$LAST_HTTP_CODE"
   if [[ "$kill_code" == "200" ]]; then
     kill_ok=$((kill_ok + 1))
-    log "    Kill requested: $ds (http=$kill_code curl_ec=$LAST_CURL_EXIT t=${LAST_DURATION}s)"
+    log "    Kill requested: $ds (http=$kill_code curl_ec=$LAST_CURL_EXIT t=${LAST_DURATION}s redirects=$LAST_REDIRECTS)"
   elif [[ "$kill_code" == "404" ]]; then
     kill_not_found=$((kill_not_found + 1))
-    log "    Skip kill (not found): $ds (http=$kill_code t=${LAST_DURATION}s)"
+    log "    Skip kill (not found): $ds (http=$kill_code t=${LAST_DURATION}s redirects=$LAST_REDIRECTS)"
   else
     kill_errors=$((kill_errors + 1))
-    log "    Kill error: $ds (http=$kill_code curl_ec=$LAST_CURL_EXIT t=${LAST_DURATION}s)"
+    log "    Kill error: $ds (http=$kill_code curl_ec=$LAST_CURL_EXIT t=${LAST_DURATION}s redirects=$LAST_REDIRECTS)"
+    [[ -n "$LAST_EFFECTIVE_URL" ]] && log "    effective_url: $LAST_EFFECTIVE_URL"
     [[ -n "$LAST_ERROR" ]] && log "    curl stderr: $LAST_ERROR"
     [[ -n "$LAST_BODY" ]] && log "    response body: $LAST_BODY"
     continue
