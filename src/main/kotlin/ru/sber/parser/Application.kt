@@ -6,6 +6,8 @@ import kotlinx.coroutines.runBlocking
 import ru.sber.parser.config.AppConfig
 import ru.sber.parser.druid.DruidClient
 import ru.sber.parser.generator.MessageGenerator
+import ru.sber.parser.metastore.PostgresSchemaMetastoreRepository
+import ru.sber.parser.metastore.SchemaRegistryService
 import ru.sber.parser.parser.MessageParser
 import ru.sber.parser.parser.strategy.CombinedStrategy
 import ru.sber.parser.parser.strategy.CompcomStrategy
@@ -215,41 +217,69 @@ fun main(args: Array<String>) = runBlocking {
             var maxPerFileNs = 0L
 
             // Парсим все JSON-файлы из входной директории с детальными временными метриками по каждому файлу.
-            val messages = jsonFiles.map { file: File ->
-                // Метрика: старт полного цикла обработки конкретного файла.
-                val fileTotalStartNs = System.nanoTime()
-                // Метрика: старт чтения файла с диска.
-                val readStartNs = System.nanoTime()
-                val content = file.readText()
-                // Метрика: длительность чтения файла.
-                val readNs = System.nanoTime() - readStartNs
-                totalReadNs += readNs
-                // Метрика: старт парсинга JSON в объект BpmMessage.
-                val parseStartNs = System.nanoTime()
-                val parsed = parser.parse(content)
-                // Метрика: длительность парсинга одного JSON-файла.
-                val parseNs = System.nanoTime() - parseStartNs
-                totalParseNs += parseNs
-                // Метрика: полная длительность обработки файла (read + parse + обвязка).
-                val fileTotalNs = System.nanoTime() - fileTotalStartNs
-                minPerFileNs = kotlin.math.min(minPerFileNs, fileTotalNs)
-                maxPerFileNs = kotlin.math.max(maxPerFileNs, fileTotalNs)
+            val schemaRegistryRepo = if (config.schemaMetastore.enabled) {
+                val pg = config.schemaMetastore.postgres
+                PostgresSchemaMetastoreRepository(
+                    jdbcUrl = pg.effectiveJdbcUrl(),
+                    username = pg.user,
+                    password = pg.password,
+                    maxPoolSize = pg.maxPoolSize,
+                    connectionTimeoutMs = pg.connectionTimeoutMs
+                ).also {
+                    it.initializeSchema()
+                    logger.info("Schema metastore is enabled, PostgreSQL repository initialized")
+                }
+            } else {
+                logger.info("Schema metastore is disabled, running baseline pipeline")
+                null
+            }
+            val schemaRegistryService = schemaRegistryRepo?.let(::SchemaRegistryService)
+            val messages = try {
+                jsonFiles.map { file: File ->
+                    // Метрика: старт полного цикла обработки конкретного файла.
+                    val fileTotalStartNs = System.nanoTime()
+                    // Метрика: старт чтения файла с диска.
+                    val readStartNs = System.nanoTime()
+                    val content = file.readText()
+                    // Метрика: длительность чтения файла.
+                    val readNs = System.nanoTime() - readStartNs
+                    totalReadNs += readNs
+                    // Метрика: старт парсинга JSON в объект BpmMessage.
+                    val parseStartNs = System.nanoTime()
+                    val parsed = parser.parse(content)
+                    // Метрика: длительность парсинга одного JSON-файла.
+                    val parseNs = System.nanoTime() - parseStartNs
+                    totalParseNs += parseNs
 
-                // Структурированный TEMP_PERF-лог по каждому файлу для анализа распределения задержек.
-                logger.info(
-                    "TEMP_PERF|component=app.parse|operation=file_parse|strategy={}|file_name={}|file_size_bytes={}|read_ns={}|read_ms={}|parse_ns={}|parse_ms={}|file_total_ns={}|file_total_ms={}",
-                    strategyName,
-                    file.name,
-                    file.length(),
-                    readNs,
-                    readNs / 1_000_000.0,
-                    parseNs,
-                    parseNs / 1_000_000.0,
-                    fileTotalNs,
-                    fileTotalNs / 1_000_000.0
-                )
+                    schemaRegistryService?.registerMessageSchema(
+                        rawMessage = content,
+                        message = parsed,
+                        source = file.absolutePath
+                    )
 
-                parsed
+                    // Метрика: полная длительность обработки файла (read + parse + обвязка).
+                    val fileTotalNs = System.nanoTime() - fileTotalStartNs
+                    minPerFileNs = kotlin.math.min(minPerFileNs, fileTotalNs)
+                    maxPerFileNs = kotlin.math.max(maxPerFileNs, fileTotalNs)
+
+                    // Структурированный TEMP_PERF-лог по каждому файлу для анализа распределения задержек.
+                    logger.info(
+                        "TEMP_PERF|component=app.parse|operation=file_parse|strategy={}|file_name={}|file_size_bytes={}|read_ns={}|read_ms={}|parse_ns={}|parse_ms={}|file_total_ns={}|file_total_ms={}",
+                        strategyName,
+                        file.name,
+                        file.length(),
+                        readNs,
+                        readNs / 1_000_000.0,
+                        parseNs,
+                        parseNs / 1_000_000.0,
+                        fileTotalNs,
+                        fileTotalNs / 1_000_000.0
+                    )
+
+                    parsed
+                }
+            } finally {
+                schemaRegistryRepo?.close()
             }
 
             logger.info("Parsed ${messages.size} messages")

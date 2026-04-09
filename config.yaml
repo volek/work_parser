@@ -80,3 +80,15 @@ druid:
   ingestionAssignRetryCount: 3
   # Пауза между retry (мс)
   ingestionAssignRetryDelayMs: 2000
+
+schemaMetastore:
+  enabled: false
+  postgres:
+    host: "localhost"
+    port: 5432
+    database: "parser_metastore"
+    user: "postgres"
+    password: "postgres"
+    pool:
+      maxPoolSize: 5
+      connectionTimeoutMs: 10000
