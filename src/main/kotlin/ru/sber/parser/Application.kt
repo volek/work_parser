@@ -20,11 +20,27 @@ import java.io.File
  * Логгер для главного модуля приложения.
  */
 private val logger = LoggerFactory.getLogger("Application")
+private val supportedStrategies = listOf("hybrid", "eav", "combined", "compcom", "default")
 
 /**
  * ObjectMapper для вспомогательного анализа (размеры структур и т.п.).
  */
 private val analysisObjectMapper: ObjectMapper = jacksonObjectMapper()
+
+private fun createStrategyOrNull(
+    strategyName: String,
+    config: AppConfig
+): ParseStrategy? {
+    val warmLimit = config.parserConfig?.effectiveWarmVariablesLimit()
+    return when (strategyName.lowercase()) {
+        "hybrid" -> HybridStrategy(config.fieldClassification)
+        "eav" -> EavStrategy()
+        "combined" -> CombinedStrategy(config.fieldClassification, warmLimit)
+        "compcom" -> CompcomStrategy(config.fieldClassification, warmLimit)
+        "default" -> DefaultStrategy()
+        else -> null
+    }
+}
 
 /**
  * Точка входа в приложение BPM Message Parser.
@@ -80,23 +96,31 @@ fun main(args: Array<String>) = runBlocking {
             
             val warmLimit = config.parserConfig?.effectiveWarmVariablesLimit()
             // Выбор стратегии трансформации данных
-            val strategy: ParseStrategy = when (strategyName.lowercase()) {
-                "hybrid" -> HybridStrategy(config.fieldClassification)
-                "eav" -> EavStrategy()
-                "combined" -> CombinedStrategy(config.fieldClassification, warmLimit)
-                "compcom" -> CompcomStrategy(config.fieldClassification, warmLimit)
-                "default" -> DefaultStrategy()
-                else -> {
-                    logger.error("Unknown strategy: $strategyName. Use: hybrid, eav, combined, compcom, default")
-                    return@runBlocking
-                }
+            val strategy = createStrategyOrNull(strategyName, config)
+            if (strategy == null) {
+                logger.error(
+                    "Unknown strategy: {}. Use: {}",
+                    strategyName,
+                    supportedStrategies.joinToString(", ")
+                )
+                return@runBlocking
             }
             
+            logger.info(
+                "ANALYSIS|component=app.strategy|stage=catalog|strategies_count={}|strategies={}",
+                supportedStrategies.size,
+                supportedStrategies.joinToString(",")
+            )
             logger.info("Parsing messages with strategy: $strategyName")
             logger.info(
                 "ANALYSIS|component=app.strategy|strategy={}|stage=params|warm_variables_limit_effective={}",
                 strategyName,
                 warmLimit ?: "null"
+            )
+            logger.info(
+                "TEMP_PERF|component=app.strategy|operation=selection|strategy={}|strategies_count={}",
+                strategyName,
+                supportedStrategies.size
             )
 
             // Аналитическое логирование схемы данных и SQL-запросов для выбранной стратегии.
@@ -500,17 +524,26 @@ fun main(args: Array<String>) = runBlocking {
             val outPath = extractStringFlag(args, "--out") ?: "query-results/${strategyName.lowercase()}.txt"
             val includeSegmentSizes = args.contains("--segment-sizes")
 
-            val strategy: ParseStrategy = when (strategyName.lowercase()) {
-                "hybrid" -> HybridStrategy(config.fieldClassification)
-                "eav" -> EavStrategy()
-                "combined" -> CombinedStrategy(config.fieldClassification, warmLimit)
-                "compcom" -> CompcomStrategy(config.fieldClassification, warmLimit)
-                "default" -> DefaultStrategy()
-                else -> {
-                    logger.error("Unknown strategy: $strategyName. Use: hybrid, eav, combined, compcom, default")
-                    return@runBlocking
-                }
+            val strategy = createStrategyOrNull(strategyName, config)
+            if (strategy == null) {
+                logger.error(
+                    "Unknown strategy: {}. Use: {}",
+                    strategyName,
+                    supportedStrategies.joinToString(", ")
+                )
+                return@runBlocking
             }
+
+            logger.info(
+                "ANALYSIS|component=app.strategy|stage=catalog|strategies_count={}|strategies={}",
+                supportedStrategies.size,
+                supportedStrategies.joinToString(",")
+            )
+            logger.info(
+                "TEMP_PERF|component=app.strategy|operation=selection|strategy={}|strategies_count={}",
+                strategyName,
+                supportedStrategies.size
+            )
 
             val queryDir = File("query/${strategyName.lowercase()}")
             if (!queryDir.exists()) {

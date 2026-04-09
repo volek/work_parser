@@ -182,13 +182,15 @@ java -jar build/libs/bpm-druid-parser-1.0.0.jar query-suite <strategy>
 
 ## Стратегии парсинга
 
-| Стратегия | Описание | Таблицы |
-|-----------|----------|---------|
-| `hybrid` | Flat columns + JSON blobs | 1 |
-| `eav` | Entity-Attribute-Value | 2 |
-| `combined` | Tiered Hot/Warm/Cold с cold blob | 2 |
-| `compcom` | Compact combined без cold blob | 2 |
-| `default` | Все поля как отдельные колонки | 1 |
+
+| Стратегия  | Описание                         | Таблицы |
+| ---------- | -------------------------------- | ------- |
+| `hybrid`   | Flat columns + JSON blobs        | 1       |
+| `eav`      | Entity-Attribute-Value           | 2       |
+| `combined` | Tiered Hot/Warm/Cold с cold blob | 2       |
+| `compcom`  | Compact combined без cold blob   | 2       |
+| `default`  | Все поля как отдельные колонки   | 1       |
+
 
 Подробнее: `strategies.md`.
 
@@ -227,3 +229,4 @@ COORDINATOR_URL="http://192.168.1.27:8081" ./scripts/clean-druid-remote.sh
 - ingestion/query ошибки соединения -> проверьте `DRUID_*_URL`.
 - `JAR not found` -> выполните `./gradlew jar` и проверьте `build/libs/`.
 - ошибки SQL manifest -> `./gradlew verifyQueryManifest`.
+

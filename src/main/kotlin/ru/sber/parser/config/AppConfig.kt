@@ -193,6 +193,12 @@ internal data class DruidFileConfig(
      * Задержка между retry при ошибке назначения task (мс).
      */
     val ingestionAssignRetryDelayMs: Long? = null
+    ,
+    /**
+     * Максимальное количество одновременно ожидаемых ingestion task на datasource.
+     * 1 = полностью последовательный режим (текущее поведение).
+     */
+    val ingestionMaxInFlightTasks: Int? = null
 )
 
 /**
@@ -259,6 +265,12 @@ data class DruidConfig(
      * Задержка между retry при ошибке назначения task (мс).
      */
     val ingestionAssignRetryDelayMs: Long = 2_000
+    ,
+    /**
+     * Максимальное количество одновременно ожидаемых ingestion task на datasource.
+     * 1 = полностью последовательный режим (текущее поведение).
+     */
+    val ingestionMaxInFlightTasks: Int = 1
 ) {
     companion object {
         private val logger = LoggerFactory.getLogger(DruidConfig::class.java)
@@ -410,7 +422,10 @@ data class DruidConfig(
                     ?: 3,
                 ingestionAssignRetryDelayMs = System.getenv("DRUID_INGESTION_ASSIGN_RETRY_DELAY_MS")?.toLongOrNull()
                     ?: fileConfig?.ingestionAssignRetryDelayMs
-                    ?: 2_000
+                    ?: 2_000,
+                ingestionMaxInFlightTasks = System.getenv("DRUID_INGESTION_MAX_IN_FLIGHT_TASKS")?.toIntOrNull()
+                    ?: fileConfig?.ingestionMaxInFlightTasks
+                    ?: 1
             )
             
             logger.info("Druid configuration loaded:")
@@ -432,6 +447,7 @@ data class DruidConfig(
             logger.info("  Ingestion task poll interval ms: ${config.ingestionTaskPollIntervalMs}")
             logger.info("  Ingestion assign retry count: ${config.ingestionAssignRetryCount}")
             logger.info("  Ingestion assign retry delay ms: ${config.ingestionAssignRetryDelayMs}")
+            logger.info("  Ingestion max in-flight tasks: ${config.ingestionMaxInFlightTasks}")
             
             return config
         }
