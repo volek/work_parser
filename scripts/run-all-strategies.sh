@@ -40,6 +40,21 @@ JAVA_BIN="${JAVA_CMD:-java}"
 MESSAGE_COUNT=500
 WARM_VARIANTS=()
 SKIP_GENERATE=false
+CONFIG_FILE="${PARSER_CONFIG_PATH:-$ROOT/config.yaml}"
+
+# Параметры запуска с приоритетом:
+# 1) CLI аргументы
+# 2) RUN_ALL_ARGS из окружения
+# 3) runAllArgs из config.yaml
+if [[ $# -eq 0 && -z "${RUN_ALL_ARGS:-}" && -f "$CONFIG_FILE" ]]; then
+  cfg_run_all_args="$(grep -m 1 -E '^[[:space:]]*runAllArgs:[[:space:]]*' "$CONFIG_FILE" || true)"
+  cfg_run_all_args="$(echo "$cfg_run_all_args" | sed -E 's/^[[:space:]]*runAllArgs:[[:space:]]*//; s/^[\"\x27]//; s/[\"\x27][[:space:]]*$//')"
+  if [[ -n "$cfg_run_all_args" ]]; then
+    # shellcheck disable=SC2086
+    eval "set -- $cfg_run_all_args"
+    echo "=== Аргументы run-all из config.yaml (runAllArgs): $cfg_run_all_args ==="
+  fi
+fi
 
 usage() {
   cat <<EOF
@@ -94,7 +109,6 @@ run_jar() {
 LOGS_DIR="$ROOT/logs"
 OUT_DIR="$ROOT/query-results"
 MESSAGES_DIR="$ROOT/messages"
-CONFIG_FILE="${PARSER_CONFIG_PATH:-$ROOT/config.yaml}"
 
 needs_tls_truststore() {
   # Проверяем, есть ли вообще https:// в конфиге/ENV.
