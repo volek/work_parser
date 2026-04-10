@@ -9,6 +9,12 @@
 #   3. Значения по умолчанию в коде
 # =============================================================================
 
+# -----------------------------------------------------------------------------
+# Параметры пакетного запуска scripts/run-all-strategies.sh
+# Используются только если не переданы CLI-аргументы и не задан RUN_ALL_ARGS.
+# -----------------------------------------------------------------------------
+runAllArgs: "-m 200 -w 10,110,210 --skip-generate"
+
 druid:
   # ---------------------------------------------------------------------------
   # URL-адреса компонентов Druid
@@ -74,3 +80,15 @@ druid:
   ingestionAssignRetryCount: 3
   # Пауза между retry (мс)
   ingestionAssignRetryDelayMs: 2000
+
+schemaMetastore:
+  enabled: false
+  postgres:
+    host: "localhost"
+    port: 5432
+    database: "parser_metastore"
+    user: "postgres"
+    password: "postgres"
+    pool:
+      maxPoolSize: 5
+      connectionTimeoutMs: 10000

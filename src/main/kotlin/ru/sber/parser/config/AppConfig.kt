@@ -29,7 +29,8 @@ import java.io.File
 data class AppConfig(
     val druid: DruidConfig = DruidConfig.fromEnvironment(),
     val fieldClassification: FieldClassification = FieldClassification.default(),
-    val parserConfig: ParserConfig? = null
+    val parserConfig: ParserConfig? = null,
+    val schemaMetastore: SchemaMetastoreConfig = SchemaMetastoreConfig.fromEnvironmentWithFallback(null)
 ) {
     companion object {
         private val logger = LoggerFactory.getLogger(AppConfig::class.java)
@@ -89,7 +90,8 @@ data class AppConfig(
             return AppConfig(
                 druid = DruidConfig.fromEnvironmentWithFallback(fileConfig?.druid),
                 fieldClassification = fileConfig?.fieldClassification ?: FieldClassification.default(),
-                parserConfig = parserConfig
+                parserConfig = parserConfig,
+                schemaMetastore = SchemaMetastoreConfig.fromEnvironmentWithFallback(fileConfig?.schemaMetastore)
             )
         }
     }
@@ -101,10 +103,102 @@ data class AppConfig(
 private data class FileConfig(
     val druid: DruidFileConfig? = null,
     val fieldClassification: FieldClassification? = null,
-    val parser: ParserFileConfig? = null
+    val parser: ParserFileConfig? = null,
+    val schemaMetastore: SchemaMetastoreFileConfig? = null
 ) {
     val parserConfig: ParserConfig?
         get() = parser?.let { ParserConfig(warmVariablesLimit = it.warmVariablesLimit) }
+}
+
+internal data class SchemaMetastoreFileConfig(
+    val enabled: Boolean? = null,
+    val postgres: SchemaMetastorePostgresFileConfig? = null
+)
+
+internal data class SchemaMetastorePostgresFileConfig(
+    val jdbcUrl: String? = null,
+    val host: String? = null,
+    val port: Int? = null,
+    val database: String? = null,
+    val user: String? = null,
+    val password: String? = null,
+    val pool: SchemaMetastorePoolFileConfig? = null
+)
+
+internal data class SchemaMetastorePoolFileConfig(
+    val maxPoolSize: Int? = null,
+    val connectionTimeoutMs: Long? = null
+)
+
+data class SchemaMetastoreConfig(
+    val enabled: Boolean = false,
+    val postgres: PostgresMetastoreConfig = PostgresMetastoreConfig()
+) {
+    companion object {
+        private fun envBool(name: String): Boolean? {
+            return System.getenv(name)?.trim()?.lowercase()?.let { raw ->
+                when (raw) {
+                    "1", "true", "yes" -> true
+                    "0", "false", "no" -> false
+                    else -> null
+                }
+            }
+        }
+
+        internal fun fromEnvironmentWithFallback(fileConfig: SchemaMetastoreFileConfig?): SchemaMetastoreConfig {
+            val enabled = envBool("SCHEMA_METASTORE_ENABLED")
+                ?: fileConfig?.enabled
+                ?: false
+
+            val filePg = fileConfig?.postgres
+            val filePool = filePg?.pool
+            return SchemaMetastoreConfig(
+                enabled = enabled,
+                postgres = PostgresMetastoreConfig(
+                    jdbcUrl = System.getenv("SCHEMA_METASTORE_POSTGRES_JDBC_URL")
+                        ?: filePg?.jdbcUrl
+                        ?: PostgresMetastoreConfig().jdbcUrl,
+                    host = System.getenv("SCHEMA_METASTORE_POSTGRES_HOST")
+                        ?: filePg?.host
+                        ?: PostgresMetastoreConfig().host,
+                    port = System.getenv("SCHEMA_METASTORE_POSTGRES_PORT")?.toIntOrNull()
+                        ?: filePg?.port
+                        ?: PostgresMetastoreConfig().port,
+                    database = System.getenv("SCHEMA_METASTORE_POSTGRES_DATABASE")
+                        ?: filePg?.database
+                        ?: PostgresMetastoreConfig().database,
+                    user = System.getenv("SCHEMA_METASTORE_POSTGRES_USER")
+                        ?: filePg?.user
+                        ?: PostgresMetastoreConfig().user,
+                    password = System.getenv("SCHEMA_METASTORE_POSTGRES_PASSWORD")
+                        ?: filePg?.password
+                        ?: PostgresMetastoreConfig().password,
+                    maxPoolSize = System.getenv("SCHEMA_METASTORE_POSTGRES_POOL_MAX_SIZE")?.toIntOrNull()
+                        ?: filePool?.maxPoolSize
+                        ?: PostgresMetastoreConfig().maxPoolSize,
+                    connectionTimeoutMs = System.getenv("SCHEMA_METASTORE_POSTGRES_POOL_CONNECTION_TIMEOUT_MS")?.toLongOrNull()
+                        ?: filePool?.connectionTimeoutMs
+                        ?: PostgresMetastoreConfig().connectionTimeoutMs
+                )
+            )
+        }
+    }
+}
+
+data class PostgresMetastoreConfig(
+    val jdbcUrl: String? = null,
+    val host: String = "localhost",
+    val port: Int = 5432,
+    val database: String = "parser_metastore",
+    val user: String = "postgres",
+    val password: String = "postgres",
+    val maxPoolSize: Int = 5,
+    val connectionTimeoutMs: Long = 10_000
+) {
+    fun effectiveJdbcUrl(): String {
+        val raw = jdbcUrl?.trim().orEmpty()
+        return if (raw.isNotBlank()) raw else "jdbc:postgresql://$host:$port/$database"
+    }
 }
 
 /**
@@ -193,6 +287,12 @@ internal data class DruidFileConfig(
      * Задержка между retry при ошибке назначения task (мс).
      */
     val ingestionAssignRetryDelayMs: Long? = null
+    ,
+    /**
+     * Максимальное количество одновременно ожидаемых ingestion task на datasource.
+     * 1 = полностью последовательный режим (текущее поведение).
+     */
+    val ingestionMaxInFlightTasks: Int? = null
 )
 
 /**
@@ -259,6 +359,12 @@ data class DruidConfig(
      * Задержка между retry при ошибке назначения task (мс).
      */
     val ingestionAssignRetryDelayMs: Long = 2_000
+    ,
+    /**
+     * Максимальное количество одновременно ожидаемых ingestion task на datasource.
+     * 1 = полностью последовательный режим (текущее поведение).
+     */
+    val ingestionMaxInFlightTasks: Int = 1
 ) {
     companion object {
         private val logger = LoggerFactory.getLogger(DruidConfig::class.java)
@@ -410,7 +516,10 @@ data class DruidConfig(
                     ?: 3,
                 ingestionAssignRetryDelayMs = System.getenv("DRUID_INGESTION_ASSIGN_RETRY_DELAY_MS")?.toLongOrNull()
                     ?: fileConfig?.ingestionAssignRetryDelayMs
-                    ?: 2_000
+                    ?: 2_000,
+                ingestionMaxInFlightTasks = System.getenv("DRUID_INGESTION_MAX_IN_FLIGHT_TASKS")?.toIntOrNull()
+                    ?: fileConfig?.ingestionMaxInFlightTasks
+                    ?: 1
             )
             
             logger.info("Druid configuration loaded:")
@@ -432,6 +541,7 @@ data class DruidConfig(
             logger.info("  Ingestion task poll interval ms: ${config.ingestionTaskPollIntervalMs}")
             logger.info("  Ingestion assign retry count: ${config.ingestionAssignRetryCount}")
             logger.info("  Ingestion assign retry delay ms: ${config.ingestionAssignRetryDelayMs}")
+            logger.info("  Ingestion max in-flight tasks: ${config.ingestionMaxInFlightTasks}")
             
             return config
         }

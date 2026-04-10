@@ -363,28 +363,26 @@ class DruidClient(private val config: DruidConfig) : Closeable {
         var minBatchTotalNs = Long.MAX_VALUE
         // Метрика: максимальное время отправки одного батча.
         var maxBatchTotalNs = 0L
-        batches.forEachIndexed { index, batch ->
-            logger.debug("Processing batch ${index + 1}/${batches.size} with ${batch.size} records")
-            // Метрика: время отправки конкретного батча в Overlord с retry
-            // при временной невозможности назначить задачу в кластере.
-            val submissionMetrics = submitBatchWithAssignRetry(
-                dataSource = dataSource,
-                batch = batch,
-                batchIndex = index + 1,
-                batchCount = batches.size
-            )
-            // Агрегируем временные метрики по всем батчам для итогового анализа.
+        val maxInFlightTasks = config.ingestionMaxInFlightTasks.coerceAtLeast(1)
+        val inFlightBatches = mutableListOf<InFlightBatch>()
+
+        fun aggregateSubmissionMetrics(
+            batchIndex: Int,
+            batch: List<Map<String, Any?>>,
+            submissionMetrics: IngestionTaskSubmissionMetrics
+        ) {
+            // Агрегируем временные метрики по всем submit (включая retry) для итогового анализа.
             sumSpecBuildNs += submissionMetrics.specBuildNs
             sumHttpRoundTripNs += submissionMetrics.httpRoundTripNs
             sumResponseDecodeNs += submissionMetrics.responseDecodeNs
             minBatchTotalNs = kotlin.math.min(minBatchTotalNs, submissionMetrics.totalNs)
             maxBatchTotalNs = kotlin.math.max(maxBatchTotalNs, submissionMetrics.totalNs)
 
-            // Структурированный TEMP_PERF-лог по каждому батчу ingestion.
+            // Структурированный TEMP_PERF-лог по каждому submit ingestion batch.
             logger.info(
                 "TEMP_PERF|component=druid.ingest|operation=batch_submit|data_source={}|batch_index={}|batch_count={}|batch_records={}|task_id={}|spec_build_ns={}|spec_build_ms={}|http_round_trip_ns={}|http_round_trip_ms={}|response_decode_ns={}|response_decode_ms={}|batch_total_ns={}|batch_total_ms={}",
                 dataSource,
-                index + 1,
+                batchIndex,
                 batches.size,
                 batch.size,
                 submissionMetrics.taskId ?: "unknown",
@@ -396,6 +394,50 @@ class DruidClient(private val config: DruidConfig) : Closeable {
                 submissionMetrics.responseDecodeNs / 1_000_000.0,
                 submissionMetrics.totalNs,
                 submissionMetrics.totalNs / 1_000_000.0
+            )
+        }
+
+        batches.forEachIndexed { index, batch ->
+            val batchIndex = index + 1
+            logger.debug("Processing batch {}/{} with {} records", batchIndex, batches.size, batch.size)
+            val submissionMetrics = submitIngestionTask(dataSource, batch)
+            aggregateSubmissionMetrics(batchIndex, batch, submissionMetrics)
+
+            if (config.awaitIngestionTasks) {
+                val taskId = submissionMetrics.taskId?.takeIf { it.isNotBlank() }
+                    ?: throw DruidException(
+                        "Ingestion submit did not return task id for dataSource '$dataSource' (batch=$batchIndex/${batches.size})"
+                    )
+                inFlightBatches.add(
+                    InFlightBatch(
+                        batchIndex = batchIndex,
+                        batchCount = batches.size,
+                        records = batch,
+                        taskId = taskId,
+                        attempt = 1
+                    )
+                )
+
+                if (inFlightBatches.size >= maxInFlightTasks) {
+                    awaitIngestionTasksCompletion(
+                        dataSource = dataSource,
+                        inFlightBatches = inFlightBatches,
+                        onResubmitted = { retryBatchIndex, retryBatch, retryMetrics ->
+                            aggregateSubmissionMetrics(retryBatchIndex, retryBatch, retryMetrics)
+                        }
+                    )
+                    inFlightBatches.clear()
+                }
+            }
+        }
+
+        if (config.awaitIngestionTasks && inFlightBatches.isNotEmpty()) {
+            awaitIngestionTasksCompletion(
+                dataSource = dataSource,
+                inFlightBatches = inFlightBatches,
+                onResubmitted = { retryBatchIndex, retryBatch, retryMetrics ->
+                    aggregateSubmissionMetrics(retryBatchIndex, retryBatch, retryMetrics)
+                }
             )
         }
         
@@ -437,58 +479,26 @@ class DruidClient(private val config: DruidConfig) : Closeable {
         logger.info("Successfully submitted ${batches.size} ingestion batches for dataSource: $dataSource")
     }
 
-    private suspend fun submitBatchWithAssignRetry(
+    private suspend fun awaitIngestionTasksCompletion(
         dataSource: String,
-        batch: List<Map<String, Any?>>,
-        batchIndex: Int,
-        batchCount: Int
-    ): IngestionTaskSubmissionMetrics {
+        inFlightBatches: MutableList<InFlightBatch>,
+        onResubmitted: (batchIndex: Int, batch: List<Map<String, Any?>>, metrics: IngestionTaskSubmissionMetrics) -> Unit
+    ) {
+        if (inFlightBatches.isEmpty()) return
+
         val retryCount = config.ingestionAssignRetryCount.coerceAtLeast(0)
         val retryDelayMs = config.ingestionAssignRetryDelayMs.coerceAtLeast(100L)
-        var attempt = 0
-
-        while (true) {
-            attempt += 1
-            val submissionMetrics = submitIngestionTask(dataSource, batch)
-            val taskId = submissionMetrics.taskId
-
-            if (config.awaitIngestionTasks && !taskId.isNullOrBlank()) {
-                try {
-                    awaitIngestionTasksCompletion(dataSource, listOf(taskId))
-                } catch (e: DruidException) {
-                    val message = e.message.orEmpty()
-                    val assignFailed = message.contains("Failed to assign this task", ignoreCase = true)
-                    val canRetry = assignFailed && attempt <= retryCount
-                    if (canRetry) {
-                        logger.warn(
-                            "Retrying ingestion batch due to task assignment failure: dataSource={}, batch={}/{}, attempt={}/{}, delay_ms={}",
-                            dataSource,
-                            batchIndex,
-                            batchCount,
-                            attempt,
-                            retryCount + 1,
-                            retryDelayMs
-                        )
-                        delay(retryDelayMs)
-                        continue
-                    }
-                    throw e
-                }
-            }
-            return submissionMetrics
-        }
-    }
-
-    private suspend fun awaitIngestionTasksCompletion(dataSource: String, taskIds: List<String>) {
         val timeoutMs = config.ingestionTaskTimeoutMs.coerceAtLeast(1_000L)
         val pollMs = config.ingestionTaskPollIntervalMs.coerceAtLeast(200L)
         val startedNs = System.nanoTime()
-        val pending = taskIds.toMutableSet()
+        val pending = linkedMapOf<String, InFlightBatch>()
+        inFlightBatches.forEach { pending[it.taskId] = it }
+        val totalTasks = pending.size
 
         logger.info(
             "Awaiting ingestion tasks completion: dataSource={}, tasks={}, timeout_ms={}, poll_ms={}",
             dataSource,
-            taskIds.size,
+            totalTasks,
             timeoutMs,
             pollMs
         )
@@ -497,30 +507,63 @@ class DruidClient(private val config: DruidConfig) : Closeable {
             val elapsedMs = (System.nanoTime() - startedNs) / 1_000_000
             if (elapsedMs > timeoutMs) {
                 throw DruidException(
-                    "Ingestion tasks timeout for dataSource '$dataSource': pending=${pending.size}/${taskIds.size}"
+                    "Ingestion tasks timeout for dataSource '$dataSource': pending=${pending.size}/$totalTasks"
                 )
             }
 
             val completedInIteration = mutableListOf<String>()
-            for (taskId in pending) {
+            val retriedInIteration = mutableListOf<Pair<String, InFlightBatch>>()
+            for ((taskId, inFlightBatch) in pending.toMap()) {
                 val status = getTaskStatus(taskId)
                 when {
                     status.isSuccess() -> completedInIteration.add(taskId)
                     status.isFailed() -> {
-                        throw DruidException(
-                            "Ingestion task failed for dataSource '$dataSource': taskId=$taskId, error=${status.errorMsg ?: "unknown"}"
-                        )
+                        val error = status.errorMsg.orEmpty()
+                        val assignFailed = error.contains("Failed to assign this task", ignoreCase = true)
+                        val canRetry = assignFailed && inFlightBatch.attempt <= retryCount
+                        if (canRetry) {
+                            logger.warn(
+                                "Retrying ingestion batch due to task assignment failure: dataSource={}, batch={}/{}, attempt={}/{}, delay_ms={}",
+                                dataSource,
+                                inFlightBatch.batchIndex,
+                                inFlightBatch.batchCount,
+                                inFlightBatch.attempt,
+                                retryCount + 1,
+                                retryDelayMs
+                            )
+                            delay(retryDelayMs)
+                            val retryMetrics = submitIngestionTask(dataSource, inFlightBatch.records)
+                            onResubmitted(inFlightBatch.batchIndex, inFlightBatch.records, retryMetrics)
+                            val retryTaskId = retryMetrics.taskId?.takeIf { it.isNotBlank() }
+                                ?: throw DruidException(
+                                    "Retry submit did not return task id for dataSource '$dataSource' (batch=${inFlightBatch.batchIndex}/${inFlightBatch.batchCount})"
+                                )
+                            retriedInIteration.add(
+                                taskId to inFlightBatch.copy(
+                                    taskId = retryTaskId,
+                                    attempt = inFlightBatch.attempt + 1
+                                )
+                            )
+                        } else {
+                            throw DruidException(
+                                "Ingestion task failed for dataSource '$dataSource': taskId=$taskId, error=${status.errorMsg ?: "unknown"}"
+                            )
+                        }
                     }
                 }
             }
             completedInIteration.forEach { pending.remove(it) }
+            retriedInIteration.forEach { (oldTaskId, retriedBatch) ->
+                pending.remove(oldTaskId)
+                pending[retriedBatch.taskId] = retriedBatch
+            }
 
             logger.info(
                 "TEMP_PERF|component=druid.ingest|operation=await_tasks_progress|data_source={}|tasks_total={}|tasks_pending={}|tasks_completed={}|tasks_failed={}|elapsed_ms={}",
                 dataSource,
-                taskIds.size,
+                totalTasks,
                 pending.size,
-                taskIds.size - pending.size,
+                totalTasks - pending.size,
                 0,
                 elapsedMs
             )
@@ -534,7 +577,7 @@ class DruidClient(private val config: DruidConfig) : Closeable {
         logger.info(
             "TEMP_PERF|component=druid.ingest|operation=await_tasks_done|data_source={}|tasks_total={}|elapsed_ms={}",
             dataSource,
-            taskIds.size,
+            totalTasks,
             totalMs
         )
     }
@@ -1104,6 +1147,14 @@ class DruidClient(private val config: DruidConfig) : Closeable {
         val httpRoundTripNs: Long,
         val responseDecodeNs: Long,
         val totalNs: Long
+    )
+
+    private data class InFlightBatch(
+        val batchIndex: Int,
+        val batchCount: Int,
+        val records: List<Map<String, Any?>>,
+        val taskId: String,
+        val attempt: Int
     )
 
     private data class EndpointPool(

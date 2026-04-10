@@ -60,6 +60,52 @@ java -jar build/libs/bpm-druid-parser-1.0.0.jar query query/hybrid/q01_select_al
 
 Инструкция по архиву: `distribution/DEPLOYMENT.md`.
 
+## Запуск `run-all-strategies.sh` независимо от консоли (systemd)
+
+Для batch-сценария `scripts/run-all-strategies.sh` добавлен unit-файл:
+
+- `scripts/work-parser-run-all.service`
+- `scripts/work-parser-run-all@.service` (template unit для разовых запусков с аргументами)
+
+Применение на Linux host:
+
+```bash
+sudo cp /home/oleg/parser/work_parser/scripts/work-parser-run-all.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl start work-parser-run-all.service
+```
+
+Проверка статуса и логов:
+
+```bash
+systemctl status work-parser-run-all.service
+journalctl -u work-parser-run-all.service -f
+```
+
+Важно:
+
+- Этот unit запускает batch-пайплайн один раз (`Type=oneshot`) и не зависит от текущей консоли.
+- Параметры можно передавать через переменную `RUN_ALL_ARGS` в `.env`:
+
+```bash
+RUN_ALL_ARGS="-m 200 -w 10,110,210 --skip-generate"
+```
+
+После изменения `.env` перезапустите сервис:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl restart work-parser-run-all.service
+```
+
+Разовый запуск с аргументами через template unit:
+
+```bash
+sudo cp /home/oleg/parser/work_parser/scripts/work-parser-run-all@.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl start "work-parser-run-all@-m\x20100\x20--skip-generate.service"
+```
+
 ## Конфигурация
 
 Приоритет источников:
@@ -136,13 +182,15 @@ java -jar build/libs/bpm-druid-parser-1.0.0.jar query-suite <strategy>
 
 ## Стратегии парсинга
 
-| Стратегия | Описание | Таблицы |
-|-----------|----------|---------|
-| `hybrid` | Flat columns + JSON blobs | 1 |
-| `eav` | Entity-Attribute-Value | 2 |
-| `combined` | Tiered Hot/Warm/Cold с cold blob | 2 |
-| `compcom` | Compact combined без cold blob | 2 |
-| `default` | Все поля как отдельные колонки | 1 |
+
+| Стратегия  | Описание                         | Таблицы |
+| ---------- | -------------------------------- | ------- |
+| `hybrid`   | Flat columns + JSON blobs        | 1       |
+| `eav`      | Entity-Attribute-Value           | 2       |
+| `combined` | Tiered Hot/Warm/Cold с cold blob | 2       |
+| `compcom`  | Compact combined без cold blob   | 2       |
+| `default`  | Все поля как отдельные колонки   | 1       |
+
 
 Подробнее: `strategies.md`.
 
@@ -181,3 +229,4 @@ COORDINATOR_URL="http://192.168.1.27:8081" ./scripts/clean-druid-remote.sh
 - ingestion/query ошибки соединения -> проверьте `DRUID_*_URL`.
 - `JAR not found` -> выполните `./gradlew jar` и проверьте `build/libs/`.
 - ошибки SQL manifest -> `./gradlew verifyQueryManifest`.
+
