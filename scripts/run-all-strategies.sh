@@ -9,8 +9,11 @@
 # Количество сообщений (по умолчанию 500):
 #   ./scripts/run-all-strategies.sh -m 100
 #
-# Варианты warm-лимита для combined/compcom (10..1010, шаг 100), несколько прогонов:
+# Варианты warm-лимита для default (10..1010, шаг 100), несколько прогонов:
 #   ./scripts/run-all-strategies.sh -w 10,110,210
+#
+# Глубина вложенности массивов для parser.arrayMaxDepth:
+#   ./scripts/run-all-strategies.sh -a 3
 #
 # Пропуск генерации messages (использовать уже существующие файлы в messages/):
 #   ./scripts/run-all-strategies.sh --skip-generate
@@ -39,29 +42,17 @@ JAR="${PARSER_JAR:-$DEFAULT_JAR}"
 JAVA_BIN="${JAVA_CMD:-java}"
 MESSAGE_COUNT=500
 WARM_VARIANTS=()
+ARRAY_MAX_DEPTH=""
 SKIP_GENERATE=false
 CONFIG_FILE="${PARSER_CONFIG_PATH:-$ROOT/config.yaml}"
-
-# Параметры запуска с приоритетом:
-# 1) CLI аргументы
-# 2) RUN_ALL_ARGS из окружения
-# 3) runAllArgs из config.yaml
-if [[ $# -eq 0 && -z "${RUN_ALL_ARGS:-}" && -f "$CONFIG_FILE" ]]; then
-  cfg_run_all_args="$(grep -m 1 -E '^[[:space:]]*runAllArgs:[[:space:]]*' "$CONFIG_FILE" || true)"
-  cfg_run_all_args="$(echo "$cfg_run_all_args" | sed -E 's/^[[:space:]]*runAllArgs:[[:space:]]*//; s/^[\"\x27]//; s/[\"\x27][[:space:]]*$//')"
-  if [[ -n "$cfg_run_all_args" ]]; then
-    # shellcheck disable=SC2086
-    eval "set -- $cfg_run_all_args"
-    echo "=== Аргументы run-all из config.yaml (runAllArgs): $cfg_run_all_args ==="
-  fi
-fi
 
 usage() {
   cat <<EOF
 Использование: $0 [опции]
 
   -m, --message-count N   Число генерируемых сообщений (по умолчанию 500)
-  -w, --warm-variants L   Список лимитов warm через запятую для combined/compcom (напр. 10,110,210)
+  -w, --warm-variants L   Список лимитов warm через запятую для default (напр. 10,110,210)
+  -a, --array-max-depth N Глубина вложенности массивов (PARSER_ARRAY_MAX_DEPTH)
       --skip-generate      Пропустить этап generate messages
   -h, --help              Эта справка
 
@@ -77,6 +68,14 @@ while [[ $# -gt 0 ]]; do
       ;;
     -w|--warm-variants)
       IFS=',' read -r -a WARM_VARIANTS <<< "${2:?}"
+      shift 2
+      ;;
+    -a|--array-max-depth)
+      ARRAY_MAX_DEPTH="${2:?}"
+      if ! [[ "$ARRAY_MAX_DEPTH" =~ ^[0-9]+$ ]] || [[ "$ARRAY_MAX_DEPTH" -lt 1 ]]; then
+        echo "Некорректное значение --array-max-depth: $ARRAY_MAX_DEPTH (ожидается целое число >= 1)" >&2
+        exit 1
+      fi
       shift 2
       ;;
     --skip-generate)
@@ -259,7 +258,7 @@ else
   fi
 fi
 
-STRATEGIES=(combined compcom eav hybrid default)
+STRATEGIES=(default)
 declare -A INGEST_OK
 
 echo "=== Парсинг и загрузка в Druid по стратегиям ==="
@@ -267,25 +266,39 @@ set +e
 for s in "${STRATEGIES[@]}"; do
   INGEST_OK["$s"]=1
   variants=('')
-  case "$s" in
-    combined|compcom)
-      if ((${#WARM_VARIANTS[@]} > 0)); then
-        variants=("${WARM_VARIANTS[@]}")
-      fi
-      ;;
-  esac
+  if ((${#WARM_VARIANTS[@]} > 0)); then
+    variants=("${WARM_VARIANTS[@]}")
+  fi
 
   for warm in "${variants[@]}"; do
     suffix=""
     if [[ -n "${warm:-}" ]]; then
       suffix="_warm${warm}"
     fi
+    if [[ -n "${ARRAY_MAX_DEPTH:-}" ]]; then
+      suffix="${suffix}_arrDepth${ARRAY_MAX_DEPTH}"
+    fi
     logf="$LOGS_DIR/${s}_ingest${suffix}.log"
+
+    if [[ -n "${ARRAY_MAX_DEPTH:-}" ]]; then
+      export PARSER_ARRAY_MAX_DEPTH="$ARRAY_MAX_DEPTH"
+    else
+      unset PARSER_ARRAY_MAX_DEPTH || true
+    fi
+
     if [[ -n "${warm:-}" ]]; then
-      echo "=== parse + ingest: $s (warm limit $warm) ==="
+      if [[ -n "${ARRAY_MAX_DEPTH:-}" ]]; then
+        echo "=== parse + ingest: $s (warm limit $warm, array max depth $ARRAY_MAX_DEPTH) ==="
+      else
+        echo "=== parse + ingest: $s (warm limit $warm) ==="
+      fi
       export PARSER_WARM_VARIABLES_LIMIT="$warm"
     else
-      echo "=== parse + ingest: $s ==="
+      if [[ -n "${ARRAY_MAX_DEPTH:-}" ]]; then
+        echo "=== parse + ingest: $s (array max depth $ARRAY_MAX_DEPTH) ==="
+      else
+        echo "=== parse + ingest: $s ==="
+      fi
       unset PARSER_WARM_VARIABLES_LIMIT || true
     fi
     run_jar parse "$s" messages --ingest 2>&1 | tee "$logf"
@@ -297,6 +310,7 @@ for s in "${STRATEGIES[@]}"; do
   done
 done
 unset PARSER_WARM_VARIABLES_LIMIT || true
+unset PARSER_ARRAY_MAX_DEPTH || true
 set -e
 
 echo "=== Выполнение всех SQL по стратегиям → $OUT_DIR ==="

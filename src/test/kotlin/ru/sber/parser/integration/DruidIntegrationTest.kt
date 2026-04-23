@@ -4,11 +4,8 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.condition.EnabledIf
-import ru.sber.parser.config.FieldClassification
 import ru.sber.parser.model.BpmMessage
-import ru.sber.parser.parser.strategy.CombinedStrategy
-import ru.sber.parser.parser.strategy.EavStrategy
-import ru.sber.parser.parser.strategy.HybridStrategy
+import ru.sber.parser.parser.strategy.DefaultStrategy
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -49,95 +46,41 @@ class DruidIntegrationTest : IntegrationTestBase() {
     
     @Test
     @Order(3)
-    fun `should ingest hybrid strategy records`() = runBlocking {
-        val strategy = HybridStrategy()
-        val testDataSource = "${testDataSourcePrefix}hybrid_${UUID.randomUUID().toString().take(8)}"
+    fun `should ingest unified default strategy records`() = runBlocking {
+        val strategy = DefaultStrategy()
+        val testDataSourceMain = "${testDataSourcePrefix}default_main_${UUID.randomUUID().toString().take(8)}"
+        val testDataSourceArray = "${testDataSourcePrefix}default_arr_${UUID.randomUUID().toString().take(8)}"
         
-        val message = createTestMessage("hybrid-test-1")
-        val records = strategy.transform(message).map { record ->
-            record.toMutableMap().apply {
-                remove("_datasource")
+        val message = createTestMessage(
+            "default-test-1",
+            mapOf(
+                "staticData" to mapOf("caseId" to "case-1"),
+                "epkData" to mapOf(
+                    "epkEntity" to mapOf(
+                        "names" to listOf(mapOf("surname" to "Ivanov"))
+                    )
+                )
+            )
+        )
+        val grouped = strategy.transformBatch(listOf(message))
+        
+        grouped.forEach { (ds, records) ->
+            val cleanRecords = records.map { r -> r.toMutableMap().apply { remove("_datasource") } }
+            val targetDs = when (ds) {
+                strategy.dataSourceName -> testDataSourceMain
+                strategy.additionalDataSources.single() -> testDataSourceArray
+                else -> ds
             }
-        }
-        
-        assertDoesNotThrow {
-            runBlocking {
-                druidClient.ingest(testDataSource, records)
+            assertDoesNotThrow {
+                runBlocking {
+                    druidClient.ingest(targetDs, cleanRecords)
+                }
             }
         }
     }
     
     @Test
     @Order(4)
-    fun `should ingest EAV strategy records`() = runBlocking {
-        val strategy = EavStrategy()
-        val testDataSourceEvents = "${testDataSourcePrefix}eav_events_${UUID.randomUUID().toString().take(8)}"
-        val testDataSourceVars = "${testDataSourcePrefix}eav_vars_${UUID.randomUUID().toString().take(8)}"
-        
-        val message = createTestMessage("eav-test-1", mapOf(
-            "epkId" to "123",
-            "fio" to "Test FIO"
-        ))
-        
-        val grouped = strategy.transformBatch(listOf(message))
-        
-        grouped.forEach { (ds, records) ->
-            val cleanRecords = records.map { r ->
-                r.toMutableMap().apply { remove("_datasource") }
-            }
-            val targetDs = when (ds) {
-                "process_events" -> testDataSourceEvents
-                "process_variables" -> testDataSourceVars
-                else -> ds
-            }
-            
-            assertDoesNotThrow {
-                runBlocking {
-                    druidClient.ingest(targetDs, cleanRecords)
-                }
-            }
-        }
-    }
-    
-    @Test
-    @Order(5)
-    fun `should ingest combined strategy records`() = runBlocking {
-        val strategy = CombinedStrategy(FieldClassification.default())
-        val testDataSourceMain = "${testDataSourcePrefix}combined_main_${UUID.randomUUID().toString().take(8)}"
-        val testDataSourceIndexed = "${testDataSourcePrefix}combined_idx_${UUID.randomUUID().toString().take(8)}"
-        
-        val message = createTestMessage("combined-test-1", mapOf(
-            "epkId" to "456",
-            "fio" to "Combined FIO",
-            "epkData" to mapOf(
-                "epkEntity" to mapOf(
-                    "ucpId" to "UCP789"
-                )
-            )
-        ))
-        
-        val grouped = strategy.transformBatch(listOf(message))
-        
-        grouped.forEach { (ds, records) ->
-            val cleanRecords = records.map { r ->
-                r.toMutableMap().apply { remove("_datasource") }
-            }
-            val targetDs = when (ds) {
-                "process_main" -> testDataSourceMain
-                "process_variables_indexed" -> testDataSourceIndexed
-                else -> ds
-            }
-            
-            assertDoesNotThrow {
-                runBlocking {
-                    druidClient.ingest(targetDs, cleanRecords)
-                }
-            }
-        }
-    }
-    
-    @Test
-    @Order(6)
     fun `should execute SQL query`() = runBlocking {
         val result = druidClient.query("SELECT COUNT(*) as cnt FROM INFORMATION_SCHEMA.TABLES")
         
@@ -146,20 +89,18 @@ class DruidIntegrationTest : IntegrationTestBase() {
     }
     
     @Test
-    @Order(7)
+    @Order(5)
     fun `should handle batch ingestion`() = runBlocking {
-        val strategy = HybridStrategy()
+        val strategy = DefaultStrategy()
         val testDataSource = "${testDataSourcePrefix}batch_${UUID.randomUUID().toString().take(8)}"
         
         val messages = (1..10).map { i ->
             createTestMessage("batch-test-$i")
         }
         
-        val allRecords = messages.flatMap { msg ->
-            strategy.transform(msg).map { r ->
-                r.toMutableMap().apply { remove("_datasource") }
-            }
-        }
+        val allRecords = strategy.transformBatch(messages)[strategy.dataSourceName]
+            .orEmpty()
+            .map { it.toMutableMap().apply { remove("_datasource") } }
         
         assertDoesNotThrow {
             runBlocking {
@@ -178,10 +119,32 @@ class DruidIntegrationTest : IntegrationTestBase() {
     ): BpmMessage {
         return BpmMessage(
             id = id,
+            parentInstanceId = null,
+            rootInstanceId = id,
+            processId = "process-$id",
+            processDefinitionId = null,
+            resourceName = null,
+            rootProcessId = null,
             processName = "IntegrationTestProcess",
             startDate = OffsetDateTime.now(),
+            endDate = null,
             state = 1,
+            businessKey = null,
+            version = 1,
+            bamProjectId = null,
+            extIds = null,
+            error = null,
+            moduleId = null,
+            engineVersion = null,
+            enginePodName = null,
+            retryCount = 0,
+            ownerRole = null,
+            idempotencyKey = null,
+            operation = null,
+            nodeInstances = emptyList(),
             variables = variables
+            ,
+            contextSize = 1
         )
     }
 }

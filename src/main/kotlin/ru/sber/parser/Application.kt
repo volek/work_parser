@@ -9,11 +9,7 @@ import ru.sber.parser.generator.MessageGenerator
 import ru.sber.parser.metastore.PostgresSchemaMetastoreRepository
 import ru.sber.parser.metastore.SchemaRegistryService
 import ru.sber.parser.parser.MessageParser
-import ru.sber.parser.parser.strategy.CombinedStrategy
-import ru.sber.parser.parser.strategy.CompcomStrategy
 import ru.sber.parser.parser.strategy.DefaultStrategy
-import ru.sber.parser.parser.strategy.EavStrategy
-import ru.sber.parser.parser.strategy.HybridStrategy
 import ru.sber.parser.parser.strategy.ParseStrategy
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -22,7 +18,7 @@ import java.io.File
  * Логгер для главного модуля приложения.
  */
 private val logger = LoggerFactory.getLogger("Application")
-private val supportedStrategies = listOf("hybrid", "eav", "combined", "compcom", "default")
+private val supportedStrategies = listOf("default", "compcom")
 
 /**
  * ObjectMapper для вспомогательного анализа (размеры структур и т.п.).
@@ -33,13 +29,24 @@ private fun createStrategyOrNull(
     strategyName: String,
     config: AppConfig
 ): ParseStrategy? {
-    val warmLimit = config.parserConfig?.effectiveWarmVariablesLimit()
+    val parserConfig = config.parserConfig
+    val warmLimit = parserConfig?.effectiveWarmVariablesLimit()
     return when (strategyName.lowercase()) {
-        "hybrid" -> HybridStrategy(config.fieldClassification)
-        "eav" -> EavStrategy()
-        "combined" -> CombinedStrategy(config.fieldClassification, warmLimit)
-        "compcom" -> CompcomStrategy(config.fieldClassification, warmLimit)
-        "default" -> DefaultStrategy()
+        "compcom" -> {
+            logger.warn("Strategy 'compcom' is deprecated. Using unified 'default' strategy.")
+            DefaultStrategy(
+                fieldClassification = config.fieldClassification,
+                maxWarmVariables = warmLimit,
+                arrayMaxDepth = parserConfig?.effectiveArrayMaxDepth(),
+                arrayObjectJsonBlobEnabled = parserConfig?.arrayObjectJsonBlobEnabled ?: false
+            )
+        }
+        "default" -> DefaultStrategy(
+            fieldClassification = config.fieldClassification,
+            maxWarmVariables = warmLimit,
+            arrayMaxDepth = parserConfig?.effectiveArrayMaxDepth(),
+            arrayObjectJsonBlobEnabled = parserConfig?.arrayObjectJsonBlobEnabled ?: false
+        )
         else -> null
     }
 }
@@ -90,8 +97,8 @@ fun main(args: Array<String>) = runBlocking {
         // Парсинг сообщений с выбранной стратегией
         // ==========================================
         "parse" -> {
-            // Название стратегии: hybrid, eav, combined, compcom или default
-            val strategyName: String = args.getOrElse(1) { "hybrid" }
+            // Название стратегии: default (compcom доступен как алиас)
+            val strategyName: String = args.getOrElse(1) { "default" }
             // Директория с входными JSON-файлами (пропускаем флаги, начинающиеся с --)
             val positionalArgs = args.filter { !it.startsWith("--") }
             val inputDir = File(positionalArgs.getOrElse(2) { "messages" })
@@ -132,32 +139,12 @@ fun main(args: Array<String>) = runBlocking {
                 val primarySchema: Map<String, String>?
                 val secondarySchemas: Map<String, Map<String, String>>
                 when (strategy) {
-                    is HybridStrategy -> {
-                        primarySchema = ru.sber.parser.parser.strategy.HybridStrategy.SCHEMA
-                        secondarySchemas = emptyMap()
-                    }
-                    is EavStrategy -> {
-                        primarySchema = ru.sber.parser.parser.strategy.EavStrategy.EVENT_SCHEMA
-                        secondarySchemas = mapOf(
-                            "variables" to ru.sber.parser.parser.strategy.EavStrategy.VARIABLE_SCHEMA
-                        )
-                    }
-                    is CombinedStrategy -> {
-                        primarySchema = ru.sber.parser.parser.strategy.CombinedStrategy.MAIN_SCHEMA
-                        secondarySchemas = mapOf(
-                            "variables_indexed" to ru.sber.parser.parser.strategy.CombinedStrategy.VARIABLE_INDEXED_SCHEMA
-                        )
-                    }
-                    is CompcomStrategy -> {
-                        primarySchema = ru.sber.parser.parser.strategy.CompcomStrategy.MAIN_SCHEMA
-                        secondarySchemas = mapOf(
-                            "variables_indexed" to ru.sber.parser.parser.strategy.CompcomStrategy.VARIABLE_INDEXED_SCHEMA
-                        )
-                    }
                     is DefaultStrategy -> {
                         // Для DefaultStrategy схема динамическая, но у модели есть базовый набор полей.
                         primarySchema = null
-                        secondarySchemas = emptyMap()
+                        secondarySchemas = mapOf(
+                            "variables_array_indexed" to ru.sber.parser.parser.strategy.DefaultStrategy.ARRAY_VARIABLE_SCHEMA
+                        )
                     }
                     else -> {
                         primarySchema = null
@@ -721,7 +708,7 @@ fun main(args: Array<String>) = runBlocking {
                 
                 Usage:
                   generate [output-dir] [count]   Generate test messages (default: messages, 500)
-                  parse <strategy> [input-dir]    Parse messages (hybrid|eav|combined|compcom|default)
+                  parse <strategy> [input-dir]    Parse messages (default; compcom alias)
                   parse <strategy> --ingest       Parse and ingest to Druid
                   query <query-file.sql>          Execute SQL query on Druid
                   query-suite <strategy>          Run all SQL files in query/<strategy> with metrics
@@ -732,11 +719,8 @@ fun main(args: Array<String>) = runBlocking {
                   java -jar build/libs/bpm-druid-parser-1.0.0.jar generate messages 500
                 
                 Strategies:
-                  hybrid   - Flat columns + JSON blobs (single table)
-                  eav      - Entity-Attribute-Value (two tables)
-                  combined - Tiered approach (hot/warm/cold, with var_blob_json)
-                  compcom  - Compact combined (hot/warm, no cold blob in Druid)
-                  default  - All message fields as columns (dot-separated names)
+                  default  - Required top-level fields + warm variables; arrays go to dedicated datasource
+                  compcom  - Deprecated alias to default
             """.trimIndent())
         }
         

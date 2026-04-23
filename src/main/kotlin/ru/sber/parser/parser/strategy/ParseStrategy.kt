@@ -8,14 +8,10 @@ import ru.sber.parser.model.BpmMessage
  * Определяет контракт для различных подходов к преобразованию
  * данных BPM-процессов в записи, готовые для загрузки в Druid.
  * 
- * Реализации:
- * ┌───────────────────┬────────────────────────────────────────┐
- * │ HybridStrategy    │ Один datasource с wide columns + blobs│
- * │ EavStrategy       │ Два datasource: события + переменные  │
- * │ CombinedStrategy  │ Два datasource: main + indexed vars   │
- * │ CompcomStrategy   │ Два datasource: compact main + indexed │
- * │ DefaultStrategy   │ Один datasource, все поля как колонки│
- * └───────────────────┴────────────────────────────────────────┘
+ * Реализация:
+ * ┌───────────────────┬──────────────────────────────────────────────────────────────┐
+ * │ DefaultStrategy   │ Основной datasource + отдельный datasource для массивов vars │
+ * └───────────────────┴──────────────────────────────────────────────────────────────┘
  * 
  * Паттерн Strategy позволяет:
  * - Выбирать подход к хранению данных без изменения кода
@@ -29,11 +25,7 @@ import ru.sber.parser.model.BpmMessage
  * druidClient.ingest(strategy.dataSourceName, records)
  * ```
  * 
- * @see HybridStrategy один datasource с колонками и блобами
- * @see EavStrategy EAV-схема с событиями и переменными
- * @see CombinedStrategy main record + индексная таблица
- * @see CompcomStrategy compact main record + индексная таблица
- * @see DefaultStrategy все поля сообщения как отдельные колонки (имя с точкой)
+ * @see DefaultStrategy обязательные top-level поля + warm-переменные и отдельный слой массивов
  */
 interface ParseStrategy {
     /**
@@ -63,11 +55,7 @@ interface ParseStrategy {
      * Преобразует одно BPM-сообщение в список записей Druid.
      * 
      * Количество записей зависит от стратегии:
-     * - HybridStrategy: 1 запись на сообщение
-     * - EavStrategy: 1 событие + N переменных
-     * - CombinedStrategy: 1 main + N indexed vars
-     * - CompcomStrategy: 1 compact main + N indexed vars
-     * - DefaultStrategy: 1 запись на сообщение (все поля — колонки)
+     * - DefaultStrategy: main запись + записи массивов в отдельный datasource
      * 
      * Каждая запись — это Map, готовая для JSON-сериализации
      * и отправки в Druid ingestion API.

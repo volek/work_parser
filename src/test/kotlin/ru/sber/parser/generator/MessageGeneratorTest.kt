@@ -69,10 +69,43 @@ class MessageGeneratorTest {
     @Test
     fun `should generate message with nodeInstances`() {
         val message = generator.generateMessage("TestProcess", 1)
-        
-        assertTrue(message.containsKey("nodeInstances"))
-        val nodes = message["nodeInstances"] as? List<*>
+
+        val variables = message["variables"] as? Map<*, *>
+        val nodes = variables?.get("nodeInstances") as? List<*>
         assertNotNull(nodes)
+        assertTrue(nodes!!.isNotEmpty())
+    }
+
+    @Test
+    fun `should generate many nested arrays for stress scenarios`() {
+        val messages = (1..40).map { i -> generator.generateMessage("TestProcess", i) }
+        val variablesList = messages.mapNotNull { it["variables"] as? Map<*, *> }
+        val arraysPerMessage = variablesList.map { vars ->
+            vars.values.count { it is List<*> }
+        }
+
+        assertTrue(arraysPerMessage.any { it >= 4 })
+        assertTrue(arraysPerMessage.any { it >= 10 })
+        assertTrue(variablesList.any { vars ->
+            val operations = vars["operations"] as? List<*> ?: return@any false
+            operations.isNotEmpty()
+        })
+        assertTrue(variablesList.any { vars ->
+            val profile = vars["arrayDepthProfile"] as? List<*> ?: return@any false
+            profile.isNotEmpty()
+        })
+    }
+
+    @Test
+    fun `should generate array profile with nested objects`() {
+        val message = generator.generateMessage("TestProcess", 15)
+        val variables = message["variables"] as? Map<*, *> ?: error("variables missing")
+        val profile = variables["arrayDepthProfile"] as? List<*> ?: error("arrayDepthProfile missing")
+        val profileString = profile.toString()
+
+        assertTrue(profileString.contains("targetDepth"))
+        assertTrue(profileString.contains("payload"))
+        assertTrue(profileString.contains("code=DEPTH_"))
     }
     
     @Test

@@ -5,13 +5,21 @@
 # Использование:
 #   COORDINATOR_URL=http://druid-host:8081 ./scripts/clean-druid-remote.sh
 #   ./scripts/clean-druid-remote.sh http://druid-host:8081
+#   ./scripts/clean-druid-remote.sh --target legacy http://druid-host:8081
 #
 # Удаляются только datasource'ы, создаваемые BPM Parser:
 #   Hybrid:   hybrid_process_hybrid
 #   EAV:      eav_process_events, eav_process_variables
 #   Combined: combined_process_main, combined_process_variables_indexed
 #   Compcom:  compcom_process_main_compact, compcom_process_variables_indexed
-#   Default:  default_process_default
+#   Default (legacy): default_process_default
+#   Default (new):    default_process_default, default_process_variables_array_indexed
+#
+# Управление наборами datasource:
+#   DRUID_CLEANUP_TARGET=all      # по умолчанию: legacy + new
+#   DRUID_CLEANUP_TARGET=legacy   # только старые стратегии (hybrid/eav/combined/compcom + default main)
+#   DRUID_CLEANUP_TARGET=default  # только текущие default datasource
+#   --target all|legacy|default   # CLI-параметр (приоритетнее DRUID_CLEANUP_TARGET)
 #
 # Требуется URL Coordinator (порт 8081), не Router (8888).
 #
@@ -21,6 +29,24 @@
 # =============================================================================
 
 set -euo pipefail
+
+usage() {
+  cat <<EOF
+Usage:
+  COORDINATOR_URL=http://host:8081 $0 [--target all|legacy|default]
+  DRUID_COORDINATOR_URL=http://host:8081 $0 [--target all|legacy|default]
+  $0 [--target all|legacy|default] http://host:8081
+
+Datasource cleanup target:
+  --target all|legacy|default
+    all     - legacy + new default datasource (default)
+    legacy  - only old strategies datasource
+    default - only current default datasource
+
+Environment fallback:
+  DRUID_CLEANUP_TARGET=all|legacy|default
+EOF
+}
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -115,12 +141,44 @@ read_config_druid_auth() {
 }
 
 CONFIG_COORD="$(read_config_coordinator_url "$CONFIG_FILE")"
-COORDINATOR_URL="${COORDINATOR_URL:-${DRUID_COORDINATOR_URL:-${1:-${CONFIG_COORD:-}}}}"
+TARGET_ARG=""
+POSITIONAL_COORDINATOR_URL=""
+while (($# > 0)); do
+  case "$1" in
+    --target)
+      if (($# < 2)); then
+        echo "ERROR: --target requires a value (all|legacy|default)" >&2
+        usage
+        exit 1
+      fi
+      TARGET_ARG="$2"
+      shift 2
+      ;;
+    --target=*)
+      TARGET_ARG="${1#*=}"
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      if [[ -z "$POSITIONAL_COORDINATOR_URL" ]]; then
+        POSITIONAL_COORDINATOR_URL="$1"
+        shift
+      else
+        echo "ERROR: Unexpected argument: $1" >&2
+        usage
+        exit 1
+      fi
+      ;;
+  esac
+done
+
+COORDINATOR_URL="${COORDINATOR_URL:-${DRUID_COORDINATOR_URL:-${POSITIONAL_COORDINATOR_URL:-${CONFIG_COORD:-}}}}"
 if [[ -z "$COORDINATOR_URL" ]]; then
-  echo "Usage: COORDINATOR_URL=http://host:8081 $0"
-  echo "   or: DRUID_COORDINATOR_URL=http://host:8081 $0"
-  echo "   or: $0 http://host:8081"
-  echo ""
+  usage
+  echo
   echo "Coordinator URL was not found in ENV or config file: $CONFIG_FILE"
   exit 1
 fi
@@ -138,7 +196,7 @@ fi
 DRUID_USERNAME="${DRUID_USERNAME:-${CONFIG_USERNAME:-}}"
 DRUID_PASSWORD="${DRUID_PASSWORD:-${CONFIG_PASSWORD:-}}"
 
-DATASOURCES=(
+LEGACY_DATASOURCES=(
   hybrid_process_hybrid
   eav_process_events
   eav_process_variables
@@ -148,6 +206,41 @@ DATASOURCES=(
   compcom_process_variables_indexed
   default_process_default
 )
+
+NEW_DEFAULT_DATASOURCES=(
+  default_process_default
+  default_process_variables_array_indexed
+)
+
+CLEANUP_TARGET_RAW="${TARGET_ARG:-${DRUID_CLEANUP_TARGET:-all}}"
+CLEANUP_TARGET="$(echo "$CLEANUP_TARGET_RAW" | tr '[:upper:]' '[:lower:]' | xargs)"
+case "$CLEANUP_TARGET" in
+  all)
+    DATASOURCES=("${LEGACY_DATASOURCES[@]}" "${NEW_DEFAULT_DATASOURCES[@]}")
+    ;;
+  legacy)
+    DATASOURCES=("${LEGACY_DATASOURCES[@]}")
+    ;;
+  default)
+    DATASOURCES=("${NEW_DEFAULT_DATASOURCES[@]}")
+    ;;
+  *)
+    echo "ERROR: Unknown cleanup target '$CLEANUP_TARGET_RAW' (expected: all|legacy|default)" >&2
+    exit 1
+    ;;
+esac
+
+# Deduplicate preserving order.
+declare -A _seen_ds=()
+declare -a _uniq_ds=()
+for _ds in "${DATASOURCES[@]}"; do
+  if [[ -z "${_seen_ds["$_ds"]+x}" ]]; then
+    _uniq_ds+=("$_ds")
+    _seen_ds["$_ds"]=1
+  fi
+done
+DATASOURCES=("${_uniq_ds[@]}")
+unset _ds
 
 POLL_SECONDS="${DRUID_CLEANUP_POLL_SECONDS:-3}"
 TIMEOUT_SECONDS="${DRUID_CLEANUP_TIMEOUT_SECONDS:-180}"

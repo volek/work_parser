@@ -1,6 +1,5 @@
 package ru.sber.parser.parser
 
-import ru.sber.parser.model.druid.ProcessVariableRecord
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.format.DateTimeParseException
@@ -107,7 +106,7 @@ class VariableFlattener {
             // Обработка null-значений
             null -> {
                 if (currentPath.isNotEmpty()) {
-                    result.add(FlattenedVariable(currentPath, null, ProcessVariableRecord.TYPE_NULL))
+                    result.add(FlattenedVariable(currentPath, null, TYPE_NULL))
                 }
             }
             // Обработка вложенных объектов (Map)
@@ -115,7 +114,7 @@ class VariableFlattener {
                 val map = obj as Map<String, Any?>
                 if (map.isEmpty() && currentPath.isNotEmpty()) {
                     // Пустой объект сохраняем как JSON
-                    result.add(FlattenedVariable(currentPath, "{}", ProcessVariableRecord.TYPE_JSON))
+                    result.add(FlattenedVariable(currentPath, "{}", TYPE_JSON))
                 } else {
                     // Рекурсивно обходим все ключи
                     map.forEach { (key, value) ->
@@ -128,7 +127,7 @@ class VariableFlattener {
             is List<*> -> {
                 if (obj.isEmpty() && currentPath.isNotEmpty()) {
                     // Пустой массив сохраняем как JSON
-                    result.add(FlattenedVariable(currentPath, "[]", ProcessVariableRecord.TYPE_JSON))
+                    result.add(FlattenedVariable(currentPath, "[]", TYPE_JSON))
                 } else {
                     // Рекурсивно обходим все элементы с индексами
                     obj.forEachIndexed { index, item ->
@@ -143,15 +142,15 @@ class VariableFlattener {
             }
             // Обработка чисел
             is Number -> {
-                result.add(FlattenedVariable(currentPath, obj.toString(), ProcessVariableRecord.TYPE_NUMBER))
+                result.add(FlattenedVariable(currentPath, obj.toString(), TYPE_NUMBER))
             }
             // Обработка булевых значений
             is Boolean -> {
-                result.add(FlattenedVariable(currentPath, obj.toString(), ProcessVariableRecord.TYPE_BOOLEAN))
+                result.add(FlattenedVariable(currentPath, obj.toString(), TYPE_BOOLEAN))
             }
             // Fallback для неизвестных типов
             else -> {
-                result.add(FlattenedVariable(currentPath, obj.toString(), ProcessVariableRecord.TYPE_STRING))
+                result.add(FlattenedVariable(currentPath, obj.toString(), TYPE_STRING))
             }
         }
     }
@@ -167,9 +166,9 @@ class VariableFlattener {
      */
     private fun detectStringType(value: String): String {
         if (isDateTimeString(value)) {
-            return ProcessVariableRecord.TYPE_DATE
+            return TYPE_DATE
         }
-        return ProcessVariableRecord.TYPE_STRING
+        return TYPE_STRING
     }
     
     /**
@@ -323,5 +322,14 @@ class VariableFlattener {
         
         /** Wildcard для всех элементов массива: [*] */
         object Wildcard : PathPart()
+    }
+
+    companion object {
+        const val TYPE_STRING = "string"
+        const val TYPE_NUMBER = "number"
+        const val TYPE_BOOLEAN = "boolean"
+        const val TYPE_DATE = "date"
+        const val TYPE_JSON = "json"
+        const val TYPE_NULL = "null"
     }
 }

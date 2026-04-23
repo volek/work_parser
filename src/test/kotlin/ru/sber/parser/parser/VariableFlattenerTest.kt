@@ -195,7 +195,7 @@ class VariableFlattenerTest {
             )
         )
         
-        val value = flattener.extractByPath(variables, "epkData.epkEntity.ucpId")
+        val value = flattener.extractValue(variables, "epkData.epkEntity.ucpId")
         
         assertEquals("UCP123", value)
     }
@@ -206,7 +206,7 @@ class VariableFlattenerTest {
             "field1" to "value1"
         )
         
-        val value = flattener.extractByPath(variables, "nonExistent.path")
+        val value = flattener.extractValue(variables, "nonExistent.path")
         
         assertNull(value)
     }
@@ -220,7 +220,7 @@ class VariableFlattenerTest {
             )
         )
         
-        val value = flattener.extractByPath(variables, "items[1].name")
+        val value = flattener.extractValue(variables, "items[1].name")
         
         assertEquals("second", value)
     }

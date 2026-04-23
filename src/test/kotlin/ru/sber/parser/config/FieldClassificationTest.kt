@@ -51,17 +51,17 @@ class FieldClassificationTest {
     }
     
     @Test
-    fun `should include answerGFL in tier 2 warm categories`() {
+    fun `should include tracingHeaders in tier 2 warm categories`() {
         val classification = FieldClassification.default()
-        
-        assertTrue(classification.tier2WarmCategories.containsKey("answerGFL"))
+
+        assertTrue(classification.tier2WarmCategories.containsKey("tracingHeaders"))
     }
     
     @Test
-    fun `should include nodeInstances in tier 3 cold blobs`() {
+    fun `should include answerGFL in tier 3 cold blobs`() {
         val classification = FieldClassification.default()
-        
-        assertTrue(classification.tier3ColdBlobs.contains("nodeInstances"))
+
+        assertTrue(classification.tier3ColdBlobs.contains("answerGFL"))
     }
     
     @Test
@@ -70,8 +70,8 @@ class FieldClassificationTest {
         
         val epkIdMapping = classification.tier1HotColumns.find { it.sourcePath == "epkId" }
         assertNotNull(epkIdMapping)
-        assertEquals("var_epkId", epkIdMapping?.columnName)
-        assertEquals(FieldType.STRING, epkIdMapping?.fieldType)
+        assertEquals("var_epkId", epkIdMapping?.targetColumn)
+        assertEquals(FieldType.STRING, epkIdMapping?.type)
     }
     
     @Test
@@ -80,7 +80,7 @@ class FieldClassificationTest {
         
         val epkDataPaths = classification.tier2WarmCategories["epkData"]
         assertNotNull(epkDataPaths)
-        assertTrue(epkDataPaths!!.contains("epkEntity"))
+        assertTrue(epkDataPaths!!.any { it.startsWith("epkEntity.") })
     }
     
     @Test

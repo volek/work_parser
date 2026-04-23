@@ -83,9 +83,21 @@ data class AppConfig(
             
             // Собираем итоговую конфигурацию с учётом приоритетов (ENV > file)
             val warmFromEnv = System.getenv("PARSER_WARM_VARIABLES_LIMIT")?.toIntOrNull()
-            val parserConfig = when {
-                warmFromEnv != null -> ParserConfig(warmVariablesLimit = warmFromEnv)
-                else -> fileConfig?.parserConfig
+            val arrayDepthFromEnv = System.getenv("PARSER_ARRAY_MAX_DEPTH")?.toIntOrNull()
+            val arrayBlobFromEnv = System.getenv("PARSER_ARRAY_OBJECT_JSON_BLOB_ENABLED")
+                ?.trim()
+                ?.lowercase()
+                ?.let { it == "true" || it == "1" || it == "yes" }
+
+            val fileParserConfig = fileConfig?.parserConfig
+            val parserConfig = if (warmFromEnv != null || arrayDepthFromEnv != null || arrayBlobFromEnv != null) {
+                ParserConfig(
+                    warmVariablesLimit = warmFromEnv ?: fileParserConfig?.warmVariablesLimit,
+                    arrayMaxDepth = arrayDepthFromEnv ?: fileParserConfig?.arrayMaxDepth,
+                    arrayObjectJsonBlobEnabled = arrayBlobFromEnv ?: fileParserConfig?.arrayObjectJsonBlobEnabled ?: false
+                )
+            } else {
+                fileParserConfig
             }
             return AppConfig(
                 druid = DruidConfig.fromEnvironmentWithFallback(fileConfig?.druid),
@@ -107,7 +119,13 @@ private data class FileConfig(
     val schemaMetastore: SchemaMetastoreFileConfig? = null
 ) {
     val parserConfig: ParserConfig?
-        get() = parser?.let { ParserConfig(warmVariablesLimit = it.warmVariablesLimit) }
+        get() = parser?.let {
+            ParserConfig(
+                warmVariablesLimit = it.warmVariablesLimit,
+                arrayMaxDepth = it.arrayMaxDepth,
+                arrayObjectJsonBlobEnabled = it.arrayObjectJsonBlobEnabled ?: false
+            )
+        }
 }
 
 internal data class SchemaMetastoreFileConfig(
@@ -205,7 +223,9 @@ data class PostgresMetastoreConfig(
  * Настройки парсера (YAML-секция parser).
  */
 private data class ParserFileConfig(
-    val warmVariablesLimit: Int? = null
+    val warmVariablesLimit: Int? = null,
+    val arrayMaxDepth: Int? = null,
+    val arrayObjectJsonBlobEnabled: Boolean? = null
 )
 
 /**
@@ -216,7 +236,9 @@ private data class ParserFileConfig(
  *                              null = без ограничения.
  */
 data class ParserConfig(
-    val warmVariablesLimit: Int? = null
+    val warmVariablesLimit: Int? = null,
+    val arrayMaxDepth: Int? = null,
+    val arrayObjectJsonBlobEnabled: Boolean = false
 ) {
     /**
      * Возвращает лимит, приведённый к допустимому диапазону, или null.
@@ -226,6 +248,12 @@ data class ParserConfig(
         if (v < 10) return null
         if (v > 1010) return 1010
         return v
+    }
+
+    fun effectiveArrayMaxDepth(): Int? {
+        val depth = arrayMaxDepth ?: return null
+        if (depth < 1) return 1
+        return depth
     }
 }
 

@@ -1,12 +1,12 @@
-# Стратегии хранения и выборок в Druid: `hybrid`, `eav`, `combined`, `compcom`, `default`
+# Стратегия хранения и выборок в Druid: `default`
 
-Документ описывает **фактическую реализованную логику** в коде проекта: как сообщения парсятся, как сериализуются в записи для Apache Druid, и как по ним выполняются выборки.
+Документ описывает фактическую реализованную логику в коде проекта после унификации стратегий.
 
 ## Общий пайплайн (для всех стратегий)
 
 1. Команда `parse <strategy> [input-dir]` читает все JSON-файлы из директории (`Application.kt`).
 2. `MessageParser` десериализует каждый JSON в `BpmMessage`.
-3. Выбранная стратегия (`HybridStrategy` / `EavStrategy` / `CombinedStrategy` / `CompcomStrategy`) делает `transform(message)`.
+3. Выбранная стратегия (`DefaultStrategy`) делает `transform(message)`.
 4. На выходе стратегия возвращает `List<Map<String, Any?>>` в формате, пригодном для Druid ingestion.
 5. При `--ingest` `DruidClient.ingest(...)` отправляет inline `index_parallel` task на Overlord:
   - `__time` используется как timestamp-колонка (формат `millis`)
@@ -16,304 +16,39 @@
     - `druid.batchSize` (максимум записей в батче),
     - `druid.maxInlineBytes` (максимальный размер inline NDJSON payload).
 
----
-
-## 1) `hybrid` стратегия
+## `default` стратегия
 
 ## Идея модели
 
-`Hybrid` = **один datasource** с комбинацией:
+`Default` = основная таблица с обязательными верхнеуровневыми полями + отдельная таблица для всех массивов из `variables`.
 
-- hot-поля как отдельные колонки (быстрые фильтры),
-- structured-поля из ключевых вложенных объектов,
-- cold JSON-блобы для полноты.
+- Основной datasource: `default_process_default`.
+- Дополнительный datasource массивов: `default_process_variables_array_indexed`.
+- В основной записи сохраняются только обязательные top-level поля и warm leaf-поля не-массивной природы.
+- Для warm-набора используется конфигурация `tier2WarmCategories` c wildcard `[*]`, как в compcom-подходе.
+- Все array-path значения пишутся в отдельный datasource с полями `var_category`, `var_path`, `var_value`, `var_type`, `value_json`.
+- Поддерживаются:
+  - конфиг глубины парсинга массивов (`parser.arrayMaxDepth`);
+  - JSON blob для вложенных объектов в массивах (`parser.arrayObjectJsonBlobEnabled`).
 
-Datasource: `hybrid_process_hybrid`.
-
-## Как работает парсинг
-
-`HybridStrategy.transform(message)` всегда возвращает **одну запись** (`HybridRecord`) на процесс.
-
-Что извлекается:
-
-- Базовые метаданные процесса: `process_id`, `process_name`, `state`, `module_id`, `business_key`, `version`, `end_date`, `error`.
-- Hot top-level поля (из `tier1HotColumns`, только верхний уровень): `caseId`, `epkId`, `fio`, `ucpId`, `status`, `globalInstanceId`, `INTERACTION_ID`, `INTERACTION_DATE`, `theme`, `result`.
-- Structured поля:
-  - из `staticData`: `caseId`, `clientEpkId`, `casePublicId`, `statusCode`, `registrationTime`, `closedTime`, `classifierVersion`;
-  - из `epkData.epkEntity`: `ucpId`, `clientStatus`, `gender`;
-  - из `tracingHeaders`: `x-request-id`, `x-b3-traceid`.
-- JSON-блобы:
-  - `node_instances_json` (всегда),
-  - `var_epkData_json`,
-  - `var_staticData_json`,
-  - `var_answerGFL_json` (если `answerGFL` есть в cold tier),
-  - `var_other_json` (все переменные вне hot/cold/structured).
-
-## Формат хранения в Druid
-
-Одна строка в `hybrid_process_hybrid` на одно BPM-сообщение.
-
-Ключевые колонки:
-
-- Временная: `__time` (epoch millis из `startDate`).
-- Идентификатор: `process_id`.
-- Hot: `var_caseId`, `var_epkId`, `var_fio`, `var_ucpId`, ...
-- Structured: `var_staticData_`*, `var_epkData_*`, `var_tracingHeaders_*`.
-- JSON: `node_instances_json`, `var_epkData_json`, `var_staticData_json`, `var_answerGFL_json`, `var_other_json`.
-
-Плюс: без JOIN, быстрые фильтры по частым полям.  
-Минус: wide-таблица, часть колонок часто `NULL`.
-
-## Как выбирать данные из Druid (hybrid)
-
-Типовые паттерны:
-
-- Фильтрация по hot-полям:
-  - `WHERE var_epkId = '...'`
-  - `WHERE process_name = '...' AND state = 1`
-- JSON-извлечение:
-  - `JSON_VALUE(var_epkData_json, '$.epkEntity.names[0].surname')`
-  - `JSON_VALUE(var_answerGFL_json, '$.Status.StatusCode')`
-- Аналитика по времени:
-  - `WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '24' HOUR`
-  - группировки по `process_name`, `state`, `module_id`.
-
-Примеры в проекте: `query/hybrid/q01_select_all.sql`, `query/hybrid/q04_filter_by_epkId.sql`, `query/hybrid/q41_json_answerGFL_check.sql`, `query/hybrid/q51_json_surname_extract.sql`.
-
----
-
-## 2) `eav` стратегия
-
-## Идея модели
-
-`EAV` (Entity-Attribute-Value) = **два datasource**:
-
-- `eav_process_events` — 1 запись на процесс (метаданные),
-- `eav_process_variables` — N записей на процесс (переменные как пары path/value/type).
+Плюс: управляемая схема, массивы вынесены в отдельный datasource, warm-пути конфигурируемы.  
+Минус: аналитика по массивам требует отдельного источника.
 
 ## Как работает парсинг
 
-`EavStrategy.transform(message)` делает:
-
-1. `createEventRecord(...)` -> 1 `ProcessEventRecord`.
-2. `createVariableRecords(...)`:
-  - `VariableFlattener.flatten(message.variables)` рекурсивно сплющивает JSON:
-    - вложенность: `a.b.c`
-    - массивы: `items[0].name`
-  - для каждого leaf-значения создается `ProcessVariableRecord(process_id, __time, var_path, var_value, var_type)`.
-
-Поддерживаемые `var_type`:
-
-- `string`, `number`, `boolean`, `date`, `json`, `null`.
-
-## Формат хранения в Druid
-
-### `eav_process_events`
-
-- `process_id`, `__time`, `process_name`, `state`, `module_id`, `business_key`, `root_instance_id`, `parent_instance_id`, `version`, `end_date`, `error`, `node_instances_json`.
-
-### `eav_process_variables`
-
-- `process_id`, `__time`, `var_path`, `var_value`, `var_type`.
-
-Кардинальность:
-
-- 1 строка в `eav_process_events` + много строк в `eav_process_variables` на каждое сообщение.
-
-Плюс: максимальная гибкость без миграций схемы при новых переменных.  
-Минус: тяжелее аналитика «по процессу целиком», часто нужен JOIN/self-JOIN.
-
-## Как выбирать данные из Druid (eav)
-
-Типовые паттерны:
-
-- Получить все значения конкретного атрибута:
-  - `WHERE var_path = 'epkId'`
-- Найти вложенные атрибуты:
-  - `WHERE var_path LIKE 'epkData.epkEntity.%'`
-- Собрать несколько атрибутов в одну строку:
-  - self-JOIN `eav_process_variables` по `process_id` для `epkId`, `caseId`, `fio`, и т.д.
-- Связать метаданные процесса и переменные:
-  - JOIN `eav_process_events` + `eav_process_variables` по `process_id` (и при необходимости по `__time`).
-
-Примеры в проекте: `query/eav/q01_select_events.sql`, `query/eav/q02_select_variables.sql`, `query/eav/q03_join_epkId.sql`, `query/eav/q04_join_caseId.sql`, `query/eav/q07_nested_epkData.sql`.
-
----
-
-## 3) `combined` стратегия
-
-## Идея модели
-
-`Combined` = tier-подход с **двумя datasource**:
-
-- `combined_process_main` — основная wide-строка на процесс (hot + structured + cold blob),
-- `combined_process_variables_indexed` — индексированные warm-переменные (`var_category`, `var_path`, `var_value`, `var_type`).
-
-Это компромисс между `hybrid` (быстро и просто) и `eav` (гибко).
-
-## Как работает парсинг
-
-`CombinedStrategy.transform(message)` делает:
-
-1. `createMainRecord(...)`:
-  - пишет базовые поля процесса;
-  - вынимает hot и structured поля (аналогично hybrid);
-  - сериализует `node_instances_json`;
-  - собирает cold-переменные из `tier3ColdBlobs` в `var_blob_json`.
-2. `createWarmVariableRecords(...)`:
-  - для каждой категории из `tier2WarmCategories` (`epkData`, `staticData`, `tracingHeaders`, `startAttributes`, `inputCC`, `inputDC`) извлекает объект;
-  - сплющивает через `VariableFlattener`;
-  - фильтрует пути по конфигурации категории, включая wildcard `[*]`;
-  - создает запись в `combined_process_variables_indexed`;
-  - **ограничение по количеству**: при заданном `maxWarmVariables` (конфиг `parser.warmVariablesLimit`) сохраняется не более N записей warm-переменных на сообщение.
-  Фактическая нормализация в коде (`ParserConfig.effectiveWarmVariablesLimit()`):
-    - `< 10` -> лимит отключается (`null`),
-    - `10..1010` -> используется как есть,
-    - `> 1010` -> обрезается до `1010`.
-
-## Формат хранения в Druid
-
-### `combined_process_main`
-
-- Метаданные процесса + hot/structured колонки.
-- JSON: `node_instances_json`, `var_blob_json`.
-- 1 строка на сообщение.
-
-### `combined_process_variables_indexed`
-
-- `process_id`, `__time`, `var_category`, `var_path`, `var_value`, `var_type`.
-- N строк на сообщение только по warm-категориям/разрешенным путям.
-
-Плюс: частые фильтры быстрые, редкие атрибуты доступны через индексный слой.  
-Минус: два datasource, усложнение запросов/загрузки.
-
-## Как выбирать данные из Druid (combined)
-
-Типовые паттерны:
-
-- Hot-поиск в `combined_process_main`:
-  - `WHERE var_epkId = '...'`
-  - `WHERE var_caseId = '...'`
-- Warm-поиск в `combined_process_variables_indexed`:
-  - `WHERE var_category = 'epkData' AND var_path = 'epkEntity.ucpId'`
-- Объединение main + indexed:
-  - JOIN по `process_id` (и при необходимости по времени).
-- Доступ к cold-части:
-  - `JSON_VALUE(var_blob_json, '$.answerGFL...')` и подобные JSON-path выборки.
-
-Примеры в проекте: `query/combined/q01_select_main.sql`, `query/combined/q02_select_indexed_vars.sql`, `query/combined/q03_filter_epkId.sql`, `query/combined/q06_join_with_indexed.sql`, `query/combined/q09_gfl_category.sql`.
-
----
-
-## 4) `compcom` стратегия (compact combined)
-
-## Идея модели
-
-`Compcom` = тот же tier-подход, что и `combined`, но **без сохранения cold blob в Druid**:
-
-- `compcom_process_main_compact` — основная wide-строка на процесс (hot + structured), **без колонки `var_blob_json`**;
-- `compcom_process_variables_indexed` — те же индексированные warm-переменные, что и у `combined`.
-
-Используется, когда холодные переменные не нужны в Druid (экономия места и упрощение схемы).
-
-## Как работает парсинг
-
-`CompcomStrategy.transform(message)` делает:
-
-1. `createMainRecord(...)` — как в combined, но cold-данные не собираются; в запись не попадает `var_blob_json` (в Druid этот столбец отсутствует).
-2. `createWarmVariableRecords(...)` — так же, как в combined, с поддержкой лимита `maxWarmVariables` (конфиг `parser.warmVariablesLimit`, см. правила нормализации выше).
-
-## Формат хранения в Druid
-
-### `compcom_process_main_compact`
-
-- Метаданные процесса + hot/structured колонки + `node_instances_json`.
-- **Нет** колонки `var_blob_json`.
-
-### `compcom_process_variables_indexed`
-
-- Совпадает со стратегией combined: `process_id`, `__time`, `var_category`, `var_path`, `var_value`, `var_type`.
-
-Плюс: меньше объём в Druid, нет cold-блоба.  
-Минус: доступ к холодным переменным через Druid невозможен.
-
----
-
-## 5) `default` стратегия
-
-## Идея модели
-
-`Default` = «плоская» wide‑таблица: **один datasource, все поля сообщения как отдельные колонки**.
-
-- Datasource: `default_process_default`.
-- Поля верхнего уровня (`id`, `process_id`, `process_name`, `state`, `start_date` и т.п.) хранятся в `snake_case`.
-- Все переменные процесса пишутся как колонки c префиксом `variables.` и путём через точку:
-  - `variables.caseId`
-  - `variables.staticData.clientEpkId`
-  - `variables.epkData.epkEntity.ucpId`
-- `node_instances` хранится в одной колонке как JSON‑строка.
-
-Плюс: самая простая модель, **нет JOIN и нет EAV‑слоя**, любые переменные сразу доступны как колонки.  
-Минус: очень wide‑таблица, число колонок растёт с разнообразием переменных; схема менее контролируема по сравнению с `hybrid`/`combined`.
-
-## Как работает парсинг
-
-`DefaultStrategy.transform(message)`:
-
-- ставит `__time` = `startDate` в millis;
-- заполняет все поля верхнего уровня в `snake_case`;
-- сериализует `node_instances` в JSON‑строку колонку `node_instances`;
-- сплющивает `variables` через `VariableFlattener` и для каждого leaf‑значения создаёт колонку `variables.<path>`.
-
-На выходе всегда **одна запись на сообщение**.
+`DefaultStrategy.transformBatch(messages)`:
+- формирует main record с обязательными top-level полями;
+- извлекает warm-поля по `tier2WarmCategories`;
+- не-массивные warm leaf значения пишет в `variables.<path>` основной записи;
+- все массивные значения и JSON blobs массивных объектов пишет в `default_process_variables_array_indexed`;
+- применяет лимит глубины массивов и лимит числа warm-переменных (если задан).
 
 ## Как выбирать данные из Druid (default)
 
 Типовые паттерны:
-
-- Фильтрация по метаданным процесса:
-  - `WHERE process_name = '...' AND state = 1`
-- Поиск по переменным:
-  - `WHERE variables.caseId = '...'`
-  - `WHERE variables.epkData.epkEntity.ucpId = '...'`
-- Вытаскивание вложенных структур из `node_instances`:
-  - `JSON_VALUE(node_instances, '$[0].nodeId')` (если нужна работа с JSON‑массивом нод).
-
----
-
-## Важный нюанс текущей реализации CLI ingestion
-
-В `Application.kt` при `parse <strategy> --ingest` выполняется:
-
-- `messages.flatMap { strategy.transform(it) }`,
-- затем **один вызов** `client.ingest(strategy.dataSourceName, records)`.
-
-Для `hybrid` это корректно (один datasource).  
-Для `eav`, `combined` и `compcom` записи обоих типов формируются и отправляются через `transformBatch(...)` с раздельным `ingest` по каждому datasource (в коде это уже реализовано).
-
-Технические детали ingest в `DruidClient`:
-
-- task type: `index_parallel`;
-- input source: `inline` (NDJSON в поле `data`);
-- timestamp: `timestampSpec.column = "__time"`, `format = "millis"`;
-- dimensions формируются из ключей первой записи батча (кроме `__time`);
-- тип dimensions определяется эвристикой `inferDruidType`: `Long/Int -> long`, `Double/Float -> double`, иначе `string`.
-
-Лимит warm-переменных для `combined` и `compcom` задаётся в конфиге: `parser.warmVariablesLimit`.
-Нормализация фактически такая: `<10` отключает лимит, `10..1010` оставляет значение, `>1010` обрезает до `1010`.
-Без значения — сохраняются все сформированные warm-записи.
-
----
-
-## Быстрое сравнение
-
-
-| Стратегия  | Datasource                                          | Записей на 1 процесс | Сильная сторона                    | Ограничение                      |
-| ---------- | --------------------------------------------------- | -------------------- | ---------------------------------- | -------------------------------- |
-| `hybrid`   | `hybrid_process_hybrid`                                               | 1                    | Простые и быстрые запросы без JOIN | Частично wide/NULL-heavy         |
-| `eav`      | `eav_process_events`, `eav_process_variables`                         | 1 + N                | Максимальная гибкость схемы        | Сложные JOIN/self-JOIN           |
-| `combined` | `combined_process_main`, `combined_process_variables_indexed`         | 1 + N(warm)          | Баланс скорости и гибкости + cold  | 2 datasource, cold blob в Druid  |
-| `compcom`  | `compcom_process_main_compact`, `compcom_process_variables_indexed`   | 1 + N(warm)          | Как combined без cold blob         | 2 datasource, нет cold в Druid   |
-| `default`  | `default_process_default`                                             | 1                    | Максимально простой мэппинг полей  | Очень wide‑таблица, динамическая |
+- по main: `WHERE process_name = '...' AND state = 1`
+- по warm не-массивам: `WHERE variables.staticData.caseId = '...'`
+- по массивам: выборка из `default_process_variables_array_indexed` по `var_category` + `var_path`
+- по blob-объектам массива: фильтрация по `value_json` через `JSON_VALUE`.
 
 

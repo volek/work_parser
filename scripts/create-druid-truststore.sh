@@ -14,12 +14,12 @@ set -euo pipefail
 #   ./scripts/create-druid-truststore.sh <host> <port> <output_store> <store_pass>
 #
 # Значения по умолчанию:
-#   host         omltd-abyss-sdp2-druid-10.opsmon.sbt
+#   host         omltd-abyss-sdp2-druid-09.opsmon.sbt
 #   port         8290
 #   output_store druid-truststore.p12
 #   store_pass   changeit
 
-HOST="${1:-omltd-abyss-sdp2-druid-10.opsmon.sbt}"
+HOST="${1:-omltd-abyss-sdp2-druid-09.opsmon.sbt}"
 PORT="${2:-8290}"
 STORE="${3:-druid-truststore.p12}"
 PASS="${4:-changeit}"

@@ -63,6 +63,7 @@ class MessageGenerator {
     
     /** Генератор случайных чисел с seed для воспроизводимости */
     private val random = Random(System.currentTimeMillis())
+    private val randomArrayMaxDepth = 5
     
     // === Справочники для генерации реалистичных данных ===
     
@@ -396,7 +397,7 @@ class MessageGenerator {
         }
         
         addProcessSpecificVariables(variables, processName)
-        addAdditionalArrayVariables(variables, startDate)
+        addAdditionalArrayVariables(variables, startDate, messageIndex)
         
         // Часть сообщений содержит дополнительные переменные-массивы разной длины и типов
         if (messageIndex % 3 != 1) { // ~2/3 сообщений с массивами
@@ -417,15 +418,28 @@ class MessageGenerator {
      * Добавляет в variables несколько переменных-массивов разной длины и с элементами разных типов.
      */
     private fun addRandomArrayVariables(variables: MutableMap<String, Any?>, messageIndex: Int) {
-        @Suppress("UNUSED_VARIABLE")
-        val ignoredMessageIndex = messageIndex
-        val count = random.nextInt(2, 6)
-        val namesPool = arrayVariableNames.shuffled(random)
+        val isHeavyArrayMessage = messageIndex % 10 == 0
+        val count = if (isHeavyArrayMessage) random.nextInt(10, 16) else random.nextInt(2, 6)
+        val namesPool = if (count > arrayVariableNames.size) {
+            buildList {
+                var sequence = 0
+                while (size < count) {
+                    arrayVariableNames.shuffled(random).forEach { base ->
+                        if (size < count) {
+                            add("${base}_$sequence")
+                            sequence++
+                        }
+                    }
+                }
+            }
+        } else {
+            arrayVariableNames.shuffled(random).take(count)
+        }
         (0 until count).forEach { i ->
             val name = namesPool[i]
-            val minLen = listOf(0, 0, 1, 2).random()
-            val maxLen = listOf(3, 5, 8, 12, 20).random()
-            variables[name] = generateRandomArray(minLen, maxLen)
+            val minLen = if (isHeavyArrayMessage) listOf(1, 2, 3).random() else listOf(0, 0, 1, 2).random()
+            val maxLen = if (isHeavyArrayMessage) listOf(12, 20, 30).random() else listOf(3, 5, 8, 12, 20).random()
+            variables[name] = generateRandomArray(minLen, maxLen, depth = 0, maxDepth = randomArrayMaxDepth)
         }
     }
     
@@ -434,17 +448,22 @@ class MessageGenerator {
      * String, Int, Long, Double, Boolean, null, Map, вложенный List.
      * @param depth Глубина вложенности (для ограничения рекурсии при вложенных списках)
      */
-    private fun generateRandomArray(minLen: Int, maxLen: Int, depth: Int = 0): List<Any?> {
+    private fun generateRandomArray(
+        minLen: Int,
+        maxLen: Int,
+        depth: Int = 0,
+        maxDepth: Int = randomArrayMaxDepth
+    ): List<Any?> {
         val len = random.nextInt(minLen, maxLen.coerceAtLeast(minLen + 1))
-        return (0 until len).map { generateRandomValue(depth) }
+        return (0 until len).map { generateRandomValue(depth, maxDepth) }
     }
     
     /**
      * Генерирует одно значение случайного типа.
      * @param depth Текущая глубина вложенности (для ограничения рекурсии)
      */
-    private fun generateRandomValue(depth: Int): Any? {
-        if (depth > 2) {
+    private fun generateRandomValue(depth: Int, maxDepth: Int): Any? {
+        if (depth >= maxDepth) {
             return listOf(
                 random.nextInt(-1000, 1000),
                 random.nextDouble(-1000.0, 1000.0),
@@ -471,10 +490,10 @@ class MessageGenerator {
                 "value" to (if (random.nextBoolean()) random.nextInt(1, 100) else random.nextDouble(0.0, 100.0)),
                 "active" to random.nextBoolean()
             )
-            9, 10 -> return generateRandomArray(0, 4, depth + 1).takeIf { it.isNotEmpty() }
+            9, 10 -> return generateRandomArray(0, 4, depth + 1, maxDepth).takeIf { it.isNotEmpty() }
             11 -> return mapOf(
                 "key" to "k_${generateHex(3)}",
-                "nested" to generateRandomValue(depth + 1)
+                "nested" to generateRandomValue(depth + 1, maxDepth)
             )
             else -> return random.nextInt(0, 100)
         }
@@ -590,7 +609,8 @@ class MessageGenerator {
      */
     private fun addAdditionalArrayVariables(
         variables: MutableMap<String, Any?>,
-        startDate: OffsetDateTime
+        startDate: OffsetDateTime,
+        messageIndex: Int
     ) {
         // Массив операций по процессу с вложенными массивами шагов и атрибутов.
         variables["operations"] = (1..random.nextInt(1, 4)).map { opIndex ->
@@ -659,6 +679,34 @@ class MessageGenerator {
                 )
             )
         }
+
+        // Добавляем контролируемый профиль глубины массивов, чтобы стабильно покрывать
+        // разные степени вложенности в тестах парсинга.
+        val targetDepth = (messageIndex % randomArrayMaxDepth) + 1
+        variables["arrayDepthProfile"] = generateDepthProfileArray(targetDepth, startDate)
+    }
+
+    private fun generateDepthProfileArray(targetDepth: Int, startDate: OffsetDateTime): List<Any?> {
+        fun nested(level: Int): Any? {
+            if (level >= targetDepth) {
+                return mapOf(
+                    "level" to level,
+                    "timestamp" to startDate.plusMinutes(level.toLong()).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+                    "payload" to mapOf(
+                        "code" to "DEPTH_${targetDepth}_$level",
+                        "active" to true
+                    )
+                )
+            }
+            return listOf(
+                mapOf("level" to level, "kind" to "object"),
+                nested(level + 1)
+            )
+        }
+        return listOf(
+            mapOf("targetDepth" to targetDepth, "rootKind" to "array"),
+            nested(1)
+        )
     }
     
     /** Генерирует структуру телефонного номера с метаданными */
